@@ -2,7 +2,7 @@
 
 Project implements two RSS servers which send updated to clients. The two servers change which is sending the news updated at random intervals. 
 
-## Project Description provided by Professor Khednek:
+## Project Description provided by Professor Khendek:
 
 The Register and Share System (RSS) consists of several clients and two servers. The goal of
 the RSS is to allow for users to share information on subjects of interest and remain up to date
