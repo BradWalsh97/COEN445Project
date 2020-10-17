@@ -1,0 +1,26 @@
+[
+ {
+  "0": {
+   "UserName": "Bob",
+   "Password": "Password123",
+   "Interests": [
+    "Soccer",
+    "Football",
+    "Hockey",
+    "Rugby"
+   ]
+  }
+ },
+ {
+  "1": {
+   "UserName": "Jim",
+   "Password": "Password123",
+   "Interests": [
+    "Soccer",
+    "Football",
+    "Hockey",
+    "Rugby"
+   ]
+  }
+ }
+]
