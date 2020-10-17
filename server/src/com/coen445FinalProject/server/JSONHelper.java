@@ -11,19 +11,23 @@ import java.util.*;
 
 public class JSONHelper {
 
+    //todo: update the return to return if the creation was succesful or not. If not, why did it fail. Return this is the register-denied frame.
     public void saveUserToJSON(User user) throws IOException {
+
         JsonObject jsonObject = new JsonObject();
         JsonObject innerUserObject = new JsonObject();
         ArrayList<String> interests = user.getInterests();
         JsonArray interestArray = new JsonArray();
+
         for (String interest: interests) {
             interestArray.add(interest);
         }
 
         innerUserObject.addProperty("UserName", user.getUserName());
         innerUserObject.addProperty("Password", user.getPassword());
-        //innerUserObject.addProperty("Interests:", user.getInterests().toArray().toString());
         innerUserObject.add("Interests", interestArray);
+        innerUserObject.addProperty("IPAddress", user.getIPAddress());
+        innerUserObject.addProperty("SocketNumber", user.getSocketNumber());
         jsonObject.add(Integer.toString(user.getUserID()), innerUserObject);
 
         writeNewUserToFile(jsonObject, user);

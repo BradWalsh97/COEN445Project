@@ -9,6 +9,10 @@ public class User {
     private String userName;
     private String password;
     private ArrayList<String> interests;
+
+    private String IPAddress;
+
+    private int socketNumber;
     private boolean isDeleted;
 
     User(String Name, String Password){
@@ -18,6 +22,22 @@ public class User {
         this.password = Password;
         this.interests = new ArrayList<String>();
         this.isDeleted = false;
+    }
+
+    public String getIPAddress() {
+        return IPAddress;
+    }
+
+    public void setIPAddress(String IPAddress) {
+        this.IPAddress = IPAddress;
+    }
+
+    public int getSocketNumber() {
+        return socketNumber;
+    }
+
+    public void setSocketNumber(int socketNumber) {
+        this.socketNumber = socketNumber;
     }
 
     public boolean isDeleted() {
