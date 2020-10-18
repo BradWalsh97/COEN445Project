@@ -7,6 +7,16 @@ public class Main {
     public static void main(String[] args) throws IOException, ClassNotFoundException {
         // TODO: 2020-10-18 change package names in both projects 
         Server server = new Server(5001);
+        server.startSerer();
+        while (true) {
+            server.acceptClient();
+            String done = server.checkMessage();
+            if(done.equalsIgnoreCase("done")){
+                break;
+            }
+        }
+
+        server.endConnection();
         /*User user = new User("Bob", "Password123");
         user.addInterest("Soccer");
         user.addInterest("Football");

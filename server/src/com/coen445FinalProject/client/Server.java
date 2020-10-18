@@ -7,6 +7,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Server {
+    private int port;
+    private String line = "";
     private Socket socket = null;
     private ServerSocket serverSocket = null;
     //private DataInputStream dataInputStream = null;
@@ -14,43 +16,52 @@ public class Server {
     private ObjectInputStream objectInputStream = null;
     private ObjectOutputStream objectOutputStream = null;
 
-    public Server(int port) throws IOException, ClassNotFoundException {
+    public Server(int port){
+        this.port = port;
+
+    }
+
+    public void startSerer() throws IOException {
         serverSocket = new ServerSocket(port);
         System.out.println("Server Started");
 
         System.out.println("Waiting for client...");
+    }
 
-        while(true) {
-            socket = serverSocket.accept();
-            System.out.println("Client Connected");
+    public void acceptClient() throws IOException {
+        socket = serverSocket.accept();
+        System.out.println("Client Connected");
 
-            //dataInputStream = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+        objectInputStream = new ObjectInputStream(socket.getInputStream());
+        objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
 
-            objectInputStream = new ObjectInputStream(socket.getInputStream());
-            objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+        bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+    }
 
-            bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+    public void endConnection() throws IOException {
+        System.out.println("Closing Connection");
 
-            String line = "";
+        socket.close();
+        objectInputStream.close();
+        objectOutputStream.close();
+    }
+
+    private Object readObject() throws IOException, ClassNotFoundException {
+        return objectInputStream.readObject();
+    }
+
+    public String checkMessage() throws IOException, ClassNotFoundException {
 
             while (!line.equalsIgnoreCase("Done")) {
-                line = (String)objectInputStream.readObject();
-                System.out.println(line);
+                line = (String) readObject();
 
 
                 if (line.equalsIgnoreCase("complete")) {
-                    User user = (User) objectInputStream.readObject();
-
-                    System.out.println(user.getUserName());
+                    User user = (User) readObject();
                 }
             }
 
-            System.out.println("Closing Connection");
+            return "done";
 
-            socket.close();
-            //dataInputStream.close();
-            objectInputStream.close();
-            objectOutputStream.close();
-        }
     }
 }
