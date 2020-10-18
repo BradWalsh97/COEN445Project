@@ -4,9 +4,9 @@ import java.io.IOException;
 
 public class Main {
 
-    public static void main(String[] args) throws IOException {
-        //Server server = new Server(5001);
-        User user = new User("Bob", "Password123");
+    public static void main(String[] args) throws IOException, ClassNotFoundException {
+        Server server = new Server(5001);
+        /*User user = new User("Bob", "Password123");
         user.addInterest("Soccer");
         user.addInterest("Football");
         user.addInterest("Hockey");
@@ -18,6 +18,6 @@ public class Main {
         user1.addInterest("Rugby");
         JSONHelper helper = new JSONHelper();
         helper.saveUserToJSON(user);
-        helper.saveUserToJSON(user1);
+        helper.saveUserToJSON(user1);*/
     }
 }

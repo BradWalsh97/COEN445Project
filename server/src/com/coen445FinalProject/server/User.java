@@ -1,9 +1,10 @@
 package com.coen445FinalProject.server;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class User {
+public class User implements Serializable {
     private static int nextID = 0;
     private int userID;
     private String userName;
@@ -12,16 +13,18 @@ public class User {
 
     private String IPAddress;
 
-    private int socketNumber;
+    private String socketNumber;
     private boolean isDeleted;
 
-    User(String Name, String Password){
+    User(String Name, String Password, String IPAddress, String socket){
         this.userID = User.nextID;
         User.nextID++;
         this.userName = Name;
         this.password = Password;
         this.interests = new ArrayList<String>();
         this.isDeleted = false;
+        this.IPAddress = IPAddress;
+        this.socketNumber = socket;
     }
 
     public String getIPAddress() {
@@ -32,11 +35,11 @@ public class User {
         this.IPAddress = IPAddress;
     }
 
-    public int getSocketNumber() {
+    public String getSocketNumber() {
         return socketNumber;
     }
 
-    public void setSocketNumber(int socketNumber) {
+    public void setSocketNumber(String socketNumber) {
         this.socketNumber = socketNumber;
     }
 
