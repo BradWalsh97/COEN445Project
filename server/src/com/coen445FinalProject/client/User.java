@@ -1,8 +1,7 @@
-package com.coen445FinalProject.server;
+package com.coen445FinalProject.client;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 
 public class User implements Serializable {
     private static int nextID = 0;

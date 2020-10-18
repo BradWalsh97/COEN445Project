@@ -1,4 +1,6 @@
-package com.coen445FinalProject.server;
+package com.coen445FinalProject.client;
+
+import com.coen445FinalProject.client1.ClientUser;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -8,9 +10,9 @@ public class Server {
     private Socket socket = null;
     private ServerSocket serverSocket = null;
     //private DataInputStream dataInputStream = null;
+    private BufferedReader bufferedReader = null;
     private ObjectInputStream objectInputStream = null;
     private ObjectOutputStream objectOutputStream = null;
-    private User user = null;
 
     public Server(int port) throws IOException, ClassNotFoundException {
         serverSocket = new ServerSocket(port);
@@ -27,22 +29,19 @@ public class Server {
             objectInputStream = new ObjectInputStream(socket.getInputStream());
             objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
 
+            bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+
             String line = "";
 
-            while (!line.equals("Done")) {
-                line = (String) objectInputStream.readObject();
+            while (!line.equalsIgnoreCase("Done")) {
+                line = (String)objectInputStream.readObject();
                 System.out.println(line);
 
-                String oistring = (String)objectInputStream.readObject();
-                //System.out.println(oistring);
-                if (!(oistring instanceof String)) {
-                    user = (User) objectInputStream.readObject();
 
-                    user.setUserName("bob");
-                    user.setIPAddress("localhost");
-                    user.setSocketNumber("5001");
+                if (line.equalsIgnoreCase("complete")) {
+                    User user = (User) objectInputStream.readObject();
 
-                    objectOutputStream.writeObject(user);
+                    System.out.println(user.getUserName());
                 }
             }
 

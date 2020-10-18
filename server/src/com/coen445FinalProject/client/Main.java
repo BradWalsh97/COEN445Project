@@ -1,10 +1,11 @@
-package com.coen445FinalProject.server;
+package com.coen445FinalProject.client;
 
 import java.io.IOException;
 
 public class Main {
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
+        // TODO: 2020-10-18 change package names in both projects 
         Server server = new Server(5001);
         /*User user = new User("Bob", "Password123");
         user.addInterest("Soccer");

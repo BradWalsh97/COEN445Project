@@ -47,7 +47,9 @@ public class Client {
         line = bufferedReader.readLine();
         String pass = line;
         objectOutputStream.writeObject(pass);
+        objectOutputStream.writeObject("complete");
         User user = new User(name, pass, "localhost", "5001");
+        System.out.println(user.getUserName());
         objectOutputStream.writeObject(user);
         //user = (User)objectInputStream.readObject();
 

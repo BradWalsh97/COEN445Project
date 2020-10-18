@@ -1,12 +1,10 @@
-package com.coen445FinalProject.server;
+package com.coen445FinalProject.client;
 import com.google.gson.*;
-import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonWriter;
 
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class JSONHelper {

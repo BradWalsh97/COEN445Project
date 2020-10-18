@@ -1,9 +1,10 @@
-package com.coen445FinalProject.client;
+package com.coen445FinalProject.client1;
+
 
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public class User implements Serializable {
+public class ClientUser implements Serializable {
     private static int nextID = 0;
     private int userID;
     private String userName;
@@ -15,9 +16,9 @@ public class User implements Serializable {
     private String socketNumber;
     private boolean isDeleted;
 
-    User(String Name, String Password, String IPAddress, String socket){
-        this.userID = User.nextID;
-        User.nextID++;
+    ClientUser(String Name, String Password, String IPAddress, String socket){
+        this.userID = com.coen445FinalProject.client1.ClientUser.nextID;
+        com.coen445FinalProject.client1.ClientUser.nextID++;
         this.userName = Name;
         this.password = Password;
         this.interests = new ArrayList<String>();
@@ -79,3 +80,4 @@ public class User implements Serializable {
         this.interests.add(interest);
     }
 }
+
