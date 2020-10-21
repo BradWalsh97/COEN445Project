@@ -1,4 +1,4 @@
-package com.coen445.FinalProject;
+package com.coen445FinalProject.client;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;

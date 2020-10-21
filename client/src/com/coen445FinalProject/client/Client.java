@@ -1,7 +1,9 @@
-package com.coen445.FinalProject;
+package com.coen445FinalProject.client;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.Scanner;
 
 public class Client {
     private String address;
