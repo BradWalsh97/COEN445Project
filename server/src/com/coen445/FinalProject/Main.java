@@ -1,4 +1,4 @@
-package com.coen445FinalProject.client;
+package com.coen445.FinalProject;
 
 import java.io.IOException;
 
@@ -10,13 +10,9 @@ public class Main {
         server.startSerer();
         while (true) {
             server.acceptClient();
-            String done = server.checkMessage();
-            if(done.equalsIgnoreCase("done")){
-                break;
-            }
+            server.checkMessage();
+            server.endConnection();
         }
-
-        server.endConnection();
         /*User user = new User("Bob", "Password123");
         user.addInterest("Soccer");
         user.addInterest("Football");

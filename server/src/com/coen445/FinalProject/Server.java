@@ -1,6 +1,4 @@
-package com.coen445FinalProject.client;
-
-import com.coen445FinalProject.client1.ClientUser;
+package com.coen445.FinalProject;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -50,18 +48,23 @@ public class Server {
         return objectInputStream.readObject();
     }
 
-    public String checkMessage() throws IOException, ClassNotFoundException {
+    public void checkMessage() throws IOException, ClassNotFoundException {
 
             while (!line.equalsIgnoreCase("Done")) {
                 line = (String) readObject();
 
+                if(line.equalsIgnoreCase("register"))
+                    System.out.println(line);
+
 
                 if (line.equalsIgnoreCase("complete")) {
                     User user = (User) readObject();
+
+                    System.out.println(user.getUserName());
                 }
             }
 
-            return "done";
+            //return "done";
 
     }
 }

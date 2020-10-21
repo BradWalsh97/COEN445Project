@@ -1,4 +1,4 @@
-package com.coen445FinalProject.client;
+package com.coen445.FinalProject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
