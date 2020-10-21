@@ -1,4 +1,4 @@
-package com.coen445FinalProject.client;
+package com.coen445.FinalProject;
 
 public class Main {
 

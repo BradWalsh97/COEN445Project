@@ -1,4 +1,4 @@
-package com.coen445FinalProject.server;
+package com.coen445.FinalProject;
 
 import java.io.IOException;
 

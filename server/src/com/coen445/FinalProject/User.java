@@ -1,7 +1,6 @@
-package com.coen445FinalProject.server;
+package com.coen445.FinalProject;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class User {
     private static int nextID = 0;
