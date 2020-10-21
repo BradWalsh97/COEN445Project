@@ -1,4 +1,6 @@
-package com.coen445.FinalProject;
+package com.coen445FinalProject.client;
+
+import com.coen445FinalProject.client1.ClientUser;
 
 import java.io.*;
 import java.net.ServerSocket;
