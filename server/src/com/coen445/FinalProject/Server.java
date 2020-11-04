@@ -1,60 +1,70 @@
 package com.coen445.FinalProject;
 
-import java.io.BufferedInputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Server {
-    //initialize socket and input stream
-    private Socket socket   = null;
-    private ServerSocket server   = null;
-    private DataInputStream in       =  null;
+    private int port;
+    private String line = "";
+    private Socket socket = null;
+    private ServerSocket serverSocket = null;
+    //private DataInputStream dataInputStream = null;
+    private BufferedReader bufferedReader = null;
+    private ObjectInputStream objectInputStream = null;
+    private ObjectOutputStream objectOutputStream = null;
 
-    // constructor with port
-    public Server(int port)
-    {
-        // starts server and waits for a connection
-        try
-        {
-            server = new ServerSocket(port);
-            System.out.println("Server started");
+    public Server(int port){
+        this.port = port;
 
-            System.out.println("Waiting for a client ...");
+    }
 
-            socket = server.accept();
-            System.out.println("Client accepted");
+    public void startSerer() throws IOException {
+        serverSocket = new ServerSocket(port);
+        System.out.println("Server Started");
 
-            // takes input from the client socket
-            in = new DataInputStream(
-                    new BufferedInputStream(socket.getInputStream()));
+        System.out.println("Waiting for client...");
+    }
 
-            String line = "";
+    public void acceptClient() throws IOException {
+        socket = serverSocket.accept();
+        System.out.println("Client Connected");
 
-            // reads message from client until "Over" is sent
-            while (!line.equals("Over"))
-            {
-                try
-                {
-                    line = in.readUTF();
+        objectInputStream = new ObjectInputStream(socket.getInputStream());
+        objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+
+        bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+    }
+
+    public void endConnection() throws IOException {
+        System.out.println("Closing Connection");
+
+        socket.close();
+        objectInputStream.close();
+        objectOutputStream.close();
+    }
+
+    private Object readObject() throws IOException, ClassNotFoundException {
+        return objectInputStream.readObject();
+    }
+
+    public void checkMessage() throws IOException, ClassNotFoundException {
+
+            while (!line.equalsIgnoreCase("Done")) {
+                line = (String) readObject();
+
+                if(line.equalsIgnoreCase("register"))
                     System.out.println(line);
 
-                }
-                catch(IOException i)
-                {
-                    System.out.println(i);
+
+                if (line.equalsIgnoreCase("complete")) {
+                    User user = (User) readObject();
+
+                    System.out.println(user.getUserName());
                 }
             }
-            System.out.println("Closing connection");
 
-            // close connection
-            socket.close();
-            in.close();
-        }
-        catch(IOException i)
-        {
-            System.out.println(i);
-        }
+            //return "done";
+
     }
 }

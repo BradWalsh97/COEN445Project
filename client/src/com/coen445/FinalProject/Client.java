@@ -1,68 +1,67 @@
 package com.coen445.FinalProject;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
-import java.net.UnknownHostException;
 
 public class Client {
-    // initialize socket and input output streams
-    private Socket socket            = null;
-    private DataInputStream input   = null;
-    private DataOutputStream out     = null;
+    private String address;
+    private String line = "";
+    private int port;
+    private Socket socket = null;
+    private BufferedReader bufferedReader = null;
+    //private DataOutputStream dataOutputStream = null;
+    private ObjectOutputStream objectOutputStream = null;
+    private ObjectInputStream objectInputStream = null;
 
-    // constructor to put ip address and port
-    public Client(String address, int port)
-    {
-        // establish a connection
-        try
-        {
-            socket = new Socket(address, port);
-            System.out.println("Connected");
+    public Client(String address, int port) throws IOException, ClassNotFoundException {
+        this.address = address;
+        this.port = port;
+    }
 
-            // takes input from terminal
-            input  = new DataInputStream(System.in);
+    public void connectToServer() throws IOException {
+        socket = new Socket(address,port);
+        System.out.println("Connected");
 
-            // sends output to the socket
-            out    = new DataOutputStream(socket.getOutputStream());
-        }
-        catch(UnknownHostException u)
-        {
-            System.out.println(u);
-        }
-        catch(IOException i)
-        {
-            System.out.println(i);
-        }
+        bufferedReader = new BufferedReader(new InputStreamReader(System.in));
 
-        // string to read message from input
-        String line = "";
+        objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+        objectInputStream = new ObjectInputStream(socket.getInputStream());
+    }
 
-        // keep reading until "Over" is input
-        while (!line.equals("Over"))
-        {
-            try
-            {
-                line = input.readLine();
-                out.writeUTF(line);
-            }
-            catch(IOException i)
-            {
-                System.out.println(i);
-            }
-        }
+    public void closeConnections() throws IOException {
+        bufferedReader.close();
+        objectOutputStream.close();
+        objectInputStream.close();
+        socket.close();
+    }
 
-        // close the connection
-        try
-        {
-            input.close();
-            out.close();
-            socket.close();
-        }
-        catch(IOException i)
-        {
-            System.out.println(i);
+    public String readLine() throws IOException {
+        return bufferedReader.readLine();
+    }
+
+    private void writeObjectToServer(Object object) throws IOException {
+        objectOutputStream.writeObject(object);
+    }
+
+    public void registerClient() throws IOException {
+        writeObjectToServer("REGISTER");
+        System.out.println("Write in username");
+        line = readLine();
+        String name = line;
+        writeObjectToServer(name);
+        System.out.println("Write in password");
+        line = readLine();
+        String pass = line;
+        writeObjectToServer(pass);
+        writeObjectToServer("complete");
+        User user = new User(name, pass, "localhost", "5001");
+        writeObjectToServer(user);
+    }
+
+    public void sendMessage() throws IOException {
+        while(!line.equalsIgnoreCase("Done")){
+            line = readLine();
+            writeObjectToServer(line);
         }
     }
 }
