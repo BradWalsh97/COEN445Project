@@ -28,9 +28,9 @@ public class Server {
         this.registered = r;
     }
 
-    public void startSerer() throws IOException {
+    public void startSever() throws IOException {
         serverSocket = new ServerSocket(port);
-        System.out.println("Server Started");
+        System.out.println("Server started on port " + port);
 
         System.out.println("Waiting for client...");
     }
@@ -79,5 +79,9 @@ public class Server {
 
     public void sendObject(Object object) throws IOException {
         objectOutputStream.writeObject(object);
+    }
+
+    public int getPort() {
+        return port;
     }
 }

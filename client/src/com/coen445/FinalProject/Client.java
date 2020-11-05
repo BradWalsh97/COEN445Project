@@ -43,6 +43,10 @@ public class Client {
         objectOutputStream.writeObject(object);
     }
 
+    public Object readObjectFromServer() throws IOException, ClassNotFoundException {
+        return objectInputStream.readObject();
+    }
+
     public void registerClient() throws IOException {
         writeObjectToServer("REGISTER");
         System.out.println("Write in username");
@@ -63,5 +67,9 @@ public class Client {
             line = readLine();
             writeObjectToServer(line);
         }
+    }
+
+    public void sendMessage(String message) throws IOException{
+        writeObjectToServer(message);
     }
 }

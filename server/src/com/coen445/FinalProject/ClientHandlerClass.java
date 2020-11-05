@@ -21,12 +21,14 @@ public class ClientHandlerClass extends Thread{
         super.run();
         String received = "";
         String toReturn = "";
+        System.out.println("Request on port: " + server.getPort());
         while(true){
             if(!server.getRegistered()){
                 try {
-                    toReturn = "It appears that you are not signed in, would you like to do so?\n" +
-                            "Yes: enter 1\n" +
-                            "No: enter 2";
+//                    toReturn = "It appears that you are not signed in, would you like to do so?\n" +
+//                            "Yes: enter 1\n" +
+//                            "No: enter 2";
+                    toReturn = "TOREGISTER";
                     server.sendObject(toReturn);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -36,8 +38,7 @@ public class ClientHandlerClass extends Thread{
                 //spit the received message. Each part of the frame is separated by a space. Thus
                 //the type of message will be the first element.
                 String[] messageSegments = received.split(" ");
-                String first = messageSegments[0];
-                switch (first) {
+                switch (messageSegments[0].toUpperCase()) {
                     case "REGISTER":
                         try {
                             server.sendObject("REGISTERED");
@@ -46,6 +47,7 @@ public class ClientHandlerClass extends Thread{
                             e.printStackTrace();
                         }
                         break;
+
                     default:
                         throw new IllegalStateException("Unexpected value: " + messageSegments[0].toUpperCase());
                 }
