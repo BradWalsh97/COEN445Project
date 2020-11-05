@@ -10,7 +10,9 @@ public class Main {
         server.startSerer();
         while (true) {
             server.acceptClient();
-            server.checkMessage();
+            Thread t = new ClientHandlerClass(server);
+            t.start();
+            //server.checkMessage();
             server.endConnection();
         }
         /*User user = new User("Bob", "Password123");

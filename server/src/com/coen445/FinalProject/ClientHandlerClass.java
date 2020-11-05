@@ -39,7 +39,12 @@ public class ClientHandlerClass extends Thread{
                 String first = messageSegments[0];
                 switch (first) {
                     case "REGISTER":
-
+                        try {
+                            server.sendObject("REGISTERED");
+                            server.setRegistered(true);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                         break;
                     default:
                         throw new IllegalStateException("Unexpected value: " + messageSegments[0].toUpperCase());

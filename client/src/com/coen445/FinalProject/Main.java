@@ -9,19 +9,19 @@ public class Main {
 	    Client client = new Client("localhost", 5001);
 	    client.connectToServer();
 
-	    while(true) {
-            System.out.println("Would you like to register? yes/no");
-            line = client.readLine();
-            if (!(line.equalsIgnoreCase("yes") || line.equalsIgnoreCase("no"))) {
-                System.out.println("Invalid input. Please enter valid input.");
-            }else{
-                break;
-            }
-        }
-
-        if(line.equalsIgnoreCase("yes")) {
-            client.registerClient();
-        }
+//	    while(true) {
+//            System.out.println("Would you like to register? yes/no");
+//            line = client.readLine();
+//            if (!(line.equalsIgnoreCase("yes") || line.equalsIgnoreCase("no"))) {
+//                System.out.println("Invalid input. Please enter valid input.");
+//            }else{
+//                break;
+//            }
+//        }
+//
+//        if(line.equalsIgnoreCase("yes")) {
+//            client.registerClient();
+//        }
 
         client.sendMessage();
 
