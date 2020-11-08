@@ -9,7 +9,8 @@
 .idea/**/shelf
 .idea/aws.xml
 server/.idea/compiler.xml
-
+server/.idea/*
+client/.idea/*
 # Generated files
 .idea/**/contentModel.xml
 
