@@ -41,6 +41,7 @@ public class ClientHandlerClass extends Thread{
                 switch (messageSegments[0].toUpperCase()) {
                     case "REGISTER":
                         try {
+                            System.out.println("Registered new user");
                             server.sendObject("REGISTERED");
                             server.setRegistered(true);
                         } catch (IOException e) {
