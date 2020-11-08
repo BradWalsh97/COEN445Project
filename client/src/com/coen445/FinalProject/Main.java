@@ -1,5 +1,6 @@
 package com.coen445.FinalProject;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -43,17 +44,36 @@ public class Main {
 
 	    while(true){ //wait for the server to connect, then attempt to register
 
-            Object serverResponse = client.readObjectFromServer(); //first message will be to register
-            if (serverResponse.toString().equalsIgnoreCase("TOREGISTER")) {
-                System.out.println("Registering Client: " + user.getUserName());
-                //format registration frame
-                String register = "REGISTER " + "1 " + user.getUserName() + " " + user.getIPAddress() + " " + user.getSocketNumber();
-                client.sendMessage(register);// second message is one we should send with the desire to register
-                System.out.println(client.readObjectFromServer());
+
+            try{
+                Object serverResponse = client.readObjectFromServer(); //first message will be to register
+                if (serverResponse.toString().equalsIgnoreCase("TOREGISTER")) {
+                    System.out.println("Registering Client: " + user.getUserName());
+                    //format registration frame
+                    String register = "REGISTER " + "1 " + user.getUserName() + " " + user.getIPAddress() + " " + user.getSocketNumber();
+                    client.sendMessage(register);// second message is one we should send with the desire to register
+                    System.out.println(client.readObjectFromServer());
+                }
+                if(client.readLine().equalsIgnoreCase("done")){
+                    break;
+                }
             }
-            if(client.readLine().equalsIgnoreCase("done")){
-                break;
+            catch (IOException e){
+                //if we get this exception here, that means that the server is no longer reachable for some reason.
+                //if this happens we terminate the connection and tell them to try again later.
+                if(e instanceof EOFException){
+                    System.out.println("The RSS server is currently experiencing an outage. \n" +
+                            "Please try again in a few minutes while we work to restore the service! <3");
+                    break;
+                }
+                else
+                    e.printStackTrace();
             }
+            catch(ClassNotFoundException e){
+                e.printStackTrace();
+            }
+
+
             // TODO: 2020-11-04 make the message to be sent automatically a registration frame.
         }
 
