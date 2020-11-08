@@ -8,7 +8,7 @@
 .idea/**/dictionaries
 .idea/**/shelf
 .idea/aws.xml
-.idea/compiler.xml
+server/.idea/compiler.xml
 
 # Generated files
 .idea/**/contentModel.xml
