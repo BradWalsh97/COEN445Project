@@ -8,6 +8,7 @@ public class Server {
     private int port;
     private String line = "";
     private Socket socket = null;
+    private boolean registered = false;
     private ServerSocket serverSocket = null;
     //private DataInputStream dataInputStream = null;
     private BufferedReader bufferedReader = null;
@@ -19,9 +20,17 @@ public class Server {
 
     }
 
-    public void startSerer() throws IOException {
+    public boolean getRegistered(){
+        return this.registered;
+    }
+
+    public void setRegistered(boolean r){
+        this.registered = r;
+    }
+
+    public void startSever() throws IOException {
         serverSocket = new ServerSocket(port);
-        System.out.println("Server Started");
+        System.out.println("Server started on port " + port);
 
         System.out.println("Waiting for client...");
     }
@@ -44,7 +53,7 @@ public class Server {
         objectOutputStream.close();
     }
 
-    private Object readObject() throws IOException, ClassNotFoundException {
+    public Object readObject() throws IOException, ClassNotFoundException {
         return objectInputStream.readObject();
     }
 
@@ -66,5 +75,13 @@ public class Server {
 
             //return "done";
 
+    }
+
+    public void sendObject(Object object) throws IOException {
+        objectOutputStream.writeObject(object);
+    }
+
+    public int getPort() {
+        return port;
     }
 }

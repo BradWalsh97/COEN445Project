@@ -12,7 +12,7 @@ import java.util.*;
 
 public class JSONHelper {
 
-    //todo: update the return to return if the creation was successful or not. If not, why did it fail. Return this is the register-denied frame.
+    //todo: update the return to return if the creation was successful or not. If not, why did it fail. Return this in the register-denied frame.
     public void saveNewUser(User user) throws IOException {
         writeNewUserToFile(user);
     }
