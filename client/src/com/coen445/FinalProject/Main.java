@@ -2,6 +2,7 @@ package com.coen445.FinalProject;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -38,7 +39,13 @@ public class Main {
 
         //start by trying to connect to server a
         Client client = new Client(ServerInfo.SERVER_A_ADDRESS, ServerInfo.SERVER_A_PORT);
-	    client.connectToServer();
+	    try {client.connectToServer();}
+	    catch (ConnectException e){
+	        if(e.getLocalizedMessage().equals("Connection refused")) {
+                System.out.println("The server is currently offline. Please try again in a few minutes. :)");
+                return;
+            }
+        }
 
 	    //todo: if server a rejects the connection (since server b is currently serving), connect to server b
 
