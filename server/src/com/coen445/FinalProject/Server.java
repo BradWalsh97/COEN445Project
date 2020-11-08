@@ -53,7 +53,7 @@ public class Server {
         objectOutputStream.close();
     }
 
-    private Object readObject() throws IOException, ClassNotFoundException {
+    public Object readObject() throws IOException, ClassNotFoundException {
         return objectInputStream.readObject();
     }
 

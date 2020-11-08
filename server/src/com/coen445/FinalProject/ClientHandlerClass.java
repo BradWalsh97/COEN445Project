@@ -30,6 +30,7 @@ public class ClientHandlerClass extends Thread{
 //                            "No: enter 2";
                     toReturn = "TOREGISTER";
                     server.sendObject(toReturn);
+                    server.setRegistered(true);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -37,6 +38,13 @@ public class ClientHandlerClass extends Thread{
             else{
                 //spit the received message. Each part of the frame is separated by a space. Thus
                 //the type of message will be the first element.
+                try {
+                    received = server.readObject().toString();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
                 String[] messageSegments = received.split(" ");
                 switch (messageSegments[0].toUpperCase()) {
                     case "REGISTER":
@@ -47,6 +55,7 @@ public class ClientHandlerClass extends Thread{
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
+                        // TODO: 2020-11-08 Add new user to the database (Use semaphore n shit) 
                         break;
 
                     default:

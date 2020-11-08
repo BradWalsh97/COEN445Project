@@ -49,6 +49,7 @@ public class Main {
                 //format registration frame
                 String register = "REGISTER " + "1 " + user.getUserName() + " " + user.getIPAddress() + " " + user.getSocketNumber();
                 client.sendMessage(register);// second message is one we should send with the desire to register
+                System.out.println(client.readObjectFromServer());
             }
             if(client.readLine().equalsIgnoreCase("done")){
                 break;

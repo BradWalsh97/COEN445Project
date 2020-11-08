@@ -5,8 +5,7 @@ import java.io.IOException;
 public class Main {
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
-        // TODO: 2020-10-18 change package names in both projects 
-        Server server = new Server(5001);
+        Server server = new Server(5001); //todo: use same free port thing as client but only check for 5001 or 5002
         server.startSever();
         while (true) {
             server.acceptClient();
