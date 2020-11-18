@@ -1,5 +1,7 @@
 package com.coen445.FinalProject;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
@@ -17,8 +19,10 @@ public class ClientHandlerClass extends Thread{
     @Override
     public void run() {
         super.run();
-        String received = "";
-        String toReturn = "";
+        Object received = null;
+        byte[] message = null;
+        Object toReturn = null;
+        RQ receivedRQ = null;
         System.out.println("Request on port: " + server.getPort());
 
         loop: while(true){
@@ -35,7 +39,7 @@ public class ClientHandlerClass extends Thread{
                 //spit the received message. Each part of the frame is separated by a space. Thus
                 //the type of message will be the first element.
                 try {
-                    received = server.readObject().toString();
+                    received = server.readObject();
                 } catch (IOException e) {
                     //in the event a client randomly disconnects, it will throw and end of file exception.
                     //When this happens, we're going to catch it, print the log that says a user disconnected, and then move on
@@ -49,12 +53,20 @@ public class ClientHandlerClass extends Thread{
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();
                 }
-                String[] messageSegments = received.split(" ");
-                switch (messageSegments[0].toUpperCase()) {
-                    case "REGISTER":
+                //String[] messageSegments = received.split(" ");
+                message = (byte[])received;
+                try {
+                    receivedRQ = new RQ(message);
+                } catch (InvalidProtocolBufferException e) {
+                    e.printStackTrace();
+                }
+                switch (receivedRQ.getRegisterCode()) {
+                    case 0:
                         try {
-                            System.out.println("Registered new user");
+                            System.out.println("Registered new user" + receivedRQ.getName() + " " + receivedRQ.getIp() + " " + receivedRQ.getSocketNum());
                             server.sendObject("REGISTERED");
+                            RQ returnRQ = new RQ(1, receivedRQ.getRqNum());
+                            server.sendObject(returnRQ.getMessage());
                             server.setRegistered(true);
                         } catch (IOException e) {
                             if(e instanceof EOFException || e instanceof SocketException){
@@ -71,7 +83,7 @@ public class ClientHandlerClass extends Thread{
                         break;
 
                     default:
-                        throw new IllegalStateException("Unexpected value: " + messageSegments[0].toUpperCase());
+                        throw new IllegalStateException("Unexpected value: " + receivedRQ);
                 }
             }
         }

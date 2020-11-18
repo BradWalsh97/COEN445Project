@@ -1,3 +1,5 @@
+package com.coen445.FinalProject;
+
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import java.util.ArrayList;

@@ -33,7 +33,8 @@ public class Main {
         //TODO: also needs to be updated everytime you boot the client up
         InetAddress clientAddress = InetAddress.getLocalHost();
 
-        User user = new User(username, password,clientAddress.getHostAddress().trim() , Integer.toString(portCheck));
+        //User user = new User(username, password,clientAddress.getHostAddress().trim() , Integer.toString(portCheck));
+        RQ registerRQ = new RQ(0, 1, username, clientAddress.getHostAddress().trim(), portCheck);
 
         String line = "";
 
@@ -55,10 +56,11 @@ public class Main {
             try{
                 Object serverResponse = client.readObjectFromServer(); //first message will be to register
                 if (serverResponse.toString().equalsIgnoreCase("TOREGISTER")) {
-                    System.out.println("Registering Client: " + user.getUserName());
+                    System.out.println("Registering Client: " + registerRQ.getName());
                     //format registration frame
-                    String register = "REGISTER " + "1 " + user.getUserName() + " " + user.getIPAddress() + " " + user.getSocketNumber();
-                    client.sendMessage(register);// second message is one we should send with the desire to register
+                    //String register = "REGISTER " + "1 " + registerRQ.getName() + " " + registerRQ.getIp() + " " + registerRQ.getSocketNum();
+                    //client.sendMessage(register);// second message is one we should send with the desire to register
+                    client.sendMessage(registerRQ.getMessage());
                     System.out.println(client.readObjectFromServer());
                 }
                 if(client.readLine().equalsIgnoreCase("done")){
