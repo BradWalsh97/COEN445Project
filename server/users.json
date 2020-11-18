@@ -14,5 +14,21 @@
   "IPAddress": "127.0.1.1",
   "socketNumber": "5003",
   "isDeleted": false
+ },
+ {
+  "userID": 0,
+  "userName": "john",
+  "interests": [],
+  "IPAddress": "192.168.246.1",
+  "socketNumber": "5003",
+  "isDeleted": false
+ },
+ {
+  "userID": 2,
+  "userName": "bob",
+  "interests": [],
+  "IPAddress": "192.168.246.1",
+  "socketNumber": "5003",
+  "isDeleted": false
  }
 ]

@@ -101,6 +101,7 @@ public class ClientHandlerClass extends Thread {
                     case 4:
                         break;
                     case 5:
+                        //todo check if user exists and delete
                         break;
                     case 6:
                         break;
@@ -109,10 +110,12 @@ public class ClientHandlerClass extends Thread {
                     case 8:
                         break;
                     case 10:
+                        //todo add subjects to user
                         break;
                     case 11:
                         break;
                     case 13:
+                        //todo check if subject is in users subjects list, send message to all users who have the same interest
                         break;
                     case 17:
                         break;

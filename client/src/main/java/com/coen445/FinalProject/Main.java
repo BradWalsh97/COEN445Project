@@ -160,17 +160,22 @@ public class Main {
                 case "DE-REGISTER":
                     System.out.println("Please enter the name of the user you want to delete: ");
                     String userToDelete = scanner.nextLine();
-                    //todo: add Joseph's delete method and do the error checking/status reporting
+                    RQ deRegisterRQ = new RQ(5, rq++, userToDelete);
+                    client.sendMessage(deRegisterRQ.getMessage());
+                    RQ receivedDeRegisterRq = new RQ((byte[]) client.readObjectFromServer());
 
                     break;
                 case "SUBJECTS":
                     System.out.println("Please enter the user for which you want ");
+                    String user = scanner.nextLine();
                     System.out.println("Please chose among the following interests. Enter the numbers, separated by commas");
                     System.out.println(Subjects.INTEREST1 + "\n" + Subjects.INTEREST2 + "\n" + Subjects.INTEREST3 + "\n" +
                             Subjects.INTEREST4 + "\n" + Subjects.INTEREST5);
                     String choices = scanner.nextLine();
                     ArrayList<String> interestList = new ArrayList<String>(Arrays.asList(choices.split(",")));
-                    //todo: call joseph's thing to update
+                    RQ subjectsRQ = new RQ(10, rq++, user, interestList);
+                    client.sendMessage(subjectsRQ.getMessage());
+                    RQ receivedSubjectsRq = new RQ((byte[]) client.readObjectFromServer());
 
                     break;
                 case "PUBLISH":
@@ -179,8 +184,19 @@ public class Main {
                     //to do the rest of the stuff. So, if update get the username and see if it exists. If it does
                     //check to see if the database ip and socket are different from what the user currently runs on
                     //if they are different send the auto update, if not
+                    System.out.println("Please enter the user for which you want ");
+                    String userPublish = scanner.nextLine();
                     System.out.println("Select the subject you want to publish to:");
+                    System.out.println(Subjects.INTEREST1 + "\n" + Subjects.INTEREST2 + "\n" + Subjects.INTEREST3 + "\n" +
+                            Subjects.INTEREST4 + "\n" + Subjects.INTEREST5);
+                    String publishChoice = scanner.nextLine();
                     ArrayList<String> userList = new ArrayList<String>();
+                    userList.add(publishChoice);
+                    System.out.println("Type in the message you would like to publish");
+                    String publishedMessage = scanner.nextLine();
+                    RQ publishRQ = new RQ(13, rq++, userPublish, userList, publishedMessage);
+                    client.sendMessage(publishRQ.getMessage());
+                    RQ receivedPublishRq = new RQ((byte[]) client.readObjectFromServer());
                     break;
 
                 case "DONE":
