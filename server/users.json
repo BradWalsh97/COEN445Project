@@ -10,7 +10,7 @@
    "Rugby"
   ],
   "IPAddress": "localhost",
-  "socketNumber": 5002,
+  "socketNumber": "5002",
   "isDeleted": false
  },
  {
@@ -24,7 +24,7 @@
    "Rugby"
   ],
   "IPAddress": "localhost",
-  "socketNumber": 5001,
+  "socketNumber": "5001",
   "isDeleted": false
  },
  {
@@ -38,7 +38,23 @@
    "Rugby"
   ],
   "IPAddress": "localhost",
-  "socketNumber": 5002,
+  "socketNumber": "5002",
+  "isDeleted": false
+ },
+ {
+  "userID": 0,
+  "userName": "bob",
+  "interests": [],
+  "IPAddress": "127.0.1.1",
+  "socketNumber": "5003",
+  "isDeleted": false
+ },
+ {
+  "userID": 0,
+  "userName": "123",
+  "interests": [],
+  "IPAddress": "127.0.1.1",
+  "socketNumber": "5003",
   "isDeleted": false
  }
 ]
