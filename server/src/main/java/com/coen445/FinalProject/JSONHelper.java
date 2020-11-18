@@ -6,10 +6,7 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
@@ -43,7 +40,7 @@ public class JSONHelper {
 
             //for (User user: users) { //consider using binary search to reduce time (need to confirm if the users.json will always be in order based on ID)
             for (int i = 0; i < users.size(); i++) {
-                if (updatedUser.getUserName().equals(users.get(i).getUserName())) {//if this is the user we want to update
+                if (updatedUser.getUserName().equalsIgnoreCase(users.get(i).getUserName())) {//if this is the user we want to update
                     //for each var, check what is different starting with the most likely case
                     //only use if because even though it can slow things down its possible that multiple things change
                     if (!updatedUser.getInterests().equals(users.get(i).getInterests())) {
@@ -84,8 +81,7 @@ public class JSONHelper {
 
             //Create objects we will need
             Gson gson = new Gson();
-            final Type USER_TYPE = new TypeToken<List<User>>() {
-            }.getType();
+            final Type USER_TYPE = new TypeToken<List<User>>() {}.getType();
             JsonReader jsonReader = new JsonReader(new FileReader("users.json"));
             List<User> users = gson.fromJson(jsonReader, USER_TYPE); //get all current users
             JsonArray jsonArray = new JsonArray();
@@ -93,7 +89,7 @@ public class JSONHelper {
 
             //check for duplicated. If not duplicate, add it to the list of users
             for (User user : users) { //check duplicates
-                if (user.getUserName().equals(newUser.getUserName())) { //if we have a duplicate (since username is unique)
+                if (user.getUserName().equalsIgnoreCase(newUser.getUserName())) { //if we have a duplicate (since username is unique)
                     System.out.println("This user already exists, user will not be added!");
                     return false;
                 } else {
@@ -153,7 +149,7 @@ public class JSONHelper {
 
             //check every user to see if they match. If they don't, add them to the list of users to keep. If they do, don't add them to the keep list
             for (User user : users) {
-                if (!username.equals(user.getUserName())) {//only add the users we want to keep to the list to store again
+                if (!username.equalsIgnoreCase(user.getUserName())) {//only add the users we want to keep to the list to store again
                     jsonArray.add(gson.toJsonTree(user, User.class));
                 } else
                     retVal = true;
@@ -170,5 +166,23 @@ public class JSONHelper {
         } finally {
             lock.unlock();
         }
+    }
+
+//    public User getUser(String username){
+//
+//    }
+    public boolean checkIfUserExists(String username) throws FileNotFoundException {
+        //assume we don't need a lock because if a user is checking to see if their username exists, they should not
+        //at the same time, be adding that user into the database.
+        Gson gson = new Gson();
+        final Type USER_TYPE = new TypeToken<List<User>>() {}.getType();
+        JsonReader jsonReader = new JsonReader(new FileReader("users.json"));
+        List<User> users = gson.fromJson(jsonReader, USER_TYPE); //get all current users
+        for (User user : users) { //check duplicates
+            if (user.getUserName().equalsIgnoreCase(username)) { //if we have a duplicate (since username is unique)
+                return true;
+            }
+        }
+        return false;
     }
 }
