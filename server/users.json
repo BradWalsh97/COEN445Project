@@ -1,57 +1,15 @@
 [
  {
   "userID": 0,
-  "userName": "Bob",
-  "password": "Password123",
-  "interests": [
-   "Soccer",
-   "Football",
-   "Hockey",
-   "Rugby"
-  ],
-  "IPAddress": "localhost",
-  "socketNumber": "5002",
-  "isDeleted": false
- },
- {
-  "userID": 1,
-  "userName": "JimBo :P",
-  "password": "Password123",
-  "interests": [
-   "Soccer",
-   "Football",
-   "Hockey",
-   "Rugby"
-  ],
-  "IPAddress": "localhost",
-  "socketNumber": "5001",
-  "isDeleted": false
- },
- {
-  "userID": 2,
-  "userName": "Tim",
-  "password": "Password123",
-  "interests": [
-   "Soccer",
-   "Football",
-   "Hockey",
-   "Rugby"
-  ],
-  "IPAddress": "localhost",
-  "socketNumber": "5002",
-  "isDeleted": false
- },
- {
-  "userID": 0,
-  "userName": "bob",
+  "userName": "brad",
   "interests": [],
   "IPAddress": "127.0.1.1",
   "socketNumber": "5003",
   "isDeleted": false
  },
  {
-  "userID": 0,
-  "userName": "123",
+  "userID": 2,
+  "userName": "joe",
   "interests": [],
   "IPAddress": "127.0.1.1",
   "socketNumber": "5003",
