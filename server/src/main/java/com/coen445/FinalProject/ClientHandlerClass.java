@@ -27,15 +27,15 @@ public class ClientHandlerClass extends Thread {
 
         loop:
         while (true) {
-            if (!server.getRegistered()) {
-                try {
-                    toReturn = "TOREGISTER";
-                    server.sendObject(toReturn);
-                    server.setRegistered(true);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            } else {
+//            if (!server.getRegistered()) {
+//                try {
+//                    toReturn = "TOREGISTER";
+//                    server.sendObject(toReturn);
+//                    server.setRegistered(true);
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            } else {
                 //spit the received message. Each part of the frame is separated by a space. Thus
                 //the type of message will be the first element.
                 try {
@@ -72,14 +72,15 @@ public class ClientHandlerClass extends Thread {
                                     receivedRQ.getIp(), Integer.toString(receivedRQ.getSocketNum())); //todo: check with jo if its ok if I change user.class socket to int. If so, change it
                             if (!helper.saveNewUser(newUser)) { //if false then it tells user why
                                 System.out.println("The user already exists");
-                                server.sendObject("REGISTER-FAILED, USER ALREADY EXISTS");
-                                server.sendObject(new RQ(2, receivedRQ.getRqNum())); //todo: ask jo how to send the register failed back to the client
+                                //server.sendObject("REGISTER-FAILED, USER ALREADY EXISTS");
+                                //RQ returnRQ = new RQ(2, receivedRQ.getRqNum());
+                                server.sendObject(new RQ(2, receivedRQ.getRqNum()).getMessage()); //todo: ask jo how to send the register failed back to the client
                             } else {
                                 //server.sendObject("REGISTERED");
                                 System.out.println("New user added to database");
                                 RQ returnRQ = new RQ(1, receivedRQ.getRqNum()); //todo: what to do with the 1
                                 server.sendObject(returnRQ.getMessage());
-                                server.setRegistered(true);
+                                //server.setRegistered(true);
                             }
                         } catch (IOException e) {
                             if (e instanceof EOFException || e instanceof SocketException) {
@@ -119,7 +120,7 @@ public class ClientHandlerClass extends Thread {
                     default:
                         throw new IllegalStateException("Unexpected value: " + receivedRQ);
                 }
-            }
+            //} //end else for that old bs if
         }
         System.out.println("Session Terminated");
     }
