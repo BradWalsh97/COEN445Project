@@ -12,6 +12,7 @@ public class Main {
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
         //for now, ask a user to register every time
+        int rq = 1;
         Scanner scanner = new Scanner(System.in);
         System.out.println("Hello there, please enter a username: ");
         String username = scanner.nextLine();
@@ -34,7 +35,6 @@ public class Main {
         InetAddress clientAddress = InetAddress.getLocalHost();
 
         //User user = new User(username, password,clientAddress.getHostAddress().trim() , Integer.toString(portCheck));
-        RQ registerRQ = new RQ(0, 1, username, clientAddress.getHostAddress().trim(), portCheck);
 
         String line = "";
 
@@ -56,6 +56,7 @@ public class Main {
             try{
                 Object serverResponse = client.readObjectFromServer(); //first message will be to register
                 if (serverResponse.toString().equalsIgnoreCase("TOREGISTER")) {
+                    RQ registerRQ = new RQ(0, rq++, username, clientAddress.getHostAddress().trim(), portCheck);
                     System.out.println("Registering Client: " + registerRQ.getName());
                     //format registration frame
                     //String register = "REGISTER " + "1 " + registerRQ.getName() + " " + registerRQ.getIp() + " " + registerRQ.getSocketNum();

@@ -63,11 +63,10 @@ public class ClientHandlerClass extends Thread{
                 switch (receivedRQ.getRegisterCode()) {
                     case 0:
                         try {
-                            System.out.println("Registered new user" + receivedRQ.getName() + " " + receivedRQ.getIp() + " " + receivedRQ.getSocketNum());
+                            System.out.println("Registered new user " + receivedRQ.getName() + " " + receivedRQ.getIp() + " " + receivedRQ.getSocketNum());
                             server.sendObject("REGISTERED");
                             RQ returnRQ = new RQ(1, receivedRQ.getRqNum());
                             server.sendObject(returnRQ.getMessage());
-                            server.setRegistered(true);
                         } catch (IOException e) {
                             if(e instanceof EOFException || e instanceof SocketException){
                                 System.out.println("A user disconnected while server trying to send a message");
