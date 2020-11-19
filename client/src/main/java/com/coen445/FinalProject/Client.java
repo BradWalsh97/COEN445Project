@@ -1,5 +1,6 @@
 package com.coen445.FinalProject;
 
+import javax.management.ObjectInstance;
 import java.io.*;
 import java.net.Socket;
 
@@ -18,12 +19,14 @@ public class Client {
         this.port = port;
     }
 
-    public void connectToServer() throws IOException {
+    public void connectToServer(ObjectOutputStream outputStream, ObjectInputStream inputStream) throws IOException {
         socket = new Socket(address,port);
         System.out.println("Connected");
 
         bufferedReader = new BufferedReader(new InputStreamReader(System.in));
 
+//        objectInputStream = inputStream;
+//        objectOutputStream = outputStream;
         objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
         objectInputStream = new ObjectInputStream(socket.getInputStream());
     }

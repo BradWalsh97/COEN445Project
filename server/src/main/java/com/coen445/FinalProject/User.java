@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class User implements Serializable {
-    private static int nextID = 0;
+    private static int nextID = 0; //todo: remove this from everything, everywhere
     private int userID;
     private String userName;
     private String password;

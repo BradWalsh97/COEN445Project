@@ -2,10 +2,9 @@ package com.coen445.FinalProject;
 
 import java.io.EOFException;
 import java.io.IOException;
-import java.net.ConnectException;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.ServerSocket;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -27,11 +26,20 @@ public class Main {
         System.out.println("What about server b's address?");
         String serverBIp = scanner.nextLine();
         String currentUser = "";
+        String username = "";
 
-        //start by trying to connect to server a
-        Client client = new Client(ServerInfo.SERVER_A_ADDRESS, ServerInfo.SERVER_A_PORT); //todo: update this with the proper info
+        int portCheck = 5003; //5001/2 are reserved for the servers
+        while (!available(portCheck)) {
+            System.out.println("Port: " + portCheck + " is occupied");
+            portCheck++;
+        }
+        Client client = new Client(ServerInfo.SERVER_A_ADDRESS, ServerInfo.SERVER_A_PORT); //todo: update this with client's own address
         try {
-            client.connectToServer();
+            //start by trying to connect to server a
+
+            client.connectToServer(
+                    new ObjectOutputStream(new Socket(ServerInfo.SERVER_A_ADDRESS, ServerInfo.SERVER_A_PORT).getOutputStream()),
+                    new ObjectInputStream(new Socket(ServerInfo.SERVER_A_ADDRESS, ServerInfo.SERVER_A_PORT).getInputStream()));
         } catch (ConnectException e) {
             if (e.getLocalizedMessage().equals("Connection refused")) {
                 System.out.println("The server is currently offline. Please try again in a few minutes. :)");
@@ -40,29 +48,44 @@ public class Main {
         }//todo: if server a rejects the connection (since server b is currently serving), connect to server b
 
 
+
+
+
+
         //uncomment when we're ready to implement the rest of the login stuff
         boolean validChoice = false;
+
+        //login/register sequence
         do {
-            System.out.println("\n\n\n\n\nWould you like to login or register? LOGIN/REGISTER");
+            System.out.println("\n\n\nWould you like to login or register? LOGIN/REGISTER");
             String loginOrRegister = scanner.nextLine();
 
             if (loginOrRegister.equalsIgnoreCase("login")) {
-                validChoice = true;
-                System.out.println("Please enter your username");
-                String username = scanner.nextLine();
-                System.out.println("Please enter your password");
-                String password = scanner.nextLine();
-
-                //todo use a frame that will call the "checkIfuserExists" method. if it does, call the get user method and check the password
-
-
+//                validChoice = true;
+//                System.out.println("Please enter your username");
+//                username = scanner.nextLine();
+//                System.out.println("Please enter your password");
+//                String password = scanner.nextLine();
+//
+//                //todo use a frame that will call the "checkIfUserExists" method. if it does, call the get user method and check the password
+                //start by trying to connect to server a
+//                Client client = new Client(ServerInfo.SERVER_A_ADDRESS, ServerInfo.SERVER_A_PORT); //todo: update this with the proper info
+//
+//                try {
+//                    client.connectToServer();
+//                } catch (ConnectException e) {
+//                    if (e.getLocalizedMessage().equals("Connection refused")) {
+//                        System.out.println("The server is currently offline. Please try again in a few minutes. :)");
+//                        return;
+//                    }
+//                }//todo: if server a rejects the connection (since server b is currently serving), connect to server b
             } else if (loginOrRegister.equalsIgnoreCase("register")) {
                 boolean registerSuccess = false;
                 validChoice = true;
                 do {
                     //todo: make it loop until its correct
                     System.out.println("Please enter a username: ");
-                    String username = scanner.nextLine();
+                    username = scanner.nextLine();
                     System.out.println("Your username is : " + username + "\n" + "Please enter a password: ");
                     String password = scanner.nextLine();
                     System.out.println("Your password is: " + password);
@@ -82,11 +105,7 @@ public class Main {
                     try {
                         //Object serverResponse = client.readObjectFromServer(); //first message will be to register
 
-                        int portCheck = 5003; //5001/2 are reserved for the servers
-                        while (!available(portCheck)) {
-                            System.out.println("Port: " + portCheck + " is occupied");
-                            portCheck++;
-                        }
+
                         //if (serverResponse.toString().equalsIgnoreCase("TOREGISTER")) {
                         RQ registerRQ = new RQ(0, rq++, username, clientAddress.getHostAddress().trim(), portCheck);
                         System.out.println("Registering Client: " + registerRQ.getName());
@@ -138,7 +157,7 @@ public class Main {
             clearScreen(); //todo: fix clear screen
 
 
-            switch (userCommand) {
+            switch (userCommand.toUpperCase()) {
 //                case "REGISTER":
 //
 //                    break;
@@ -166,14 +185,37 @@ public class Main {
 
                     break;
                 case "SUBJECTS":
-                    System.out.println("Please enter the user for which you want ");
-                    String user = scanner.nextLine();
+                    System.out.println("Changing the interests for user " + username);
+                    //String user = scanner.nextLine();
                     System.out.println("Please chose among the following interests. Enter the numbers, separated by commas");
                     System.out.println(Subjects.INTEREST1 + "\n" + Subjects.INTEREST2 + "\n" + Subjects.INTEREST3 + "\n" +
                             Subjects.INTEREST4 + "\n" + Subjects.INTEREST5);
                     String choices = scanner.nextLine();
-                    ArrayList<String> interestList = new ArrayList<String>(Arrays.asList(choices.split(",")));
-                    RQ subjectsRQ = new RQ(10, rq++, user, interestList);
+
+                    //convert the numbers inputted by the user to their associated values
+                    ArrayList<String> interestList = new ArrayList<String>();
+                    for(String choice: Arrays.asList(choices.split(","))){
+                        switch (choice){
+                            case "1":
+                                interestList.add(Subjects.INTEREST1_FOR_SERVER);
+                                break;
+                            case "2":
+                                interestList.add(Subjects.INTEREST2_FOR_SERVER);
+                                break;
+                            case "3":
+                                interestList.add(Subjects.INTEREST3_FOR_SERVER);
+                                break;
+                            case "4":
+                                interestList.add(Subjects.INTEREST4_FOR_SERVER);
+                                break;
+                            case "5":
+                                interestList.add(Subjects.INTEREST5_FOR_SERVER);
+                                break;
+                        }
+                    }
+
+                    //now send the server the subjects.
+                    RQ subjectsRQ = new RQ(10, rq++, username, interestList);
                     client.sendMessage(subjectsRQ.getMessage());
                     RQ receivedSubjectsRq = new RQ((byte[]) client.readObjectFromServer());
 
@@ -188,7 +230,7 @@ public class Main {
                     String userPublish = scanner.nextLine();
                     System.out.println("Select the subject you want to publish to:");
                     System.out.println(Subjects.INTEREST1 + "\n" + Subjects.INTEREST2 + "\n" + Subjects.INTEREST3 + "\n" +
-                            Subjects.INTEREST4 + "\n" + Subjects.INTEREST5);
+                            Subjects.INTEREST4 + "\n" + Subjects.INTEREST5); //give user all options to allow the rejection case.
                     String publishChoice = scanner.nextLine();
                     ArrayList<String> userList = new ArrayList<String>();
                     userList.add(publishChoice);
@@ -225,15 +267,15 @@ public class Main {
 
 
     public static void clearScreen() {
-        System.out.println("\\033[H\\033[2J"); //todo: maybe get this working? Or not, doesn't matter honestly
-        System.out.flush();
+        //System.out.println("\\033[H\\033[2J"); //todo: maybe get this working? Or not, doesn't matter honestly
+        //System.out.flush();
     }
 
 
     //function obtains from: https://stackoverflow.com/questions/434718/sockets-discover-port-availability-using-java
     //provided by user: David Santamaria on stackoverflow.com
     public static boolean available(int port) {
-        if (port < 5001 || port > 65353) {
+        if (port < 5002 || port > 65353) {
             throw new IllegalArgumentException("Invalid start port: " + port);
         }
 
@@ -252,11 +294,11 @@ public class Main {
             }
 
             if (ss != null) {
-                try {
-                    ss.close();
-                } catch (IOException e) {
-                    /* should not be thrown */
-                }
+//                try {
+//                    ss.close();
+//                } catch (IOException e) {
+//                    /* should not be thrown */
+//                }
             }
         }
 

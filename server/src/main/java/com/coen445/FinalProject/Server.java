@@ -12,9 +12,10 @@ public class Server {
     private ServerSocket serverSocket = null;
     //private DataInputStream dataInputStream = null;
     private BufferedReader bufferedReader = null;
-    private ObjectInputStream objectInputStream = null;
-    private ObjectOutputStream objectOutputStream = null;
 
+    private ObjectInputStream objectInputStream = null;
+
+    private ObjectOutputStream objectOutputStream = null;
     public Server(int port){
         this.port = port;
 
@@ -36,6 +37,7 @@ public class Server {
     }
 
     public void acceptClient() throws IOException {
+
         socket = serverSocket.accept();
         System.out.println("Client Connected");
 
@@ -83,5 +85,18 @@ public class Server {
 
     public int getPort() {
         return port;
+    }
+
+    public ObjectOutputStream getObjectOutputStream() {
+        return objectOutputStream;
+    }
+    public void setObjectOutputStream(ObjectOutputStream objectOutputStream) {
+        this.objectOutputStream = objectOutputStream;
+    }
+    public ObjectInputStream getObjectInputStream() {
+        return objectInputStream;
+    }
+    public void setObjectInputStream(ObjectInputStream objectInputStream) {
+        this.objectInputStream = objectInputStream;
     }
 }
