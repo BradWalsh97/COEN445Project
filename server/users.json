@@ -30,5 +30,17 @@
   "IPAddress": "192.168.246.1",
   "socketNumber": "5003",
   "isDeleted": false
+ },
+ {
+  "userID": 0,
+  "userName": "hnerty",
+  "interests": [
+   "Politics",
+   "Sports",
+   "Pop culture"
+  ],
+  "IPAddress": "192.168.246.1",
+  "socketNumber": "5003",
+  "isDeleted": false
  }
 ]

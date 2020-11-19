@@ -14,7 +14,7 @@ import java.util.Scanner;
 public class Main {
 
     //todo about updating if loggin in from new computer
-    //hkendek said that the update can server as a login (since you're updating the ip address). If you update from a
+    //khendek said that the update can server as a login (since you're updating the ip address). If you update from a
     //new computer, you can't know which server is currently serving and thus you'll send it to both
     //if you're updating on the same computer you only send it to the server serving.
     public static void main(String[] args) throws IOException, ClassNotFoundException {
@@ -27,6 +27,7 @@ public class Main {
         System.out.println("What about server b's address?");
         String serverBIp = scanner.nextLine();
         String currentUser = "";
+        String username = "";
 
         //start by trying to connect to server a
         Client client = new Client(ServerInfo.SERVER_A_ADDRESS, ServerInfo.SERVER_A_PORT); //todo: update this with the proper info
@@ -49,7 +50,7 @@ public class Main {
             if (loginOrRegister.equalsIgnoreCase("login")) {
                 validChoice = true;
                 System.out.println("Please enter your username");
-                String username = scanner.nextLine();
+                username = scanner.nextLine();
                 System.out.println("Please enter your password");
                 String password = scanner.nextLine();
 
@@ -62,7 +63,7 @@ public class Main {
                 do {
                     //todo: make it loop until its correct
                     System.out.println("Please enter a username: ");
-                    String username = scanner.nextLine();
+                    username = scanner.nextLine();
                     System.out.println("Your username is : " + username + "\n" + "Please enter a password: ");
                     String password = scanner.nextLine();
                     System.out.println("Your password is: " + password);
@@ -166,14 +167,37 @@ public class Main {
 
                     break;
                 case "SUBJECTS":
-                    System.out.println("Please enter the user for which you want ");
-                    String user = scanner.nextLine();
+                    System.out.println("Changing the interests for user " + username);
+                    //String user = scanner.nextLine();
                     System.out.println("Please chose among the following interests. Enter the numbers, separated by commas");
                     System.out.println(Subjects.INTEREST1 + "\n" + Subjects.INTEREST2 + "\n" + Subjects.INTEREST3 + "\n" +
                             Subjects.INTEREST4 + "\n" + Subjects.INTEREST5);
                     String choices = scanner.nextLine();
-                    ArrayList<String> interestList = new ArrayList<String>(Arrays.asList(choices.split(",")));
-                    RQ subjectsRQ = new RQ(10, rq++, user, interestList);
+
+                    //convert the numbers inputted by the user to their associated values
+                    ArrayList<String> interestList = new ArrayList<String>();
+                    for(String choice: Arrays.asList(choices.split(","))){
+                        switch (choice){
+                            case "1":
+                                interestList.add(Subjects.INTEREST1_FOR_SERVER);
+                                break;
+                            case "2":
+                                interestList.add(Subjects.INTEREST2_FOR_SERVER);
+                                break;
+                            case "3":
+                                interestList.add(Subjects.INTEREST3_FOR_SERVER);
+                                break;
+                            case "4":
+                                interestList.add(Subjects.INTEREST4_FOR_SERVER);
+                                break;
+                            case "5":
+                                interestList.add(Subjects.INTEREST5_FOR_SERVER);
+                                break;
+                        }
+                    }
+
+                    //now send the server the subjects.
+                    RQ subjectsRQ = new RQ(10, rq++, username, interestList);
                     client.sendMessage(subjectsRQ.getMessage());
                     RQ receivedSubjectsRq = new RQ((byte[]) client.readObjectFromServer());
 

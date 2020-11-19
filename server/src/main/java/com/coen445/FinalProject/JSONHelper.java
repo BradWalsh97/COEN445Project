@@ -8,7 +8,9 @@ import com.google.gson.stream.JsonWriter;
 
 import java.io.*;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -136,7 +138,8 @@ public class JSONHelper {
         writer.close();
     }
 
-    public boolean deleteUser(String username) throws IOException {
+    //checks if user exists. If yes: delete and return true. Else, return false
+    public boolean deleteUserWithCheck(String username) throws IOException {
         lock.lock();
         try {
             Gson gson = new Gson();
@@ -168,9 +171,76 @@ public class JSONHelper {
         }
     }
 
-//    public User getUser(String username){
-//
-//    }
+    // delete user without verifying that is exists. This is essentially done regardless but we're just not returning
+    // anything because this will only be called if we know the user does not exists
+    public void deleteUserWithoutCheck(String username) throws IOException{
+        lock.lock();
+        try {
+            Gson gson = new Gson();
+            final Type USER_TYPE = new TypeToken<List<User>>() {
+            }.getType();
+            JsonReader jsonReader = new JsonReader(new FileReader("users.json"));
+            List<User> users = gson.fromJson(jsonReader, USER_TYPE);
+            JsonArray jsonArray = new JsonArray();
+
+            //check every user to see if they match. If they don't, add them to the list of users to keep. If they do, don't add them to the keep list
+            for (User user : users) {
+                if (!username.equalsIgnoreCase(user.getUserName())) {//only add the users we want to keep to the list to store again
+                    jsonArray.add(gson.toJsonTree(user, User.class));
+                }
+            }
+
+            //write change to the file
+            FileWriter writer = new FileWriter("users.json", false);
+            JsonWriter jsonWriter = new JsonWriter(writer);
+            jsonWriter.setIndent(" ");
+            gson.toJson(jsonArray, jsonWriter);
+            writer.close();
+
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    //this should only be called if we know the user exists
+    public Optional<User> getUser(String username) throws FileNotFoundException {
+        lock.lock();
+        try {
+            Gson gson = new Gson();
+            final Type USER_TYPE = new TypeToken<List<User>>() {
+            }.getType();
+            JsonReader jsonReader = new JsonReader(new FileReader("users.json"));
+            List<User> users = gson.fromJson(jsonReader, USER_TYPE);
+            JsonArray jsonArray = new JsonArray();
+
+            //check every user to see if they match. If they don't, add them to the list of users to keep. If they do, don't add them to the keep list
+            for (User user : users) {
+                if (username.equalsIgnoreCase(user.getUserName())) {//only add the users we want to keep to the list to store again
+                    return Optional.of(user);
+                }
+            }
+
+            return Optional.empty();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public ArrayList<User> getAllUsersWithInterest(String interest){
+        ArrayList<User> users = new ArrayList<>();
+        for(User user: users){//for every user
+            for(String userInterest: user.getInterests()){//and every interest of that user
+                //check to see if they have that interest.
+                if(userInterest.equalsIgnoreCase(interest)){
+                    users.add(user);
+                    continue;
+                }
+            }
+        }
+        return users;
+    }
+
+    //checks if a user exists in the database. returns true if exists. False if not
     public boolean checkIfUserExists(String username) throws FileNotFoundException {
         //assume we don't need a lock because if a user is checking to see if their username exists, they should not
         //at the same time, be adding that user into the database.
@@ -184,5 +254,56 @@ public class JSONHelper {
             }
         }
         return false;
+    }
+
+    public boolean checkIfUserHasInterest(String username, String interest) throws FileNotFoundException {
+        Optional<User> user = getUser(username);
+        if(user.isPresent()){
+            for(String userInterest: user.get().getInterests()){
+                if (userInterest.equalsIgnoreCase(interest))
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean updateUserSubjects(String username, ArrayList<String> newInterests ) throws FileNotFoundException {
+        if(checkIfUserExists(username)) { //if user exists, make the change. else, return false
+            lock.lock();
+            try {
+                Gson gson = new Gson();
+                final Type USER_TYPE = new TypeToken<List<User>>() {
+                }.getType();
+                JsonReader jsonReader = new JsonReader(new FileReader("users.json"));
+                List<User> users = gson.fromJson(jsonReader, USER_TYPE);
+                JsonArray jsonArray = new JsonArray();
+
+                //check every user to see if they match. If they don't, add them to the list of users to keep. If they do, update their interest
+                for (User user : users) {
+                    if (!username.equalsIgnoreCase(user.getUserName())) {//only add the users we want to keep to the list to store again
+                        jsonArray.add(gson.toJsonTree(user, User.class));
+                    }
+                    else{ //add the new interests to the user and save them again
+                        user.setInterests(newInterests);
+                        jsonArray.add(gson.toJsonTree(user, User.class));
+                    }
+                }
+
+                //write change to the file
+                FileWriter writer = new FileWriter("users.json", false);
+                JsonWriter jsonWriter = new JsonWriter(writer);
+                jsonWriter.setIndent(" ");
+                gson.toJson(jsonArray, jsonWriter);
+                writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                lock.unlock();
+            }
+        }
+        else
+            return false;
+
+        return true;
     }
 }

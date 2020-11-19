@@ -3,8 +3,12 @@ package com.coen445.FinalProject;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import java.io.EOFException;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
 import java.net.SocketException;
+import java.util.ArrayList;
 
 //todo: in client make sure that socket is unique. if not unique, chose another random socket until a free one is found
 //todo: while also making sure that they're above the reserved sockets [(thus do rand() % (max socket - amount of reserved sockets)] + amount of reserved sockets
@@ -59,6 +63,8 @@ public class ClientHandlerClass extends Thread {
                 } catch (InvalidProtocolBufferException e) {
                     e.printStackTrace();
                 }
+                //Handle all incoming packets
+                JSONHelper helper = new JSONHelper();
                 switch (receivedRQ.getRegisterCode()) {
                     case 0: //register
                         try {
@@ -67,7 +73,6 @@ public class ClientHandlerClass extends Thread {
 
                             //check validity of new user, start by making sure that their username is unique.
                             //This is done with the json helper's return value.
-                            JSONHelper helper = new JSONHelper();
                             User newUser = new User(receivedRQ.getName(), receivedRQ.getPassword(),
                                     receivedRQ.getIp(), Integer.toString(receivedRQ.getSocketNum())); //todo: check with jo if its ok if I change user.class socket to int. If so, change it
                             if (!helper.saveNewUser(newUser)) { //if false then it tells user why
@@ -95,27 +100,101 @@ public class ClientHandlerClass extends Thread {
 
                         break;
 
-                    case 3: //todo: add comment to say which case is what
+                    case 3://REGISTERED (server to server)
+                        //todo: add comment to say which case is what
 
                         break;
-                    case 4:
+                    case 4: //REGISTER-DENIED (from other server)
                         break;
-                    case 5:
+                    case 5: //DE-REGISTER
                         //todo check if user exists and delete
+                        try {
+                            if(helper.deleteUserWithCheck(receivedRQ.getName())) {//if true: user deleted
+                                System.out.println("User " + receivedRQ.getName() + " has been deleted");
+                                server.sendObject(new RQ(6, receivedRQ.getName()).getMessage()); //send DE-REGISTER response to other server
+                                //todo: send to other server the update
+                            }
+                            else { //user not found
+                                System.out.println("The user " + receivedRQ.getName() + " was not found and thus could not be deleted.");
+                            }
+
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                         break;
-                    case 6:
+                    case 6://other server has told this server to delete the user from the DB
+                        try {
+                            helper.deleteUserWithoutCheck(receivedRQ.getName());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                         break;
-                    case 7:
+                    case 7://UPDATE //todo: when we hear back from khendek
+                        //todo: open a connection here if its a login scenario
+
+                        //needs to send update-confirmed (8) to both client and server
                         break;
-                    case 8:
+                    case 8://UPDATE-CONFIRMED (From server to server)
+                        //received the update confirmed. Now update the user accordingly
+                        try {
+                            helper.updateUser(new User(receivedRQ.getName(), receivedRQ.getPassword(),
+                                    receivedRQ.getIp(), Integer.toString(receivedRQ.getSocketNum())));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                         break;
-                    case 10:
-                        //todo add subjects to user
+                    case 10://SUBJECTS (Client to Server -> we receive the new subjects)
+                        try {
+                            if(helper.updateUserSubjects(receivedRQ.getName(), receivedRQ.getSubjects())){
+                                //send to client and other server update confirmed.
+                                server.sendObject(new RQ(11, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getSubjects()).getMessage()); //send to client
+
+//                                clientOutputStream.writeObject(new RQ(11, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getSubjects()).getMessage());
+                                //server.sendObject(new RQ(11, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getSubjects()).getMessage()); //send to other server //todo: update to send to server (using objectOutputStream)
+                            }
+                            else{
+                                //send subjects-rejected to client
+//                                clientOutputStream.writeObject(new RQ(12, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getSubjects()).getMessage());//send to client
+                            }
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                         break;
                     case 11:
+                        try {
+                            helper.updateUserSubjects(receivedRQ.getName(), receivedRQ.getSubjects());
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        }
                         break;
                     case 13:
-                        //todo check if subject is in users subjects list, send message to all users who have the same interest
+                        try {
+                            //first we ensure that the person who sends the publish request is a valid user.
+                            if(helper.checkIfUserExists(receivedRQ.getName())) {//if they are, check if they have the appropriate interest
+                                if(helper.checkIfUserHasInterest(receivedRQ.getName(), receivedRQ.getSubjects().get(0))) { //and if they have the interest
+                                    //get all users with that interest
+                                    ArrayList<User> users = new ArrayList<>(helper.getAllUsersWithInterest(receivedRQ.getSubjects().get(0)));
+                                    for (User user : users) {//for each user show shares that interest, send them the new message
+                                        try {
+                                            Socket socket = new Socket(user.getIPAddress(), Integer.parseInt(user.getSocketNumber()));
+                                            ObjectOutputStream clientOutputStream = new ObjectOutputStream(socket.getOutputStream());
+                                            clientOutputStream.writeObject(new RQ(14, receivedRQ.getName(),
+                                                    receivedRQ.getSubjects(), receivedRQ.getText()).getMessage());
+                                            socket.close();
+                                            clientOutputStream.close();
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                }
+                            }
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        }
                         break;
                     case 17:
                         break;
