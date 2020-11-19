@@ -2,10 +2,7 @@ package com.coen445.FinalProject;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
-import java.io.EOFException;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
@@ -15,9 +12,19 @@ import java.util.ArrayList;
 
 public class ClientHandlerClass extends Thread {
     private Server server;
+    private Socket client;
+    private ObjectOutputStream outputStream;
+    private ObjectInputStream inputStream;
+    private ArrayList<ClientHandlerClass> clients;
 
     public ClientHandlerClass(Server server) {
         this.server = server;
+    }
+    public ClientHandlerClass(Socket socket, ArrayList<ClientHandlerClass> clients) throws IOException {
+        this.client = socket;
+        this.clients = clients;
+        outputStream = new ObjectOutputStream(client.getOutputStream());
+        inputStream = new ObjectInputStream(client.getInputStream());
     }
 
     @Override
@@ -27,7 +34,7 @@ public class ClientHandlerClass extends Thread {
         byte[] message = null;
         Object toReturn = null;
         RQ receivedRQ = null;
-        System.out.println("Request on port: " + server.getPort());
+        //System.out.println("Request on port: " + server.getPort());
 
         loop:
         while (true) {
@@ -43,7 +50,8 @@ public class ClientHandlerClass extends Thread {
                 //spit the received message. Each part of the frame is separated by a space. Thus
                 //the type of message will be the first element.
                 try {
-                    received = server.readObject();
+                    //received = server.readObject();
+                    received = inputStream.readObject();
                 } catch (IOException e) {
                     //in the event a client randomly disconnects, it will throw and end of file exception.
                     //When this happens, we're going to catch it, print the log that says a user disconnected, and then move on
@@ -79,12 +87,14 @@ public class ClientHandlerClass extends Thread {
                                 System.out.println("The user already exists");
                                 //server.sendObject("REGISTER-FAILED, USER ALREADY EXISTS");
                                 //RQ returnRQ = new RQ(2, receivedRQ.getRqNum());
-                                server.sendObject(new RQ(2, receivedRQ.getRqNum()).getMessage()); //todo: ask jo how to send the register failed back to the client
+                                //server.sendObject(new RQ(2, receivedRQ.getRqNum()).getMessage()); //todo: ask jo how to send the register failed back to the client
+                                outputStream.writeObject(new RQ(2, receivedRQ.getRqNum()).getMessage());
                             } else {
                                 //server.sendObject("REGISTERED");
                                 System.out.println("New user added to database");
                                 RQ returnRQ = new RQ(1, receivedRQ.getRqNum()); //todo: what to do with the 1
-                                server.sendObject(returnRQ.getMessage());
+                                //server.sendObject(returnRQ.getMessage());
+                                outputStream.writeObject(returnRQ.getMessage());
                                 //server.setRegistered(true);
                             }
                         } catch (IOException e) {
@@ -111,7 +121,8 @@ public class ClientHandlerClass extends Thread {
                         try {
                             if(helper.deleteUserWithCheck(receivedRQ.getName())) {//if true: user deleted
                                 System.out.println("User " + receivedRQ.getName() + " has been deleted");
-                                server.sendObject(new RQ(6, receivedRQ.getName()).getMessage()); //send DE-REGISTER response to other server
+                                //server.sendObject(new RQ(6, receivedRQ.getName()).getMessage()); //send DE-REGISTER response to other server
+                                outputStream.writeObject(new RQ(6, receivedRQ.getName()).getMessage());
                                 //todo: send to other server the update
                             }
                             else { //user not found
@@ -149,7 +160,8 @@ public class ClientHandlerClass extends Thread {
                         try {
                             if(helper.updateUserSubjects(receivedRQ.getName(), receivedRQ.getSubjects())){
                                 //send to client and other server update confirmed.
-                                server.sendObject(new RQ(11, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getSubjects()).getMessage()); //send to client
+                                //server.sendObject(new RQ(11, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getSubjects()).getMessage()); //send to client
+                                outputStream.writeObject(new RQ(11, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getSubjects()).getMessage());
 
 //                                clientOutputStream.writeObject(new RQ(11, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getSubjects()).getMessage());
                                 //server.sendObject(new RQ(11, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getSubjects()).getMessage()); //send to other server //todo: update to send to server (using objectOutputStream)

@@ -1,39 +1,7 @@
 [
  {
-  "userID": 0,
-  "userName": "brad",
-  "interests": [],
-  "IPAddress": "127.0.1.1",
-  "socketNumber": "5003",
-  "isDeleted": false
- },
- {
-  "userID": 2,
-  "userName": "joe",
-  "interests": [],
-  "IPAddress": "127.0.1.1",
-  "socketNumber": "5003",
-  "isDeleted": false
- },
- {
-  "userID": 0,
+  "userID": 1,
   "userName": "john",
-  "interests": [],
-  "IPAddress": "192.168.246.1",
-  "socketNumber": "5003",
-  "isDeleted": false
- },
- {
-  "userID": 2,
-  "userName": "bob",
-  "interests": [],
-  "IPAddress": "192.168.246.1",
-  "socketNumber": "5003",
-  "isDeleted": false
- },
- {
-  "userID": 0,
-  "userName": "hnerty",
   "interests": [
    "Politics",
    "Sports",
