@@ -183,11 +183,13 @@ public class ClientHandlerClass extends Thread {
                             e.printStackTrace();
                         }
                         break;
-                    case 13:
+                    case 13: //PUBLISH
                         try {
                             //first we ensure that the person who sends the publish request is a valid user.
                             if(helper.checkIfUserExists(receivedRQ.getName())) {//if they are, check if they have the appropriate interest
+                                System.out.println("Found user");
                                 if(helper.checkIfUserHasInterest(receivedRQ.getName(), receivedRQ.getSubjects().get(0))) { //and if they have the interest
+                                    System.out.println("Inside interests");
                                     //get all users with that interest
                                     ArrayList<User> users = new ArrayList<>(helper.getAllUsersWithInterest(receivedRQ.getSubjects().get(0)));
                                     for (User user : users) {//for each user show shares that interest, send them the new message

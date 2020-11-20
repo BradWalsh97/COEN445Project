@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class ServerConnection extends Thread {
     private Socket server;
@@ -32,7 +33,11 @@ public class ServerConnection extends Thread {
                 //System.out.println(receivedRq);
             }
         }catch (IOException | ClassNotFoundException e){
-            e.printStackTrace();
+            if(e instanceof SocketException){
+                System.out.println("The RSS server is currently experiencing an outage. \n" +
+                        "Please try again in a few minutes while we work to restore the service! <3");
+            }else
+                e.printStackTrace();
         }finally {
             try{
                 inputStream.close();

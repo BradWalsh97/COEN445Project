@@ -67,7 +67,7 @@ public class Main {
                             portCheck++;
                         }
 
-                        RQ registerRQ = new RQ(0, rq++, username, clientAddress.getHostAddress().trim(), portCheck);
+                        RQ registerRQ = new RQ(0, rq++, username, clientAddress.getHostAddress().trim(), socket.getLocalPort());
                         System.out.println("Registering Client: " + registerRQ.getName());
                         outputStream.writeObject(registerRQ.getMessage());
                         Thread.sleep(1000);
@@ -152,6 +152,7 @@ public class Main {
 
                         break;
                     case "PUBLISH":
+                        System.out.println(socket.getLocalPort());
                         //todo: the system needs to be implemented such that when the client is booted up
                         //you must either register or update. Once this is done, you will have the username
                         //to do the rest of the stuff. So, if update get the username and see if it exists. If it does

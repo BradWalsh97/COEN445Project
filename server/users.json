@@ -1,6 +1,6 @@
 [
  {
-  "userID": 1,
+  "userID": 0,
   "userName": "john",
   "interests": [
    "Politics",
@@ -8,7 +8,19 @@
    "Pop culture"
   ],
   "IPAddress": "192.168.246.1",
-  "socketNumber": "5003",
+  "socketNumber": "53151",
+  "isDeleted": false
+ },
+ {
+  "userID": 2,
+  "userName": "brad",
+  "interests": [
+   "Politics",
+   "Sports",
+   "Pop culture"
+  ],
+  "IPAddress": "192.168.246.1",
+  "socketNumber": "53160",
   "isDeleted": false
  }
 ]
