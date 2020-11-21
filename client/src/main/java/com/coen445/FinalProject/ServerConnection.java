@@ -25,10 +25,10 @@ public class ServerConnection extends Thread {
 
                 RQ receivedRq = new RQ((byte[]) serverResponse);
                 if (receivedRq.getRegisterCode() == 1) {
-                    System.out.println(receivedRq.getName() + " has been registered!");
+                    System.out.println(Main.username + " has been registered!");
                     Main.registerSuccess = true;
                 } else if (receivedRq.getRegisterCode() == 2)
-                    System.out.println(receivedRq.getName() + " already exists. Please chose another name");
+                    System.out.println(Main.username + " already exists. Please chose another name");
 
                 //System.out.println(receivedRq);
             }

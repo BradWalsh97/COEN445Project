@@ -12,6 +12,7 @@ import java.util.Scanner;
 
 public class Main {
     public static boolean registerSuccess = false;
+    public static String username = "";
 
     //todo about updating if loggin in from new computer
     //khendek said that the update can server as a login (since you're updating the ip address). If you update from a
@@ -27,7 +28,6 @@ public class Main {
         System.out.println("What about server b's address?");
         String serverBIp = scanner.nextLine();
         String currentUser = "";
-        String username = "";
         boolean validChoice = false;
 
         Socket socket = new Socket(ServerInfo.SERVER_A_ADDRESS, ServerInfo.SERVER_A_PORT);
