@@ -226,16 +226,32 @@ public class JSONHelper {
         }
     }
 
-    public ArrayList<User> getAllUsersWithInterest(String interest){
+    public ArrayList<User> getAllUsersWithInterest(String interest, String userName){
+        lock.lock();
+        ArrayList<User> allUsers = new ArrayList<>();
         ArrayList<User> users = new ArrayList<>();
-        for(User user: users){//for every user
-            for(String userInterest: user.getInterests()){//and every interest of that user
-                //check to see if they have that interest.
-                if(userInterest.equalsIgnoreCase(interest)){
-                    users.add(user);
+        try {
+            Gson gson = new Gson();
+            final Type USER_TYPE = new TypeToken<List<User>>() {
+            }.getType();
+            JsonReader jsonReader = new JsonReader(new FileReader("users.json"));
+            allUsers = gson.fromJson(jsonReader, USER_TYPE);
+            for (User user : allUsers) {//for every user
+                if(user.getUserName().equalsIgnoreCase(userName))
                     continue;
+                for (String userInterest : user.getInterests()) {//and every interest of that user
+                    //check to see if they have that interest.
+                    if (userInterest.equalsIgnoreCase(interest)) {
+                        users.add(user);
+                        continue;
+                    }
                 }
             }
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            lock.unlock();
         }
         return users;
     }
