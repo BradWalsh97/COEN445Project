@@ -159,14 +159,30 @@ public class Main {
                         //check to see if the database ip and socket are different from what the user currently runs on
                         //if they are different send the auto update, if not
                         System.out.println("Please enter the user for which you want ");
-                        String userPublish = scanner.nextLine();
+                        String userPublish = scanner.nextLine(); //todo: set this to the currently logged in user
                         System.out.println("Select the subject you want to publish to:");
                         System.out.println(Subjects.INTEREST1 + "\n" + Subjects.INTEREST2 + "\n" + Subjects.INTEREST3 + "\n" +
                                 Subjects.INTEREST4 + "\n" + Subjects.INTEREST5);
-                        String publishChoice = scanner.nextLine();
+                        String publishChoiceNumber = scanner.nextLine();
                         ArrayList<String> userList = new ArrayList<String>();
-                        userList.add(publishChoice);
-                        System.out.println("Type in the message you would like to publish");
+                        switch (publishChoiceNumber) {
+                            case "1":
+                                userList.add(Subjects.INTEREST1_FOR_SERVER);
+                                break;
+                            case "2":
+                                userList.add(Subjects.INTEREST2_FOR_SERVER);
+                                break;
+                            case "3":
+                                userList.add(Subjects.INTEREST3_FOR_SERVER);
+                                break;
+                            case "4":
+                                userList.add(Subjects.INTEREST4_FOR_SERVER);
+                                break;
+                            case "5":
+                                userList.add(Subjects.INTEREST5_FOR_SERVER);
+                                break;
+                        }
+                        System.out.println("Type in the message you would like to publish"); //todo: add error checking (no empty messages)
                         String publishedMessage = scanner.nextLine();
                         RQ publishRQ = new RQ(13, rq++, userPublish, userList, publishedMessage);
                         //client.sendMessage(publishRQ.getMessage());
