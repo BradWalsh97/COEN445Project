@@ -21,6 +21,7 @@ public class Main {
             //t.start();
             System.out.println("Waiting for client connection...");
             Socket client = listener.accept();
+            System.out.println("socket is " + client.getLocalPort() + "and " + client.getPort());
             System.out.println("Connected to client");
             ClientHandlerClass clientThread = new ClientHandlerClass(client, clients);
             clients.add(clientThread);

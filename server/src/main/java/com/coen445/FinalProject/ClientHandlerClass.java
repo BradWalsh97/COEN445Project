@@ -3,6 +3,7 @@ package com.coen445.FinalProject;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import java.io.*;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
@@ -195,12 +196,14 @@ public class ClientHandlerClass extends Thread {
                                     for (User user : users) {//for each user show shares that interest, send them the new message
                                         try {
 
-//                                            Socket socket = new Socket(user.getIPAddress(), Integer.parseInt(user.getSocketNumber()));
-//                                            ObjectOutputStream clientOutputStream = new ObjectOutputStream(socket.getOutputStream());
-//                                            clientOutputStream.writeObject(new RQ(14, receivedRQ.getName(),
-//                                                    receivedRQ.getSubjects(), receivedRQ.getText()).getMessage());
-//                                            socket.close();
-//                                            clientOutputStream.close();
+                                            System.out.println("ip " + user.getIPAddress() + " socket " + user.getSocketNumber());
+                                            Socket socket = new Socket(user.getIPAddress(), Integer.parseInt(user.getSocketNumber()));
+                                            System.out.println(socket.getLocalPort());
+                                            ObjectOutputStream clientOutputStream = new ObjectOutputStream(socket.getOutputStream());
+                                            clientOutputStream.writeObject(new RQ(14, receivedRQ.getName(),
+                                                    receivedRQ.getSubjects(), receivedRQ.getText()).getMessage());
+                                            socket.close();
+                                            clientOutputStream.close();
                                         } catch (IOException e) {
                                             e.printStackTrace();
                                         }

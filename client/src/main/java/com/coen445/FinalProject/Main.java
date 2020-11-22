@@ -66,8 +66,11 @@ public class Main {
                             System.out.println("Port: " + portCheck + " is occupied");
                             portCheck++;
                         }
-
-                        RQ registerRQ = new RQ(0, rq++, username, clientAddress.getHostAddress().trim(), socket.getLocalPort());
+                        RQ registerRQ = null;
+                        if(socket.getInetAddress().toString().equalsIgnoreCase("localhost/127.0.0.1"))
+                            registerRQ = new RQ(0, rq++, username, "127.0.0.1", socket.getLocalPort());
+                        else
+                            registerRQ = new RQ(0, rq++, username, socket.getInetAddress().toString(), socket.getLocalPort());
                         System.out.println("Registering Client: " + registerRQ.getName());
                         outputStream.writeObject(registerRQ.getMessage());
                         Thread.sleep(1000);
