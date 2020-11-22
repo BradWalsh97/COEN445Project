@@ -8,8 +8,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Main {
-    private static ArrayList<ClientHandlerClass> clients = new ArrayList<>();
-    private static ExecutorService pool = Executors.newFixedThreadPool(4);
+    public static ArrayList<ClientHandlerClass> clients = new ArrayList<>();
+    public static ExecutorService pool = Executors.newFixedThreadPool(4);
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
         //Server server = new Server(5001); //todo: use same free port thing as client but only check for 5001 or 5002

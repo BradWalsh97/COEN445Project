@@ -195,15 +195,23 @@ public class ClientHandlerClass extends Thread {
                                     ArrayList<User> users = new ArrayList<>(helper.getAllUsersWithInterest(receivedRQ.getSubjects().get(0), receivedRQ.getName()));
                                     for (User user : users) {//for each user show shares that interest, send them the new message
                                         try {
+                                            for(ClientHandlerClass c : Main.clients){
+                                                if(Integer.toString(c.client.getPort()).equalsIgnoreCase(user.getSocketNumber())){
+                                                    c.outputStream.writeObject(new RQ(14, receivedRQ.getName(),
+                                                            receivedRQ.getSubjects(), receivedRQ.getText()).getMessage());
+                                                    break;
+                                                }
+                                            }
 
-                                            System.out.println("ip " + user.getIPAddress() + " socket " + user.getSocketNumber());
-                                            Socket socket = new Socket(user.getIPAddress(), Integer.parseInt(user.getSocketNumber()));
-                                            System.out.println(socket.getLocalPort());
-                                            ObjectOutputStream clientOutputStream = new ObjectOutputStream(socket.getOutputStream());
-                                            clientOutputStream.writeObject(new RQ(14, receivedRQ.getName(),
-                                                    receivedRQ.getSubjects(), receivedRQ.getText()).getMessage());
-                                            socket.close();
-                                            clientOutputStream.close();
+                                            //System.out.println("ip " + client.getLocalAddress().getHostAddress() + " socket " + client.getLocalPort());
+                                            //Socket socket = new Socket(user.getIPAddress(), Integer.parseInt(user.getSocketNumber()));
+                                            //Socket socket = client;
+                                            //System.out.println(socket.getLocalPort());
+                                            //ObjectOutputStream clientOutputStream = new ObjectOutputStream(socket.getOutputStream());
+                                            //clientOutputStream.writeObject(new RQ(14, receivedRQ.getName(),
+                                                    //receivedRQ.getSubjects(), receivedRQ.getText()).getMessage());
+                                            //socket.close();
+                                            //clientOutputStream.close();
                                         } catch (IOException e) {
                                             e.printStackTrace();
                                         }

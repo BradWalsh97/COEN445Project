@@ -29,6 +29,8 @@ public class ServerConnection extends Thread {
                     Main.registerSuccess = true;
                 } else if (receivedRq.getRegisterCode() == 2)
                     System.out.println(Main.username + " already exists. Please chose another name");
+                else if(receivedRq.getRegisterCode() == 14)
+                    System.out.println(receivedRq.getSubjects().get(0) + ": " + receivedRq.getText() + " from " + receivedRq.getName());
 
                 //System.out.println(receivedRq);
             }
