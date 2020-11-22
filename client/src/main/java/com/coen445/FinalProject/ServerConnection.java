@@ -24,13 +24,25 @@ public class ServerConnection extends Thread {
                 if(serverResponse == null) break;
 
                 RQ receivedRq = new RQ((byte[]) serverResponse);
-                if (receivedRq.getRegisterCode() == 1) {
-                    System.out.println(Main.username + " has been registered!");
-                    Main.registerSuccess = true;
-                } else if (receivedRq.getRegisterCode() == 2)
-                    System.out.println(Main.username + " already exists. Please chose another name");
-                else if(receivedRq.getRegisterCode() == 14)
-                    System.out.println(receivedRq.getSubjects().get(0) + ": " + receivedRq.getText() + " from " + receivedRq.getName());
+
+                switch(receivedRq.getRegisterCode()){
+                    case 1:
+                        System.out.println(Main.username + " has been registered!");
+                        Main.registerSuccess = true;
+                        break;
+
+                    case 2:
+                        System.out.println(Main.username + " already exists. Please chose another name");
+                        break;
+
+                    case 14:
+                        System.out.println(receivedRq.getSubjects().get(0) + ": " + receivedRq.getText() + " from " + receivedRq.getName());
+                        break;
+
+                    case 15:
+                        System.out.println("Message could not be published.. " + receivedRq.getText());
+                        break;
+                }
 
                 //System.out.println(receivedRq);
             }

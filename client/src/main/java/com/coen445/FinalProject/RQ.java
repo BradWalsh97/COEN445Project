@@ -56,6 +56,8 @@ public class RQ {
             case 2:
 
             case 9:
+
+            case 15:
                 this.rqNum = requestIn.getRqNum();
                 this.text = requestIn.getText();
                 break;
@@ -97,6 +99,8 @@ public class RQ {
             case 17:
                 this.ip = requestIn.getIp();
                 this.socketNum = requestIn.getSocketNum();
+                break;
+
         }
 
     }

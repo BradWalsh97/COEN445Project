@@ -6,17 +6,7 @@
    "Politics"
   ],
   "IPAddress": "127.0.0.1",
-  "socketNumber": "51806",
-  "isDeleted": false
- },
- {
-  "userID": 1,
-  "userName": "brad",
-  "interests": [
-   "Politics"
-  ],
-  "IPAddress": "127.0.0.1",
-  "socketNumber": "51812",
+  "socketNumber": "55110",
   "isDeleted": false
  }
 ]

@@ -1,13 +1,10 @@
 package com.coen445.FinalProject;
 
-import java.io.EOFException;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -30,11 +27,15 @@ public class Main {
         String currentUser = "";
         boolean validChoice = false;
 
-        Socket socket = new Socket(ServerInfo.SERVER_A_ADDRESS, ServerInfo.SERVER_A_PORT);
-        ServerConnection serverConnection = new ServerConnection(socket);
-        ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
+        Socket socketA = new Socket(ServerInfo.SERVER_A_ADDRESS, ServerInfo.SERVER_A_PORT);
+        Socket socketB = new Socket(ServerInfo.SERVER_B_ADDRESS, ServerInfo.SERVER_B_PORT);
+        ServerConnection serverConnectionA = new ServerConnection(socketA);
+        ServerConnection serverConnectionB = new ServerConnection(socketB);
+        ObjectOutputStream outputStreamA = new ObjectOutputStream(socketA.getOutputStream());
+        ObjectOutputStream outputStreamB = new ObjectOutputStream(socketB.getOutputStream());
 
-        new Thread(serverConnection).start();
+        new Thread(serverConnectionA).start();
+        new Thread(serverConnectionB).start();
 
         while(true) {
             do {
@@ -47,6 +48,11 @@ public class Main {
                     username = scanner.nextLine();
                     System.out.println("Please enter your password");
                     String password = scanner.nextLine();
+
+                    RQ updateRQ = new RQ(7, rq++, username, socketA.getLocalAddress().getHostAddress(), socketA.getLocalPort());
+                    System.out.println("Logging in Client: " + updateRQ.getName());
+                    outputStreamA.writeObject(updateRQ.getMessage());
+                    Thread.sleep(1000);
 
                     //todo use a frame that will call the "checkIfuserExists" method. if it does, call the get user method and check the password
 
@@ -66,9 +72,9 @@ public class Main {
                             System.out.println("Port: " + portCheck + " is occupied");
                             portCheck++;
                         }
-                        RQ registerRQ = new RQ(0, rq++, username, socket.getLocalAddress().getHostAddress(), socket.getLocalPort());
+                        RQ registerRQ = new RQ(0, rq++, username, socketA.getLocalAddress().getHostAddress(), socketA.getLocalPort());
                         System.out.println("Registering Client: " + registerRQ.getName());
-                        outputStream.writeObject(registerRQ.getMessage());
+                        outputStreamA.writeObject(registerRQ.getMessage());
                         Thread.sleep(1000);
                     }while (!registerSuccess);
                 }
@@ -89,9 +95,9 @@ public class Main {
                 switch (userCommand) {
                     case "UPDATE":
                         //IMPORT ASSUMPTION FOR THE UPDATE: updating port and IP will be done automatically so that the
-                        //user cannot mess things up. Futhermore, the prof said that everything wrt to ip and socket (save for the server address)
+                        //user cannot mess things up. Futhermore, the prof said that everything wrt to ip and socketA (save for the server address)
                         //should be done automatically. This also gives users a better experience.
-                        System.out.println("Do you want manually or automatically update your IP and socket? AUTO/MAN ");
+                        System.out.println("Do you want manually or automatically update your IP and socketA? AUTO/MAN ");
 
                         String newIP = clientAddress.getHostAddress().trim();
                         int updatePort = 5003;
@@ -107,7 +113,7 @@ public class Main {
                         String userToDelete = scanner.nextLine();
                         RQ deRegisterRQ = new RQ(5, rq++, userToDelete);
                         //client.sendMessage(deRegisterRQ.getMessage());
-                        outputStream.writeObject(deRegisterRQ.getMessage());
+                        outputStreamA.writeObject(deRegisterRQ.getMessage());
                         Thread.sleep(1000);
                         //RQ receivedDeRegisterRq = new RQ((byte[]) client.readObjectFromServer());
 
@@ -145,17 +151,17 @@ public class Main {
                         //now send the server the subjects.
                         RQ subjectsRQ = new RQ(10, rq++, username, interestList);
                         //client.sendMessage(subjectsRQ.getMessage());
-                        outputStream.writeObject(subjectsRQ.getMessage());
+                        outputStreamA.writeObject(subjectsRQ.getMessage());
                         Thread.sleep(1000);
                         //RQ receivedSubjectsRq = new RQ((byte[]) client.readObjectFromServer());
 
                         break;
                     case "PUBLISH":
-                        System.out.println(socket.getLocalPort());
+                        System.out.println(socketA.getLocalPort());
                         //todo: the system needs to be implemented such that when the client is booted up
                         //you must either register or update. Once this is done, you will have the username
                         //to do the rest of the stuff. So, if update get the username and see if it exists. If it does
-                        //check to see if the database ip and socket are different from what the user currently runs on
+                        //check to see if the database ip and socketA are different from what the user currently runs on
                         //if they are different send the auto update, if not
                         System.out.println("Please enter the user for which you want ");
                         String userPublish = scanner.nextLine(); //todo: set this to the currently logged in user
@@ -185,15 +191,15 @@ public class Main {
                         String publishedMessage = scanner.nextLine();
                         RQ publishRQ = new RQ(13, rq++, userPublish, userList, publishedMessage);
                         //client.sendMessage(publishRQ.getMessage());
-                        outputStream.writeObject(publishRQ.getMessage());
+                        outputStreamA.writeObject(publishRQ.getMessage());
                         Thread.sleep(1000);
                         //RQ receivedPublishRq = new RQ((byte[]) client.readObjectFromServer());
                         break;
 
                     case "DONE":
                         //client.closeConnections();
-                        socket.close();
-                        outputStream.close();
+                        socketA.close();
+                        outputStreamA.close();
                         System.out.println("Client disconnected from server. Have a nice day! :)");
                         return;
                 }

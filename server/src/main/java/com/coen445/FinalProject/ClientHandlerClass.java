@@ -145,6 +145,9 @@ public class ClientHandlerClass extends Thread {
                         break;
                     case 7://UPDATE //todo: when we hear back from khendek
                         //todo: open a connection here if its a login scenario
+                        //todo check if user exists and update ip and port upon login, else send user does not exit
+
+
 
                         //needs to send update-confirmed (8) to both client and server
                         break;
@@ -188,9 +191,7 @@ public class ClientHandlerClass extends Thread {
                         try {
                             //first we ensure that the person who sends the publish request is a valid user.
                             if(helper.checkIfUserExists(receivedRQ.getName())) {//if they are, check if they have the appropriate interest
-                                System.out.println("Found user");
                                 if(helper.checkIfUserHasInterest(receivedRQ.getName(), receivedRQ.getSubjects().get(0))) { //and if they have the interest
-                                    System.out.println("Inside interests");
                                     //get all users with that interest
                                     ArrayList<User> users = new ArrayList<>(helper.getAllUsersWithInterest(receivedRQ.getSubjects().get(0), receivedRQ.getName()));
                                     for (User user : users) {//for each user show shares that interest, send them the new message
@@ -216,9 +217,13 @@ public class ClientHandlerClass extends Thread {
                                             e.printStackTrace();
                                         }
                                     }
+                                }else{
+                                    outputStream.writeObject(new RQ(15, receivedRQ.getRqNum(), "The subject chosen is not in your list of interests, please update your interests and try again.").getMessage());
                                 }
                             }
                         } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
                             e.printStackTrace();
                         }
                         break;
