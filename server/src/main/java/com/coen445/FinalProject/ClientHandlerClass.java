@@ -74,10 +74,10 @@ public class ClientHandlerClass extends Thread {
                 //Handle all incoming packets
                 JSONHelper helper = new JSONHelper();
                 switch (receivedRQ.getRegisterCode()) {
-                    case 0: //register
+                    case 0: //register  //todo: make an exception for an empty username
                         try {
                             //start by receiving the message and logging its info
-                            System.out.println("Registered new user " + receivedRQ.getName() + " " + receivedRQ.getIp() + " " + receivedRQ.getSocketNum());
+                            System.out.println("Registering new user " + receivedRQ.getName() + " " + receivedRQ.getIp() + " " + receivedRQ.getSocketNum());
 
                             //check validity of new user, start by making sure that their username is unique.
                             //This is done with the json helper's return value.
@@ -87,8 +87,8 @@ public class ClientHandlerClass extends Thread {
                                 System.out.println("The user already exists");
                                 //server.sendObject("REGISTER-FAILED, USER ALREADY EXISTS");
                                 //RQ returnRQ = new RQ(2, receivedRQ.getRqNum());
-                                //server.sendObject(new RQ(2, receivedRQ.getRqNum()).getMessage()); //todo: ask jo how to send the register failed back to the client
-                                outputStream.writeObject(new RQ(2, receivedRQ.getRqNum()).getMessage());
+                                //server.sendObject(new RQ(2, receivedRQ.getRqNum()).getMessage());
+                                outputStream.writeObject(new RQ(2, receivedRQ.getRqNum()).getMessage()); //send register failed?
                             } else {
                                 //server.sendObject("REGISTERED");
                                 System.out.println("New user added to database");
@@ -191,15 +191,16 @@ public class ClientHandlerClass extends Thread {
                                 if(helper.checkIfUserHasInterest(receivedRQ.getName(), receivedRQ.getSubjects().get(0))) { //and if they have the interest
                                     System.out.println("Inside interests");
                                     //get all users with that interest
-                                    ArrayList<User> users = new ArrayList<>(helper.getAllUsersWithInterest(receivedRQ.getSubjects().get(0)));
+                                    ArrayList<User> users = new ArrayList<>(helper.getAllUsersWithInterest(receivedRQ.getSubjects().get(0), receivedRQ.getName()));
                                     for (User user : users) {//for each user show shares that interest, send them the new message
                                         try {
-                                            Socket socket = new Socket(user.getIPAddress(), Integer.parseInt(user.getSocketNumber()));
-                                            ObjectOutputStream clientOutputStream = new ObjectOutputStream(socket.getOutputStream());
-                                            clientOutputStream.writeObject(new RQ(14, receivedRQ.getName(),
-                                                    receivedRQ.getSubjects(), receivedRQ.getText()).getMessage());
-                                            socket.close();
-                                            clientOutputStream.close();
+
+//                                            Socket socket = new Socket(user.getIPAddress(), Integer.parseInt(user.getSocketNumber()));
+//                                            ObjectOutputStream clientOutputStream = new ObjectOutputStream(socket.getOutputStream());
+//                                            clientOutputStream.writeObject(new RQ(14, receivedRQ.getName(),
+//                                                    receivedRQ.getSubjects(), receivedRQ.getText()).getMessage());
+//                                            socket.close();
+//                                            clientOutputStream.close();
                                         } catch (IOException e) {
                                             e.printStackTrace();
                                         }
