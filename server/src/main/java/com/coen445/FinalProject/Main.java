@@ -18,13 +18,14 @@ public class Main {
 
     public static boolean isServing = true;
     public static ScheduledExecutorService servingTimer = Executors.newScheduledThreadPool(1);
-    public static int port;
+    public static int serverPort;
+    public static String whichServer;
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
         boolean servingDone = false;
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Hello Systems Administrator. Please chose which port you will run this server on: ");
-        port = Integer.parseInt(scanner.nextLine());
+        System.out.println("Hello Systems Administrator. Is this server A or B? (A/B)");
+        whichServer = scanner.nextLine();
         System.out.println("Is this server the primary server? (Y/N)");
         String isPrimaryString = scanner.nextLine();
 
@@ -44,10 +45,16 @@ public class Main {
         //todo do server socket between server A and B
 
         ServerSocket listener = null;
-        if(available(5001))
-            listener = new ServerSocket(5001);
-        else
-            listener = new ServerSocket(5002);
+        //if(available(serverPort))
+        if(whichServer.equalsIgnoreCase("a")) {
+            serverPort = ServerInfo.SERVER_A_PORT;
+            listener = new ServerSocket(serverPort);
+        }else if(whichServer.equalsIgnoreCase("b")){
+            serverPort = ServerInfo.SERVER_B_PORT;
+            listener = new ServerSocket(serverPort);
+        }
+        //else
+            //listener = new ServerSocket(serverPort++);
 
         //now that the server has been created, start a timer between 3 & 5 minutes
         Random randTimerValue = new Random();

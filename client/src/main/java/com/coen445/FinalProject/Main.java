@@ -19,7 +19,7 @@ public class Main {
         //for now, ask a user to register every time
         int rq = 1;
         Scanner scanner = new Scanner(System.in);
-        InetAddress clientAddress = InetAddress.getLocalHost();
+        InetAddress clientAddress = InetAddress.getByName("localhost");
         System.out.println("Hello, lets get some info about the servers you want to connect to. \nWhat is the ip of server a?");
         String serverAIp = scanner.nextLine();
         System.out.println("What about server b's address?");
@@ -79,6 +79,7 @@ public class Main {
                         RQ updateRQ = new RQ(7, rq++, username, socketA.getLocalAddress().getHostAddress(), socketA.getLocalPort());
                         System.out.println("Logging in Client: " + updateRQ.getName());
                         outputStreamA.writeObject(updateRQ.getMessage());
+                        //outputStreamB.writeObject(updateRQ.getMessage());
                         Thread.sleep(1000);
 
 
@@ -100,6 +101,7 @@ public class Main {
                         RQ registerRQ = new RQ(0, rq++, username, socketA.getLocalAddress().getHostAddress(), socketA.getLocalPort());
                         System.out.println("Registering Client: " + registerRQ.getName());
                         outputStreamA.writeObject(registerRQ.getMessage());
+                        outputStreamB.writeObject(registerRQ.getMessage());
                         Thread.sleep(1000);
                         // } while (!registerSuccess);
                     } else //invalid choice

@@ -16,6 +16,11 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class JSONHelper {
     private Lock lock = new ReentrantLock();
+    private String serverName;
+
+    public JSONHelper(String serverName){
+        this.serverName = serverName;
+    }
 
     //todo: update the return to return if the creation was successful or not. If not, why did it fail. Return this in the register-denied frame.
     public boolean saveNewUser(User user) throws IOException {
@@ -36,7 +41,7 @@ public class JSONHelper {
             Gson gson = new Gson();
             final Type USER_TYPE = new TypeToken<List<User>>() {
             }.getType();
-            JsonReader jsonReader = new JsonReader(new FileReader("users.json"));
+            JsonReader jsonReader = new JsonReader(new FileReader("users" + serverName + ".json"));
             List<User> users = gson.fromJson(jsonReader, USER_TYPE);
 
 
@@ -77,14 +82,14 @@ public class JSONHelper {
             this is because the person might try to add a new user zero. */
 
 
-        File newFile = new File("users.json"); //use this to check if the file is empty
+        File newFile = new File("users" + serverName + ".json"); //use this to check if the file is empty
 
         if (newFile.length() > 0) { //if file not empty:
 
             //Create objects we will need
             Gson gson = new Gson();
             final Type USER_TYPE = new TypeToken<List<User>>() {}.getType();
-            JsonReader jsonReader = new JsonReader(new FileReader("users.json"));
+            JsonReader jsonReader = new JsonReader(new FileReader("users" + serverName + ".json"));
             List<User> users = gson.fromJson(jsonReader, USER_TYPE); //get all current users
             JsonArray jsonArray = new JsonArray();
 
@@ -103,7 +108,7 @@ public class JSONHelper {
             jsonArray.add(gson.toJsonTree(newUser, User.class));
 
             //write the array to the json user file
-            FileWriter writer = new FileWriter("users.json", false);
+            FileWriter writer = new FileWriter("users" + serverName + ".json", false);
             JsonWriter jsonWriter = new JsonWriter(writer);
             jsonWriter.setIndent(" ");
             gson.toJson(jsonArray, jsonWriter);
@@ -115,7 +120,7 @@ public class JSONHelper {
             Gson gson = new Gson();
             User[] userList = new User[1];
             userList[0] = newUser;
-            FileWriter writer = new FileWriter("users.json", false);
+            FileWriter writer = new FileWriter("users" + serverName + ".json", false);
             JsonWriter jsonWriter = new JsonWriter(writer);
             jsonWriter.setIndent(" ");
             gson.toJson(userList, User[].class, jsonWriter);
@@ -130,7 +135,7 @@ public class JSONHelper {
         Gson gson = new Gson();
         JsonArray jsonArray = new Gson().toJsonTree(users).getAsJsonArray();
 
-        FileWriter writer = new FileWriter("users.json", false);
+        FileWriter writer = new FileWriter("users" + serverName + ".json", false);
         JsonWriter jsonWriter = new JsonWriter(writer);
         jsonWriter.setIndent(" ");
 
@@ -145,7 +150,7 @@ public class JSONHelper {
             Gson gson = new Gson();
             final Type USER_TYPE = new TypeToken<List<User>>() {
             }.getType();
-            JsonReader jsonReader = new JsonReader(new FileReader("users.json"));
+            JsonReader jsonReader = new JsonReader(new FileReader("users" + serverName + ".json"));
             List<User> users = gson.fromJson(jsonReader, USER_TYPE);
             JsonArray jsonArray = new JsonArray();
             boolean retVal = false;
@@ -159,7 +164,7 @@ public class JSONHelper {
             }
 
             //write change to the file
-            FileWriter writer = new FileWriter("users.json", false);
+            FileWriter writer = new FileWriter("users" + serverName + ".json", false);
             JsonWriter jsonWriter = new JsonWriter(writer);
             jsonWriter.setIndent(" ");
             gson.toJson(jsonArray, jsonWriter);
@@ -179,7 +184,7 @@ public class JSONHelper {
             Gson gson = new Gson();
             final Type USER_TYPE = new TypeToken<List<User>>() {
             }.getType();
-            JsonReader jsonReader = new JsonReader(new FileReader("users.json"));
+            JsonReader jsonReader = new JsonReader(new FileReader("users" + serverName + ".json"));
             List<User> users = gson.fromJson(jsonReader, USER_TYPE);
             JsonArray jsonArray = new JsonArray();
 
@@ -191,7 +196,7 @@ public class JSONHelper {
             }
 
             //write change to the file
-            FileWriter writer = new FileWriter("users.json", false);
+            FileWriter writer = new FileWriter("users" + serverName + ".json", false);
             JsonWriter jsonWriter = new JsonWriter(writer);
             jsonWriter.setIndent(" ");
             gson.toJson(jsonArray, jsonWriter);
@@ -209,7 +214,7 @@ public class JSONHelper {
             Gson gson = new Gson();
             final Type USER_TYPE = new TypeToken<List<User>>() {
             }.getType();
-            JsonReader jsonReader = new JsonReader(new FileReader("users.json"));
+            JsonReader jsonReader = new JsonReader(new FileReader("users" + serverName + ".json"));
             List<User> users = gson.fromJson(jsonReader, USER_TYPE);
             JsonArray jsonArray = new JsonArray();
 
@@ -234,7 +239,7 @@ public class JSONHelper {
             Gson gson = new Gson();
             final Type USER_TYPE = new TypeToken<List<User>>() {
             }.getType();
-            JsonReader jsonReader = new JsonReader(new FileReader("users.json"));
+            JsonReader jsonReader = new JsonReader(new FileReader("users" + serverName + ".json"));
             allUsers = gson.fromJson(jsonReader, USER_TYPE);
             for (User user : allUsers) {//for every user
                 if(user.getUserName().equalsIgnoreCase(userName))
@@ -262,7 +267,7 @@ public class JSONHelper {
         //at the same time, be adding that user into the database.
         Gson gson = new Gson();
         final Type USER_TYPE = new TypeToken<List<User>>() {}.getType();
-        JsonReader jsonReader = new JsonReader(new FileReader("users.json"));
+        JsonReader jsonReader = new JsonReader(new FileReader("users" + serverName + ".json"));
         List<User> users = gson.fromJson(jsonReader, USER_TYPE); //get all current users
         for (User user : users) { //check duplicates
             if (user.getUserName().equalsIgnoreCase(username)) { //if we have a duplicate (since username is unique)
@@ -290,7 +295,7 @@ public class JSONHelper {
                 Gson gson = new Gson();
                 final Type USER_TYPE = new TypeToken<List<User>>() {
                 }.getType();
-                JsonReader jsonReader = new JsonReader(new FileReader("users.json"));
+                JsonReader jsonReader = new JsonReader(new FileReader("users" + serverName + ".json"));
                 List<User> users = gson.fromJson(jsonReader, USER_TYPE);
                 JsonArray jsonArray = new JsonArray();
 
@@ -306,7 +311,7 @@ public class JSONHelper {
                 }
 
                 //write change to the file
-                FileWriter writer = new FileWriter("users.json", false);
+                FileWriter writer = new FileWriter("users" + serverName + ".json", false);
                 JsonWriter jsonWriter = new JsonWriter(writer);
                 jsonWriter.setIndent(" ");
                 gson.toJson(jsonArray, jsonWriter);
