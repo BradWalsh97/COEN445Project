@@ -69,7 +69,7 @@ public class Client {
         }
     }
 
-    public void sendMessage(String message) throws IOException{
+    public void sendMessage(Object message) throws IOException{
         writeObjectToServer(message);
     }
 }
