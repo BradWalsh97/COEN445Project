@@ -45,18 +45,18 @@ public class JSONHelper {
                 if (updatedUser.getUserName().equalsIgnoreCase(users.get(i).getUserName())) {//if this is the user we want to update
                     //for each var, check what is different starting with the most likely case
                     //only use if because even though it can slow things down its possible that multiple things change
-                    if (!updatedUser.getInterests().equals(users.get(i).getInterests())) {
-                        users.get(i).setInterests(updatedUser.getInterests());
-                    }
-                    if (!updatedUser.getIPAddress().equals(users.get(i).getIPAddress())) {
+//                    if (!updatedUser.getInterests().equals(users.get(i).getInterests())) { //update interests
+//                        users.get(i).setInterests(updatedUser.getInterests());
+//                    }
+                    if (!updatedUser.getIPAddress().equals(users.get(i).getIPAddress())) { //update ip address
                         users.get(i).setIPAddress(updatedUser.getIPAddress());
                     }
-                    if (updatedUser.getSocketNumber() != users.get(i).getSocketNumber()) {
+                    if (updatedUser.getSocketNumber() != users.get(i).getSocketNumber()) { //update socket number
                         users.get(i).setSocketNumber(updatedUser.getSocketNumber());
                     }
-                    if (!updatedUser.getUserName().equals(users.get(i).getUserName())) { //todo: this should probably be deprecated
-                        users.get(i).setUserName(updatedUser.getUserName());
-                    }
+//                    if (!updatedUser.getUserName().equals(users.get(i).getUserName())) { //todo: this should probably be deprecated
+//                        users.get(i).setUserName(updatedUser.getUserName());
+//                    }
                     //todo: is it worth updating the rest??? (DONT ALLOW UPDATING USERID!!!)
 
                     //upon finishing the changes break so we don't have to go through the rest

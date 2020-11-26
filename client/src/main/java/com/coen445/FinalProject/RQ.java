@@ -53,9 +53,13 @@ public class RQ {
                 this.rqNum = requestIn.getRqNum();
                 break;
 
+            case 9:
+                this.rqNum = requestIn.getRqNum();
+                this.text = requestIn.getName();
+                break;
             case 2:
 
-            case 9:
+            //case 9:
 
             case 15:
                 this.rqNum = requestIn.getRqNum();

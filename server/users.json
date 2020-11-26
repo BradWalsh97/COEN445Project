@@ -1,12 +1,10 @@
 [
  {
   "userID": 0,
-  "userName": "john",
-  "interests": [
-   "Politics"
-  ],
+  "userName": "brad",
+  "interests": [],
   "IPAddress": "127.0.0.1",
-  "socketNumber": "55110",
+  "socketNumber": "34824",
   "isDeleted": false
  }
 ]

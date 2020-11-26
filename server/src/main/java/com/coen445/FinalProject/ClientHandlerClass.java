@@ -1,7 +1,6 @@
 package com.coen445.FinalProject;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -146,7 +145,27 @@ public class ClientHandlerClass extends Thread {
                     case 7://UPDATE //todo: when we hear back from khendek
                         //todo: open a connection here if its a login scenario
                         //todo check if user exists and update ip and port upon login, else send user does not exit
-
+                        //start by checking to see if the user exists
+                        try {
+                            if (helper.checkIfUserExists(receivedRQ.getName())){
+                                //if the user exists, update their info
+                                try {
+                                    helper.updateUser(new User(receivedRQ.getName(), receivedRQ.getPassword(), receivedRQ.getIp(), Integer.toString(receivedRQ.getSocketNum())));
+                                    outputStream.writeObject(new RQ(8, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getIp(), receivedRQ.getSocketNum()).getMessage());
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            else{
+                                try {
+                                    outputStream.writeObject(new RQ(9, "Username or password did not match an existing user").getMessage());
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        }
 
 
                         //needs to send update-confirmed (8) to both client and server

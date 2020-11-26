@@ -39,6 +39,15 @@ public class ServerConnection extends Thread {
                         System.out.println(receivedRq.getSubjects().get(0) + ": " + receivedRq.getText() + " from " + receivedRq.getName());
                         break;
 
+                    case 8:
+                        System.out.println("Successfully logged in");
+                        Main.registerSuccess = true;
+                        break;
+
+                    case 9:
+                        System.out.println(receivedRq.getText());
+                        break;
+
                     case 15:
                         System.out.println("Message could not be published.. " + receivedRq.getText());
                         break;

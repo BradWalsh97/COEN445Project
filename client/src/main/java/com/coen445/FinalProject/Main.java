@@ -11,7 +11,7 @@ public class Main {
     public static boolean registerSuccess = false;
     public static String username = "";
 
-    //todo about updating if loggin in from new computer
+    //todo about updating if logging in from new computer
     //khendek said that the update can server as a login (since you're updating the ip address). If you update from a
     //new computer, you can't know which server is currently serving and thus you'll send it to both
     //if you're updating on the same computer you only send it to the server serving.
@@ -28,58 +28,57 @@ public class Main {
         boolean validChoice = false;
 
         Socket socketA = new Socket(ServerInfo.SERVER_A_ADDRESS, ServerInfo.SERVER_A_PORT);
-        Socket socketB = new Socket(ServerInfo.SERVER_B_ADDRESS, ServerInfo.SERVER_B_PORT);
+        //Socket socketB = new Socket(ServerInfo.SERVER_B_ADDRESS, ServerInfo.SERVER_B_PORT);
         ServerConnection serverConnectionA = new ServerConnection(socketA);
-        ServerConnection serverConnectionB = new ServerConnection(socketB);
+        //ServerConnection serverConnectionB = new ServerConnection(socketB);
         ObjectOutputStream outputStreamA = new ObjectOutputStream(socketA.getOutputStream());
-        ObjectOutputStream outputStreamB = new ObjectOutputStream(socketB.getOutputStream());
+        //ObjectOutputStream outputStreamB = new ObjectOutputStream(socketB.getOutputStream());
 
         new Thread(serverConnectionA).start();
-        new Thread(serverConnectionB).start();
+        //new Thread(serverConnectionB).start();
 
         while(true) {
             do {
-                System.out.println("\n\n\n\n\nWould you like to login or register? LOGIN/REGISTER");
-                String loginOrRegister = scanner.nextLine();
+                do {
+                    System.out.println("\n\nWould you like to login or register? LOGIN/REGISTER");
+                    String loginOrRegister = scanner.nextLine();
 
-                if (loginOrRegister.equalsIgnoreCase("login")) {
-                    validChoice = true;
-                    System.out.println("Please enter your username");
-                    username = scanner.nextLine();
-                    System.out.println("Please enter your password");
-                    String password = scanner.nextLine();
-
-                    RQ updateRQ = new RQ(7, rq++, username, socketA.getLocalAddress().getHostAddress(), socketA.getLocalPort());
-                    System.out.println("Logging in Client: " + updateRQ.getName());
-                    outputStreamA.writeObject(updateRQ.getMessage());
-                    Thread.sleep(1000);
-
-                    //todo use a frame that will call the "checkIfuserExists" method. if it does, call the get user method and check the password
-
-
-                } else if (loginOrRegister.equalsIgnoreCase("register")) {
-                    validChoice = true;
-                    do{
-                        //todo: make it loop until its correct
-                        System.out.println("Please enter a username: ");
+                    if (loginOrRegister.equalsIgnoreCase("login")) {
+                        validChoice = true;
+                        System.out.println("Please enter your username");
                         username = scanner.nextLine();
-                        System.out.println("Your username is : " + username + "\n" + "Please enter a password: ");
+                        System.out.println("Please enter your password");
                         String password = scanner.nextLine();
-                        System.out.println("Your password is: " + password);
 
-                        int portCheck = 5003; //5001/2 are reserved for the servers
-                        while (!available(portCheck)) {
-                            System.out.println("Port: " + portCheck + " is occupied");
-                            portCheck++;
-                        }
-                        RQ registerRQ = new RQ(0, rq++, username, socketA.getLocalAddress().getHostAddress(), socketA.getLocalPort());
-                        System.out.println("Registering Client: " + registerRQ.getName());
-                        outputStreamA.writeObject(registerRQ.getMessage());
+                        RQ updateRQ = new RQ(7, rq++, username, socketA.getLocalAddress().getHostAddress(), socketA.getLocalPort());
+                        System.out.println("Logging in Client: " + updateRQ.getName());
+                        outputStreamA.writeObject(updateRQ.getMessage());
                         Thread.sleep(1000);
-                    }while (!registerSuccess);
-                }
-                else //invalid choice
-                    System.out.println("Please enter a valid input.");
+
+
+                    } else if (loginOrRegister.equalsIgnoreCase("register")) {
+                        validChoice = true;
+                        //do {
+                            //todo: make it loop until its correct
+                            System.out.println("Please enter a username: ");
+                            username = scanner.nextLine();
+                            System.out.println("Your username is : " + username + "\n" + "Please enter a password: ");
+                            String password = scanner.nextLine();
+                            System.out.println("Your password is: " + password);
+
+                            int portCheck = 5003; //5001/2 are reserved for the servers
+                            while (!available(portCheck)) {
+                                System.out.println("Port: " + portCheck + " is occupied");
+                                portCheck++;
+                            }
+                            RQ registerRQ = new RQ(0, rq++, username, socketA.getLocalAddress().getHostAddress(), socketA.getLocalPort());
+                            System.out.println("Registering Client: " + registerRQ.getName());
+                            outputStreamA.writeObject(registerRQ.getMessage());
+                            Thread.sleep(1000);
+                       // } while (!registerSuccess);
+                    } else //invalid choice
+                        System.out.println("Please enter a valid input.");
+                }while (!registerSuccess);
             }while(!validChoice);
 
             while(true){
