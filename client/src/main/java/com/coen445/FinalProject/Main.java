@@ -26,16 +26,40 @@ public class Main {
         String serverBIp = scanner.nextLine();
         String currentUser = "";
         boolean validChoice = false;
+        Socket socketA = null;
+        ServerConnection serverConnectionA = null;
+        ObjectOutputStream outputStreamA = null;
+        Socket socketB = null;
+        ServerConnection serverConnectionB = null;
+        ObjectOutputStream outputStreamB = null;
+        boolean serverConnect = false;
 
-        Socket socketA = new Socket(ServerInfo.SERVER_A_ADDRESS, ServerInfo.SERVER_A_PORT);
-        //Socket socketB = new Socket(ServerInfo.SERVER_B_ADDRESS, ServerInfo.SERVER_B_PORT);
-        ServerConnection serverConnectionA = new ServerConnection(socketA);
-        //ServerConnection serverConnectionB = new ServerConnection(socketB);
-        ObjectOutputStream outputStreamA = new ObjectOutputStream(socketA.getOutputStream());
-        //ObjectOutputStream outputStreamB = new ObjectOutputStream(socketB.getOutputStream());
+        try{
+            socketA = new Socket(ServerInfo.SERVER_A_ADDRESS, ServerInfo.SERVER_A_PORT);
+            socketA.setSoTimeout(500);
+            serverConnectionA = new ServerConnection(socketA);
+            outputStreamA = new ObjectOutputStream(socketA.getOutputStream());
+            System.out.println("Connected to server A");
+            serverConnect = true;
+            new Thread(serverConnectionA).start();
+        } catch (ConnectException e) {
+            System.out.println("Server A currently unavailable. Trying server B");
+        }
+        if(!serverConnect) {
+            try {
+                socketB = new Socket(ServerInfo.SERVER_B_ADDRESS, ServerInfo.SERVER_B_PORT);
+                socketB.setSoTimeout(1000);
+                serverConnectionB = new ServerConnection(socketB);
+                outputStreamB = new ObjectOutputStream(socketB.getOutputStream());
+                System.out.println("Connected to server B");
+                new Thread(serverConnectionB).start();
 
-        new Thread(serverConnectionA).start();
-        //new Thread(serverConnectionB).start();
+            } catch (Exception e) {
+                System.out.println("The RSS server is currently experiencing an outage. \n" +
+                        "Please try again in a few minutes while we work to restore the service! <3");
+                return;
+            }
+        }
 
         while(true) {
             do {
@@ -82,8 +106,12 @@ public class Main {
             }while(!validChoice);
 
             while(true){
-                System.out.println("Command list: \nTo update your user: UPDATE" +
-                        "\nTo delete a user: DE-REGISTER \nTo update your subjects: SUBJECTS \nTo publish a message: PUBLISH" +
+                System.out.println("Command list: +" +
+                        //"\nTo update your user: UPDATE" +
+                        "\nTo delete a user: DE-REGISTER" +
+                        "\nTo update your subjects: SUBJECTS " +
+                        "\nTo publish a message: PUBLISH" +
+                        "\nFor a joke: JOKE" +
                         "\nTo exit: DONE");
                 String userCommand = scanner.nextLine().toUpperCase();
 
@@ -92,27 +120,30 @@ public class Main {
 
 
                 switch (userCommand) {
-                    case "UPDATE":
-                        //IMPORT ASSUMPTION FOR THE UPDATE: updating port and IP will be done automatically so that the
-                        //user cannot mess things up. Futhermore, the prof said that everything wrt to ip and socketA (save for the server address)
-                        //should be done automatically. This also gives users a better experience.
-                        System.out.println("Do you want manually or automatically update your IP and socketA? AUTO/MAN ");
-
-                        String newIP = clientAddress.getHostAddress().trim();
-                        int updatePort = 5003;
-                        while (!available(updatePort)) updatePort++;
-                        System.out.println("New IP: " + newIP + ", New port: " + updatePort);
-                        //todo: add josephs update thing
-                        //todo: make sure its valid (name exists) and tell the user the result
-                        //if it fails they go back to the menu and need to try to update again
-                        break;
+//                    case "UPDATE":
+//                        //IMPORT ASSUMPTION FOR THE UPDATE: updating port and IP will be done automatically so that the
+//                        //user cannot mess things up. Futhermore, the prof said that everything wrt to ip and socketA (save for the server address)
+//                        //should be done automatically. This also gives users a better experience.
+//                        System.out.println("Do you want manually or automatically update your IP and socketA? AUTO/MAN ");
+//
+//                        String newIP = clientAddress.getHostAddress().trim();
+//                        int updatePort = 5003;
+//                        while (!available(updatePort)) updatePort++;
+//                        System.out.println("New IP: " + newIP + ", New port: " + updatePort);
+//                        //todo: add josephs update thing
+//                        //todo: make sure its valid (name exists) and tell the user the result
+//                        //if it fails they go back to the menu and need to try to update again
+//                        break;
 
                     case "DE-REGISTER":
-                        System.out.println("Please enter the name of the user you want to delete: ");
-                        String userToDelete = scanner.nextLine();
-                        RQ deRegisterRQ = new RQ(5, rq++, userToDelete);
-                        //client.sendMessage(deRegisterRQ.getMessage());
-                        outputStreamA.writeObject(deRegisterRQ.getMessage());
+                        System.out.println("Are you sure you want to de-register? You will need to recreate an account to " +
+                                "continue using this service! (Y/N)");
+                        String areYouSureOrNAWH = scanner.nextLine();
+                        if(areYouSureOrNAWH.equalsIgnoreCase("y")) {
+                            RQ deRegisterRQ = new RQ(5, rq++, username);
+                            //client.sendMessage(deRegisterRQ.getMessage());
+                            outputStreamA.writeObject(deRegisterRQ.getMessage());
+                        }
                         Thread.sleep(1000);
                         //RQ receivedDeRegisterRq = new RQ((byte[]) client.readObjectFromServer());
 
@@ -201,6 +232,9 @@ public class Main {
                         outputStreamA.close();
                         System.out.println("Client disconnected from server. Have a nice day! :)");
                         return;
+
+                    case "JOKE":
+                        break;
                 }
             }
         }
