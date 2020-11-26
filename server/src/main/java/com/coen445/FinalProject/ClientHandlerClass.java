@@ -96,6 +96,9 @@ public class ClientHandlerClass extends Thread {
                                 //server.sendObject(returnRQ.getMessage());
                                 outputStream.writeObject(returnRQ.getMessage());
                                 //server.setRegistered(true);
+
+                                //after sending registered to the client, we must also send it to the server not currently serving
+
                             }
                         } catch (IOException e) {
                             if (e instanceof EOFException || e instanceof SocketException) {
@@ -104,14 +107,10 @@ public class ClientHandlerClass extends Thread {
                             } else
                                 e.printStackTrace();
                         }
-                        // TODO: 2020-11-08 Add new user to the database (Use semaphore n shit)
-
-                        //now that we have the data from the user we need to save it.
 
                         break;
 
                     case 3://REGISTERED (server to server)
-                        //todo: add comment to say which case is what
 
                         break;
                     case 4: //REGISTER-DENIED (from other server)
@@ -142,7 +141,7 @@ public class ClientHandlerClass extends Thread {
                             e.printStackTrace();
                         }
                         break;
-                    case 7://UPDATE //todo: when we hear back from khendek
+                    case 7://UPDATE
                         //todo: open a connection here if its a login scenario
                         //todo check if user exists and update ip and port upon login, else send user does not exit
                         //start by checking to see if the user exists
@@ -166,7 +165,6 @@ public class ClientHandlerClass extends Thread {
                         } catch (FileNotFoundException e) {
                             e.printStackTrace();
                         }
-
 
                         //needs to send update-confirmed (8) to both client and server
                         break;

@@ -32,36 +32,40 @@ public class Main {
         Socket socketB = null;
         ServerConnection serverConnectionB = null;
         ObjectOutputStream outputStreamB = null;
-        boolean serverConnect = false;
+        boolean serverAConnect = false;
+        boolean serverBConnect = false;
 
-        try{
+        try {
             socketA = new Socket(ServerInfo.SERVER_A_ADDRESS, ServerInfo.SERVER_A_PORT);
             socketA.setSoTimeout(500);
             serverConnectionA = new ServerConnection(socketA);
             outputStreamA = new ObjectOutputStream(socketA.getOutputStream());
             System.out.println("Connected to server A");
-            serverConnect = true;
+            serverAConnect = true;
             new Thread(serverConnectionA).start();
         } catch (ConnectException e) {
-            System.out.println("Server A currently unavailable. Trying server B");
+            System.out.println("Server A currently unavailable");
         }
-        if(!serverConnect) {
-            try {
-                socketB = new Socket(ServerInfo.SERVER_B_ADDRESS, ServerInfo.SERVER_B_PORT);
-                socketB.setSoTimeout(1000);
-                serverConnectionB = new ServerConnection(socketB);
-                outputStreamB = new ObjectOutputStream(socketB.getOutputStream());
-                System.out.println("Connected to server B");
-                new Thread(serverConnectionB).start();
+        try {
+            socketB = new Socket(ServerInfo.SERVER_B_ADDRESS, ServerInfo.SERVER_B_PORT);
+            socketB.setSoTimeout(1000);
+            serverConnectionB = new ServerConnection(socketB);
+            outputStreamB = new ObjectOutputStream(socketB.getOutputStream());
+            System.out.println("Connected to server B");
+            serverBConnect = true;
+            new Thread(serverConnectionB).start();
 
-            } catch (Exception e) {
-                System.out.println("The RSS server is currently experiencing an outage. \n" +
-                        "Please try again in a few minutes while we work to restore the service! <3");
-                return;
-            }
+        } catch (Exception e) {
+            System.out.println("Server B is unavailable");
         }
 
-        while(true) {
+        if (!serverAConnect || !serverBConnect) {
+            System.out.println("The RSS server is currently experiencing an outage. \n" +
+                    "Please try again in a few minutes while we work to restore the service! <3");
+            return;
+        }
+
+        while (true) {
             do {
                 do {
                     System.out.println("\n\nWould you like to login or register? LOGIN/REGISTER");
@@ -83,29 +87,29 @@ public class Main {
                     } else if (loginOrRegister.equalsIgnoreCase("register")) {
                         validChoice = true;
                         //do {
-                            //todo: make it loop until its correct
-                            System.out.println("Please enter a username: ");
-                            username = scanner.nextLine();
-                            System.out.println("Your username is : " + username + "\n" + "Please enter a password: ");
-                            String password = scanner.nextLine();
-                            System.out.println("Your password is: " + password);
+                        //todo: make it loop until its correct
+                        System.out.println("Please enter a username: ");
+                        username = scanner.nextLine();
+                        System.out.println("Your username is : " + username + "\n" + "Please enter a password: ");
+                        String password = scanner.nextLine();
+                        System.out.println("Your password is: " + password);
 
-                            int portCheck = 5003; //5001/2 are reserved for the servers
-                            while (!available(portCheck)) {
-                                System.out.println("Port: " + portCheck + " is occupied");
-                                portCheck++;
-                            }
-                            RQ registerRQ = new RQ(0, rq++, username, socketA.getLocalAddress().getHostAddress(), socketA.getLocalPort());
-                            System.out.println("Registering Client: " + registerRQ.getName());
-                            outputStreamA.writeObject(registerRQ.getMessage());
-                            Thread.sleep(1000);
-                       // } while (!registerSuccess);
+                        int portCheck = 5003; //5001/2 are reserved for the servers
+                        while (!available(portCheck)) {
+                            System.out.println("Port: " + portCheck + " is occupied");
+                            portCheck++;
+                        }
+                        RQ registerRQ = new RQ(0, rq++, username, socketA.getLocalAddress().getHostAddress(), socketA.getLocalPort());
+                        System.out.println("Registering Client: " + registerRQ.getName());
+                        outputStreamA.writeObject(registerRQ.getMessage());
+                        Thread.sleep(1000);
+                        // } while (!registerSuccess);
                     } else //invalid choice
                         System.out.println("Please enter a valid input.");
-                }while (!registerSuccess);
-            }while(!validChoice);
+                } while (!registerSuccess);
+            } while (!validChoice);
 
-            while(true){
+            while (true) {
                 System.out.println("Command list: +" +
                         //"\nTo update your user: UPDATE" +
                         "\nTo delete a user: DE-REGISTER" +
@@ -139,7 +143,7 @@ public class Main {
                         System.out.println("Are you sure you want to de-register? You will need to recreate an account to " +
                                 "continue using this service! (Y/N)");
                         String areYouSureOrNAWH = scanner.nextLine();
-                        if(areYouSureOrNAWH.equalsIgnoreCase("y")) {
+                        if (areYouSureOrNAWH.equalsIgnoreCase("y")) {
                             RQ deRegisterRQ = new RQ(5, rq++, username);
                             //client.sendMessage(deRegisterRQ.getMessage());
                             outputStreamA.writeObject(deRegisterRQ.getMessage());
@@ -239,7 +243,6 @@ public class Main {
             }
         }
     }
-
 
 
 //        //start by trying to connect to server a
