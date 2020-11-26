@@ -15,6 +15,7 @@ public class ClientHandlerClass extends Thread {
     private Socket client;
     private ObjectOutputStream outputStream;
     private ObjectInputStream inputStream;
+    private ObjectInputStream serverInputStream;
     private ArrayList<ClientHandlerClass> clients;
 
     public ClientHandlerClass(Server server) {
@@ -31,9 +32,12 @@ public class ClientHandlerClass extends Thread {
     public void run() {
         super.run();
         Object received = null;
+        Object fromServer = null;
         byte[] message = null;
+        byte[] serverMessage = null;
         Object toReturn = null;
         RQ receivedRQ = null;
+        RQ receivedFromServerRQ = null;
         //System.out.println("Request on port: " + server.getPort());
 
         loop:
@@ -52,6 +56,15 @@ public class ClientHandlerClass extends Thread {
                 try {
                     //received = server.readObject();
                     received = inputStream.readObject();
+                    if(Main.port == 5001){
+                        Socket socket = new Socket("localhost", 5002);
+                        serverInputStream = new ObjectInputStream(socket.getInputStream());
+                        fromServer = serverInputStream.readObject();
+                    }else if(Main.port == 5002){
+                        Socket socket = new Socket("localhost", 5001);
+                        serverInputStream = new ObjectInputStream(socket.getInputStream());
+                        fromServer = serverInputStream.readObject();
+                    }
                 } catch (IOException e) {
                     //in the event a client randomly disconnects, it will throw and end of file exception.
                     //When this happens, we're going to catch it, print the log that says a user disconnected, and then move on
@@ -66,8 +79,11 @@ public class ClientHandlerClass extends Thread {
                 }
                 //String[] messageSegments = received.split(" ");
                 message = (byte[]) received;
+                serverMessage = (byte[]) fromServer;
                 try {
                     receivedRQ = new RQ(message);
+                    if(serverMessage != null)
+                        receivedFromServerRQ = new RQ(serverMessage);
                 } catch (InvalidProtocolBufferException e) {
                     e.printStackTrace();
                 }
@@ -89,6 +105,18 @@ public class ClientHandlerClass extends Thread {
                                 //RQ returnRQ = new RQ(2, receivedRQ.getRqNum());
                                 //server.sendObject(new RQ(2, receivedRQ.getRqNum()).getMessage());
                                 outputStream.writeObject(new RQ(2, receivedRQ.getRqNum()).getMessage()); //send register failed?
+
+                                //server sends register denied to other server
+                                if(Main.port == 5001){
+                                    Socket socket = new Socket("localhost", 5002);
+                                    ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
+                                    outputStream.writeObject(new RQ(4, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getIp(), receivedRQ.getSocketNum()).getMessage());
+                                }else if(Main.port == 5002){
+                                    Socket socket = new Socket("localhost", 5001);
+                                    ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
+                                    outputStream.writeObject(new RQ(4, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getIp(), receivedRQ.getSocketNum()).getMessage());
+                                }
+
                             } else {
                                 //server.sendObject("REGISTERED");
                                 System.out.println("New user added to database");
@@ -98,6 +126,15 @@ public class ClientHandlerClass extends Thread {
                                 //server.setRegistered(true);
 
                                 //after sending registered to the client, we must also send it to the server not currently serving
+                                if(Main.port == 5001){
+                                    Socket socket = new Socket("localhost", 5002);
+                                    ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
+                                    outputStream.writeObject(new RQ(3, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getIp(), receivedRQ.getSocketNum()).getMessage());
+                                }else if(Main.port == 5002){
+                                    Socket socket = new Socket("localhost", 5001);
+                                    ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
+                                    outputStream.writeObject(new RQ(3, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getIp(), receivedRQ.getSocketNum()).getMessage());
+                                }
 
                             }
                         } catch (IOException e) {
@@ -108,12 +145,6 @@ public class ClientHandlerClass extends Thread {
                                 e.printStackTrace();
                         }
 
-                        break;
-
-                    case 3://REGISTERED (server to server)
-
-                        break;
-                    case 4: //REGISTER-DENIED (from other server)
                         break;
                     case 5: //DE-REGISTER
                         //todo check if user exists and delete
@@ -133,13 +164,6 @@ public class ClientHandlerClass extends Thread {
                         } catch (IOException e) {
                         e.printStackTrace();
                     }
-                        break;
-                    case 6://other server has told this server to delete the user from the DB
-                        try {
-                            helper.deleteUserWithoutCheck(receivedRQ.getName());
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
                         break;
                     case 7://UPDATE
                         //todo: open a connection here if its a login scenario
@@ -168,15 +192,6 @@ public class ClientHandlerClass extends Thread {
 
                         //needs to send update-confirmed (8) to both client and server
                         break;
-                    case 8://UPDATE-CONFIRMED (From server to server)
-                        //received the update confirmed. Now update the user accordingly
-                        try {
-                            helper.updateUser(new User(receivedRQ.getName(), receivedRQ.getPassword(),
-                                    receivedRQ.getIp(), Integer.toString(receivedRQ.getSocketNum())));
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        break;
                     case 10://SUBJECTS (Client to Server -> we receive the new subjects)
                         try {
                             if(helper.updateUserSubjects(receivedRQ.getName(), receivedRQ.getSubjects())){
@@ -194,13 +209,6 @@ public class ClientHandlerClass extends Thread {
                         } catch (FileNotFoundException e) {
                             e.printStackTrace();
                         } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        break;
-                    case 11:
-                        try {
-                            helper.updateUserSubjects(receivedRQ.getName(), receivedRQ.getSubjects());
-                        } catch (FileNotFoundException e) {
                             e.printStackTrace();
                         }
                         break;
@@ -244,12 +252,57 @@ public class ClientHandlerClass extends Thread {
                             e.printStackTrace();
                         }
                         break;
-                    case 17:
-                        break;
 
                     default:
                         throw new IllegalStateException("Unexpected value: " + receivedRQ);
                 }
+
+               try {
+                    switch (receivedFromServerRQ.getRegisterCode()) {
+                        case 3: //REGISTERED from other server
+                            //todo create 2nd database, choose which db to edit depending on port
+                            System.out.println("Other server has registered user " + receivedFromServerRQ.getName());
+                            break;
+
+                        case 4: //REGISTER-DENIED from other server
+                            System.out.println("Other server has denied registration to user " + receivedFromServerRQ.getName());
+                            break;
+
+                        case 6://other server has told this server to delete the user from the DB
+                            try {
+                                helper.deleteUserWithoutCheck(receivedRQ.getName());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            break;
+
+                        case 8://UPDATE-CONFIRMED (From server to server)
+                            //received the update confirmed. Now update the user accordingly
+                            try {
+                                helper.updateUser(new User(receivedRQ.getName(), receivedRQ.getPassword(),
+                                        receivedRQ.getIp(), Integer.toString(receivedRQ.getSocketNum())));
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            break;
+
+                        case 11:
+                            try {
+                                helper.updateUserSubjects(receivedRQ.getName(), receivedRQ.getSubjects());
+                            } catch (FileNotFoundException e) {
+                                e.printStackTrace();
+                            }
+                            break;
+
+                        case 17:
+                            break;
+
+                        default:
+                            throw new IllegalStateException("Unexpected value: " + receivedRQ);
+                    }
+                }catch(NullPointerException e){
+                   System.out.println("Nothing from server");
+               }
             //} //end else for that old bs if
         }
         System.out.println("Session Terminated");

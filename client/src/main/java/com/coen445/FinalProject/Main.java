@@ -37,7 +37,6 @@ public class Main {
 
         try {
             socketA = new Socket(ServerInfo.SERVER_A_ADDRESS, ServerInfo.SERVER_A_PORT);
-            socketA.setSoTimeout(500);
             serverConnectionA = new ServerConnection(socketA);
             outputStreamA = new ObjectOutputStream(socketA.getOutputStream());
             System.out.println("Connected to server A");
@@ -48,7 +47,6 @@ public class Main {
         }
         try {
             socketB = new Socket(ServerInfo.SERVER_B_ADDRESS, ServerInfo.SERVER_B_PORT);
-            socketB.setSoTimeout(1000);
             serverConnectionB = new ServerConnection(socketB);
             outputStreamB = new ObjectOutputStream(socketB.getOutputStream());
             System.out.println("Connected to server B");

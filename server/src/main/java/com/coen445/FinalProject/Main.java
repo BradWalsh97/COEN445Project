@@ -18,12 +18,13 @@ public class Main {
 
     public static boolean isServing = true;
     public static ScheduledExecutorService servingTimer = Executors.newScheduledThreadPool(1);
+    public static int port;
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
         boolean servingDone = false;
         Scanner scanner = new Scanner(System.in);
         System.out.println("Hello Systems Administrator. Please chose which port you will run this server on: ");
-        int port = Integer.parseInt(scanner.nextLine());
+        port = Integer.parseInt(scanner.nextLine());
         System.out.println("Is this server the primary server? (Y/N)");
         String isPrimaryString = scanner.nextLine();
 
@@ -40,7 +41,7 @@ public class Main {
 
 
 
-
+        //todo do server socket between server A and B
 
         ServerSocket listener = null;
         if(available(5001))
@@ -52,7 +53,7 @@ public class Main {
         Random randTimerValue = new Random();
         if(isPrimary){ //start n minute timer
 //            servingTimer.schedule(Main::toggleIsServer, randTimerValue.nextInt(2) + 3, TimeUnit.MINUTES);
-            servingTimer.schedule(Main::toggleIsServer, 1, TimeUnit.MINUTES);
+            servingTimer.schedule(Main::toggleIsServer, 5, TimeUnit.MINUTES);
 
         }
 
