@@ -1,9 +1,8 @@
 package com.coen445.FinalProject;
 
 import java.io.IOException;
-import java.net.DatagramSocket;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.io.ObjectOutputStream;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
@@ -19,7 +18,10 @@ public class Main {
     public static boolean isServing = true;
     public static ScheduledExecutorService servingTimer = Executors.newScheduledThreadPool(1);
     public static int serverPort;
+    public static int altServerPort;
     public static String whichServer;
+    public static boolean backupConnected = false;
+    public static boolean backupRegistered = false;
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
         boolean servingDone = false;
@@ -28,6 +30,7 @@ public class Main {
         whichServer = scanner.nextLine();
         System.out.println("Is this server the primary server? (Y/N)");
         String isPrimaryString = scanner.nextLine();
+        ServerConnection serverConnection = null;
 
         boolean isPrimary;
         if(isPrimaryString.equalsIgnoreCase("Y")) {
@@ -45,38 +48,49 @@ public class Main {
         //todo do server socket between server A and B
 
         ServerSocket listener = null;
+        Socket otherServerSocket = null;
         //if(available(serverPort))
         if(whichServer.equalsIgnoreCase("a")) {
             serverPort = ServerInfo.SERVER_A_PORT;
             listener = new ServerSocket(serverPort);
+            altServerPort = ServerInfo.SERVER_B_PORT;
         }else if(whichServer.equalsIgnoreCase("b")){
             serverPort = ServerInfo.SERVER_B_PORT;
             listener = new ServerSocket(serverPort);
+            altServerPort = ServerInfo.SERVER_A_PORT;
         }
-        //else
-            //listener = new ServerSocket(serverPort++);
 
         //now that the server has been created, start a timer between 3 & 5 minutes
         Random randTimerValue = new Random();
+        Socket socket = null;
         if(isPrimary){ //start n minute timer
 //            servingTimer.schedule(Main::toggleIsServer, randTimerValue.nextInt(2) + 3, TimeUnit.MINUTES);
             servingTimer.schedule(Main::toggleIsServer, 5, TimeUnit.MINUTES);
-
+        }else{
+            socket = new Socket(ServerInfo.SERVER_A_ADDRESS, altServerPort);
+            serverConnection = new ServerConnection(socket);
         }
 
+        if(!isServing){
+            new Thread(serverConnection).start();
+        }
         //server.startSever();
         while (true) {
             //server.acceptClient();
             //Thread t = new ClientHandlerClass(server);
             //t.start();
+
             System.out.println("Waiting for client connection...");
             Socket client = listener.accept();
+
+
             System.out.println("socket is " + client.getLocalPort() + " and " + client.getPort());
             System.out.println("Connected to client");
             ClientHandlerClass clientThread = new ClientHandlerClass(client, clients);
             clients.add(clientThread);
 
             pool.execute(clientThread);
+
             //server.checkMessage();
             //server.endConnection();
         }
