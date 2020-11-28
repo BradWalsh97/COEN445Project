@@ -1,0 +1,18 @@
+[
+ {
+  "userID": 0,
+  "userName": "john",
+  "interests": [],
+  "IPAddress": "127.0.0.1",
+  "socketNumber": "56893",
+  "isDeleted": false
+ },
+ {
+  "userID": 1,
+  "userName": "brad",
+  "interests": [],
+  "IPAddress": "127.0.0.1",
+  "socketNumber": "50051",
+  "isDeleted": false
+ }
+]

@@ -12,7 +12,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class Main {
-    public static ArrayList<ClientHandlerClass> clients = new ArrayList<>();
+    //public static ArrayList<ClientHandlerClass> clients = new ArrayList<>();
     public static ExecutorService pool = Executors.newFixedThreadPool(4);
 
     public static boolean isServing = true;
@@ -46,8 +46,8 @@ public class Main {
 
         //todo do server socket between server A and B
 
-        ServerSocket listener = null;
-        Socket otherServerSocket = null;
+        //ServerSocket listener = null;
+        //Socket otherServerSocket = null;
         //if(available(serverPort))
         if(whichServer.equalsIgnoreCase("a")) {
             serverPort = ServerInfo.SERVER_A_PORT;
@@ -67,8 +67,10 @@ public class Main {
         }
 
         //Thread.sleep(5000);
-        ServerConnection serverConnection = new ServerConnection(serverPort);
-        new Thread(serverConnection).start();
+        //ServerConnection serverConnection = new ServerConnection(serverPort);
+        //new Thread(serverConnection).start();
+
+        new ClientHandler(5001).start();
 
         //System.out.println("Stopping server");
         //serverConnection.stopServer();

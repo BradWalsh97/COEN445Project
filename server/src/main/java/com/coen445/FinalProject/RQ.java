@@ -22,14 +22,18 @@ public class RQ {
     private Request.Register requestIn = Request.Register.newBuilder().build();
 
     //For deserializing a request
-    public RQ(byte[] RQIn) throws InvalidProtocolBufferException {
-        this.requestIn = Request.Register.parseFrom(RQIn);
+    public RQ(Request.Register RQIn) throws InvalidProtocolBufferException {
+        this.requestIn = RQIn;
 
         System.out.println(requestIn);
 
         this.registerCode = requestIn.getRegisterCode();
         generateRQ();
 
+    }
+
+    public Request.Register getRequestOut(){
+        return requestOut.build();
     }
 
     private void generateRQ(){

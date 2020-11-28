@@ -21,8 +21,8 @@ public class RQ {
     private Request.Register requestIn = Request.Register.newBuilder().build();
 
     //For deserializing a request
-    public RQ(byte[] RQIn) throws InvalidProtocolBufferException {
-        this.requestIn = Request.Register.parseFrom(RQIn);
+    public RQ(Request.Register RQIn) throws InvalidProtocolBufferException {
+        this.requestIn = RQIn;
 
         System.out.println(requestIn);
 
@@ -252,6 +252,10 @@ public class RQ {
         }
 
         return subList.build();
+    }
+
+    public Request.Register getRequestOut(){
+        return requestOut.build();
     }
 
     public byte[] getMessage() {
