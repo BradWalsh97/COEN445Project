@@ -30,9 +30,6 @@ public class Main {
         boolean validChoice = false;
         DatagramSocket socketA = null;
         ServerConnection serverConnectionA = null;
-        ByteArrayOutputStream bstreamA = null;
-        DatagramPacket dpSend = null;
-        ObjectOutputStream outputStreamA = null;
         DatagramSocket socketB = null;
         ServerConnection serverConnectionB = null;
         //ObjectOutputStream outputStreamB = null;
@@ -40,13 +37,9 @@ public class Main {
         boolean serverBConnect = false;
         int clientPortA = 6000;
         int clientPortB = 6001;
-        Request.Register message;
-        byte[] data;
 
         try {
             socketA = new DatagramSocket();
-            bstreamA = new ByteArrayOutputStream();
-            outputStreamA = new ObjectOutputStream(bstreamA);
             while(!available(clientPortA)){
                 clientPortA++;
             }
@@ -92,17 +85,20 @@ public class Main {
                         System.out.println("Please enter your password");
                         String password = scanner.nextLine();
 
-                        RQ updateRQ = new RQ(7, rq++, username, clientAddress.getHostAddress(), socketA.getLocalPort());
-                        message = updateRQ.getRequestOut();
-                        System.out.println("Logging in Client: " + updateRQ.getName());
-                        outputStreamA.writeObject(message);
-                        data = bstreamA.toByteArray();
-                        dpSend = new DatagramPacket(data, data.length, clientAddress, 5001);
-                        socketA.send(dpSend);
-                        //outputStreamA.writeObject(updateRQ.getMessage());
-                        message = null;
-                        data = null;
-                        //outputStreamB.writeObject(updateRQ.getMessage());
+                        try {
+                            RQ updateRQ = new RQ(7, rq++, username, clientAddress.getHostAddress(), socketA.getLocalPort());
+                            Request.Register message = updateRQ.getRequestOut();
+                            System.out.println("Logging in Client: " + updateRQ.getName());
+                            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                            ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
+                            outputStream.writeObject(message);
+                            byte[] data = byteArrayOutputStream.toByteArray();
+                            DatagramPacket dp = new DatagramPacket(data, data.length, clientAddress, 5001);
+                            socketA.send(dp);
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+
                         Thread.sleep(1000);
 
 
@@ -121,17 +117,23 @@ public class Main {
                             System.out.println("Port: " + portCheck + " is occupied");
                             portCheck++;
                         }
-                        RQ registerRQ = new RQ(0, rq++, username, clientAddress.getHostAddress(), socketA.getLocalPort());
-                        message = registerRQ.getRequestOut();
-                        System.out.println("Registering Client: " + registerRQ.getName());
-                        outputStreamA.writeObject(message);
-                        data = bstreamA.toByteArray();
-                        dpSend = new DatagramPacket(data, data.length, clientAddress, 5001);
-                        socketA.send(dpSend);
-                        message = null;
-                        data = null;
-                        //outputStreamA.writeObject(registerRQ.getMessage());
-                        //outputStreamB.writeObject(registerRQ.getMessage());
+
+                        try {
+                            RQ registerRQ = new RQ(0, rq++, username, clientAddress.getHostAddress(), socketA.getLocalPort());
+                            Request.Register message = registerRQ.getRequestOut();
+                            System.out.println("Registering Client: " + registerRQ.getName());
+                            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                            ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
+                            outputStream.writeObject(message);
+                            byte[] data = byteArrayOutputStream.toByteArray();
+                            DatagramPacket dp = new DatagramPacket(data, data.length, clientAddress, 5001);
+                            socketA.send(dp);
+                            //outputStreamA.writeObject(registerRQ.getMessage());
+                            //outputStreamB.writeObject(registerRQ.getMessage());
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+
                         Thread.sleep(1000);
                         // } while (!registerSuccess);
                     } else //invalid choice
@@ -173,14 +175,19 @@ public class Main {
                                 "continue using this service! (Y/N)");
                         String areYouSureOrNAWH = scanner.nextLine();
                         if (areYouSureOrNAWH.equalsIgnoreCase("y")) {
-                            RQ deRegisterRQ = new RQ(5, rq++, username);
-                            message = deRegisterRQ.getRequestOut();
-                            outputStreamA.writeObject(message);
-                            data = bstreamA.toByteArray();
-                            dpSend = new DatagramPacket(data, data.length, clientAddress, 5001);
-                            socketA.send(dpSend);
-                            message = null;
-                            data = null;
+
+                            try {
+                                RQ deRegisterRQ = new RQ(5, rq++, username);
+                                Request.Register message = deRegisterRQ.getRequestOut();
+                                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                                ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
+                                outputStream.writeObject(message);
+                                byte[] data = byteArrayOutputStream.toByteArray();
+                                DatagramPacket dp = new DatagramPacket(data, data.length, clientAddress, 5001);
+                                socketA.send(dp);
+                            }catch (Exception e){
+                                e.printStackTrace();
+                            }
                             //client.sendMessage(deRegisterRQ.getMessage());
                             //outputStreamA.writeObject(deRegisterRQ.getMessage());
                         }
@@ -219,14 +226,18 @@ public class Main {
                         }
 
                         //now send the server the subjects.
-                        RQ subjectsRQ = new RQ(10, rq++, username, interestList);
-                        message = subjectsRQ.getRequestOut();
-                        outputStreamA.writeObject(message);
-                        data = bstreamA.toByteArray();
-                        dpSend = new DatagramPacket(data, data.length, clientAddress, 5001);
-                        socketA.send(dpSend);
-                        message = null;
-                        data = null;
+                        try {
+                            RQ subjectsRQ = new RQ(10, rq++, username, interestList);
+                            Request.Register message = subjectsRQ.getRequestOut();
+                            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                            ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
+                            outputStream.writeObject(message);
+                            byte[] data = byteArrayOutputStream.toByteArray();
+                            DatagramPacket dp = new DatagramPacket(data, data.length, clientAddress, 5001);
+                            socketA.send(dp);
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
                         //client.sendMessage(subjectsRQ.getMessage());
                         //outputStreamA.writeObject(subjectsRQ.getMessage());
                         Thread.sleep(1000);
@@ -266,14 +277,18 @@ public class Main {
                         }
                         System.out.println("Type in the message you would like to publish"); //todo: add error checking (no empty messages)
                         String publishedMessage = scanner.nextLine();
-                        RQ publishRQ = new RQ(13, rq++, userPublish, userList, publishedMessage);
-                        message = publishRQ.getRequestOut();
-                        outputStreamA.writeObject(message);
-                        data = bstreamA.toByteArray();
-                        dpSend = new DatagramPacket(data, data.length, clientAddress, 5001);
-                        socketA.send(dpSend);
-                        message = null;
-                        data = null;
+                        try {
+                            RQ publishRQ = new RQ(13, rq++, userPublish, userList, publishedMessage);
+                            Request.Register message = publishRQ.getRequestOut();
+                            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                            ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
+                            outputStream.writeObject(message);
+                            byte[] data = byteArrayOutputStream.toByteArray();
+                            DatagramPacket dp = new DatagramPacket(data, data.length, clientAddress, 5001);
+                            socketA.send(dp);
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
                         //client.sendMessage(publishRQ.getMessage());
                         //outputStreamA.writeObject(publishRQ.getMessage());
                         Thread.sleep(1000);

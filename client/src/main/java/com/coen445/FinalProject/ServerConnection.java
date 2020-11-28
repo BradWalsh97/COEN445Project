@@ -12,8 +12,6 @@ import java.net.SocketException;
 public class ServerConnection extends Thread {
     private DatagramSocket server;
     //private ObjectInputStream inputStream;
-    private byte[] receive = new byte[65535];
-    private DatagramPacket dpReceive = null;
 
     public ServerConnection(DatagramSocket socket) throws IOException {
         this.server = socket;
@@ -25,9 +23,10 @@ public class ServerConnection extends Thread {
         try{
             while(true){
                 //Object serverResponse = inputStream.readObject();
-                dpReceive = new DatagramPacket(receive, receive.length);
-                server.receive(dpReceive);
-                byte[] data = dpReceive.getData();
+                byte[] receive = new byte[65535];
+                DatagramPacket dp = new DatagramPacket(receive, receive.length);
+                server.receive(dp);
+                byte[] data = dp.getData();
                 ByteArrayInputStream in = new ByteArrayInputStream(data);
                 ObjectInputStream inputStream = new ObjectInputStream(in);
 
@@ -60,6 +59,9 @@ public class ServerConnection extends Thread {
                     case 9:
                         System.out.println(receivedRQ.getText());
                         break;
+
+                    case 13:
+                        System.out.println("Message from");
 
                     case 15:
                         System.out.println("Message could not be published.. " + receivedRQ.getText());

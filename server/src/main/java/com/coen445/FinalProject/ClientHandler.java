@@ -2,21 +2,16 @@ package com.coen445.FinalProject;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
+import javax.xml.crypto.Data;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
 
 public class ClientHandler extends Thread {
     private DatagramSocket socket = null;
-    private byte[] buffer = new byte[65535];
-    private DatagramPacket packet = null;
-    private ByteArrayOutputStream bstream = null;
-    private ObjectOutputStream outputStream = null;
 
     public ClientHandler(int port) throws IOException {
-        this.socket = new DatagramSocket(port);
-        bstream = new ByteArrayOutputStream();
-        outputStream = new ObjectOutputStream(bstream);
+        socket = new DatagramSocket(port);
     }
 
     public StringBuilder data(byte[] a) {
@@ -34,40 +29,19 @@ public class ClientHandler extends Thread {
 
     @Override
     public void run() {
-        while (true) {
-            packet = new DatagramPacket(buffer, buffer.length);
-            try {
+        try {
+            while (true) {
+                byte[] buffer = new byte[65535];
+                DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                 socket.receive(packet);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            byte[] data = packet.getData();
-            ByteArrayInputStream in = new ByteArrayInputStream(data);
-            ObjectInputStream inputStream = null;
-            try {
-                inputStream = new ObjectInputStream(in);
-            } catch (IOException e) {
-                System.out.println("Stream corrupted");
-            }
+                byte[] data = packet.getData();
+                ByteArrayInputStream in = new ByteArrayInputStream(data);
+                ObjectInputStream inputStream = new ObjectInputStream(in);
+                Request.Register rq = (Request.Register) inputStream.readObject();
 
-            Request.Register rq = null;
-            try {
-                rq = (Request.Register) inputStream.readObject();
-            } catch (IOException | ClassNotFoundException | NullPointerException e) {
-                System.out.println("Nothing from client");
-            }
+                RQ receivedRQ = new RQ(rq);
+                JSONHelper helper = new JSONHelper(Main.whichServer);
 
-            RQ receivedRQ = null;
-            try {
-                receivedRQ = new RQ(rq);
-            } catch (InvalidProtocolBufferException | NullPointerException e) {
-                System.out.println("Nothing from client");
-            }
-            JSONHelper helper = new JSONHelper(Main.whichServer);
-            Request.Register message;
-            byte[] dataSent;
-
-            try {
                 switch (receivedRQ.getRegisterCode()) {
                     case 0: //register  //todo: make an exception for an empty username
                         try {
@@ -80,37 +54,34 @@ public class ClientHandler extends Thread {
                                     receivedRQ.getIp(), Integer.toString(receivedRQ.getSocketNum())); //todo: check with jo if its ok if I change user.class socket to int. If so, change it
                             if (!helper.saveNewUser(newUser)) { //if false then it tells user why
                                 System.out.println("The user already exists");
-                                RQ returnRQ = new RQ(2, receivedRQ.getRqNum());
-                                message = returnRQ.getRequestOut();
-                                outputStream.writeObject(message);
-                                dataSent = bstream.toByteArray();
-                                packet = new DatagramPacket(dataSent, dataSent.length, packet.getAddress(), packet.getPort());
-                                socket.send(packet);
+                                try {
+                                    RQ returnRQ = new RQ(2, receivedRQ.getRqNum());
+                                    Request.Register message = returnRQ.getRequestOut();
+                                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                                    ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
+                                    outputStream.writeObject(message);
+                                    byte[] dataSent = byteArrayOutputStream.toByteArray();
+                                    DatagramPacket dp = new DatagramPacket(dataSent, dataSent.length, packet.getAddress(), packet.getPort());
+                                    socket.send(dp);
+                                }catch (Exception e){
+                                    e.printStackTrace();
+                                }
 
                             } else {
                                 //server.sendObject("REGISTERED");
                                 System.out.println("New user added to database");
-                                RQ returnRQ = new RQ(1, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getIp(), receivedRQ.getSocketNum()); //todo: what to do with the 1
-                                message = returnRQ.getRequestOut();
-                                outputStream.writeObject(message);
-                                dataSent = bstream.toByteArray();
-                                packet = new DatagramPacket(dataSent, dataSent.length, packet.getAddress(), packet.getPort());
-                                socket.send(packet);
-                                //server.sendObject(returnRQ.getMessage());
-                                //outputStream.writeObject(returnRQ.getMessage());
-                                //outputStream.writeObject(new RQ(3, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getIp(), receivedRQ.getSocketNum()).getMessage());
-                                //server.setRegistered(true);
-
-                                //after sending registered to the client, we must also send it to the server not currently serving
-                                /*if (Main.serverPort == 5001) {
-                                    Socket socket = new Socket("localhost", 5002);
-                                    ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
-                                    outputStream.writeObject(new RQ(3, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getIp(), receivedRQ.getSocketNum()).getMessage());
-                                } else if (Main.serverPort == 5002) {
-                                    Socket socket = new Socket("localhost", 5001);
-                                    ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
-                                    outputStream.writeObject(new RQ(3, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getIp(), receivedRQ.getSocketNum()).getMessage());
-                                }*/
+                                try {
+                                    RQ returnRQ = new RQ(1, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getIp(), receivedRQ.getSocketNum()); //todo: what to do with the 1
+                                    Request.Register message = returnRQ.getRequestOut();
+                                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                                    ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
+                                    outputStream.writeObject(message);
+                                    byte[] dataSent = byteArrayOutputStream.toByteArray();
+                                    DatagramPacket dp = new DatagramPacket(dataSent, dataSent.length, packet.getAddress(), packet.getPort());
+                                    socket.send(dp);
+                                }catch (Exception e){
+                                    e.printStackTrace();
+                                }
 
                             }
                         } catch (IOException e) {
@@ -129,19 +100,23 @@ public class ClientHandler extends Thread {
                             if (helper.deleteUserWithCheck(receivedRQ.getName())) {//if true: user deleted
                                 System.out.println("User " + receivedRQ.getName() + " has been deleted");
                                 //server.sendObject(new RQ(6, receivedRQ.getName()).getMessage()); //send DE-REGISTER response to other server
-                                RQ returnRQ = new RQ(6, receivedRQ.getName());
-                                message = returnRQ.getRequestOut();
-                                outputStream.writeObject(message);
-                                dataSent = bstream.toByteArray();
-                                packet = new DatagramPacket(dataSent, dataSent.length, packet.getAddress(), packet.getPort());
-                                socket.send(packet);
+                                try {
+                                    RQ returnRQ = new RQ(6, receivedRQ.getName());
+                                    Request.Register message = returnRQ.getRequestOut();
+                                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                                    ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
+                                    outputStream.writeObject(message);
+                                    byte[] dataSent = byteArrayOutputStream.toByteArray();
+                                    DatagramPacket dp = new DatagramPacket(dataSent, dataSent.length, packet.getAddress(), packet.getPort());
+                                    socket.send(dp);
+                                }catch (Exception e){
+                                    e.printStackTrace();
+                                }
                                 //todo: send to other server the update
                             } else { //user not found
                                 System.out.println("The user " + receivedRQ.getName() + " was not found and thus could not be deleted.");
                             }
 
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -157,22 +132,26 @@ public class ClientHandler extends Thread {
                                 try {
                                     helper.updateUser(new User(receivedRQ.getName(), receivedRQ.getPassword(), receivedRQ.getIp(), Integer.toString(receivedRQ.getSocketNum())));
                                     RQ returnRQ = new RQ(8, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getIp(), receivedRQ.getSocketNum());
-                                    message = returnRQ.getRequestOut();
+                                    Request.Register message = returnRQ.getRequestOut();
+                                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                                    ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
                                     outputStream.writeObject(message);
-                                    dataSent = bstream.toByteArray();
-                                    packet = new DatagramPacket(dataSent, dataSent.length, packet.getAddress(), packet.getPort());
-                                    socket.send(packet);
+                                    byte[] dataSent = byteArrayOutputStream.toByteArray();
+                                    DatagramPacket dp = new DatagramPacket(dataSent, dataSent.length, packet.getAddress(), packet.getPort());
+                                    socket.send(dp);
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
                             } else {
                                 try {
                                     RQ returnRQ = new RQ(9, "Username or password did not match an existing user");
-                                    message = returnRQ.getRequestOut();
+                                    Request.Register message = returnRQ.getRequestOut();
+                                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                                    ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
                                     outputStream.writeObject(message);
-                                    dataSent = bstream.toByteArray();
-                                    packet = new DatagramPacket(dataSent, dataSent.length, packet.getAddress(), packet.getPort());
-                                    socket.send(packet);
+                                    byte[] dataSent = byteArrayOutputStream.toByteArray();
+                                    DatagramPacket dp = new DatagramPacket(dataSent, dataSent.length, packet.getAddress(), packet.getPort());
+                                    socket.send(dp);
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
@@ -189,27 +168,37 @@ public class ClientHandler extends Thread {
                             if (helper.updateUserSubjects(receivedRQ.getName(), receivedRQ.getSubjects())) {
                                 //send to client and other server update confirmed.
                                 //server.sendObject(new RQ(11, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getSubjects()).getMessage()); //send to client
-                                RQ returnRQ = new RQ(11, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getSubjects());
-                                message = returnRQ.getRequestOut();
-                                outputStream.writeObject(message);
-                                dataSent = bstream.toByteArray();
-                                packet = new DatagramPacket(dataSent, dataSent.length, packet.getAddress(), packet.getPort());
-                                socket.send(packet);
+                                try {
+                                    RQ returnRQ = new RQ(11, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getSubjects());
+                                    Request.Register message = returnRQ.getRequestOut();
+                                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                                    ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
+                                    outputStream.writeObject(message);
+                                    byte[] dataSent = byteArrayOutputStream.toByteArray();
+                                    DatagramPacket dp = new DatagramPacket(dataSent, dataSent.length, packet.getAddress(), packet.getPort());
+                                    socket.send(dp);
+                                }catch (Exception e){
+                                    e.printStackTrace();
+                                }
 
 //                                clientOutputStream.writeObject(new RQ(11, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getSubjects()).getMessage());
                                 //server.sendObject(new RQ(11, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getSubjects()).getMessage()); //send to other server //todo: update to send to server (using objectOutputStream)
                             } else {
                                 //send subjects-rejected to client
 //                                clientOutputStream.writeObject(new RQ(12, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getSubjects()).getMessage());//send to client
-                                RQ returnRQ = new RQ(12, receivedRQ.getRqNum());
-                                message = returnRQ.getRequestOut();
-                                outputStream.writeObject(message);
-                                dataSent = bstream.toByteArray();
-                                packet = new DatagramPacket(dataSent, dataSent.length, packet.getAddress(), packet.getPort());
-                                socket.send(packet);
+                                try {
+                                    RQ returnRQ = new RQ(12, receivedRQ.getRqNum());
+                                    Request.Register message = returnRQ.getRequestOut();
+                                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                                    ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
+                                    outputStream.writeObject(message);
+                                    byte[] dataSent = byteArrayOutputStream.toByteArray();
+                                    DatagramPacket dp = new DatagramPacket(dataSent, dataSent.length, packet.getAddress(), packet.getPort());
+                                    socket.send(dp);
+                                }catch (Exception e){
+                                    e.printStackTrace();
+                                }
                             }
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -224,38 +213,34 @@ public class ClientHandler extends Thread {
                                     ArrayList<User> users = new ArrayList<>(helper.getAllUsersWithInterest(receivedRQ.getSubjects().get(0), receivedRQ.getName()));
                                     for (User user : users) {//for each user show shares that interest, send them the new message
                                         try {
-                                            RQ returnRQ = new RQ(13, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getSubjects(), receivedRQ.getText());
-                                            message = returnRQ.getRequestOut();
+                                            RQ returnRQ = new RQ(14, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getSubjects(), receivedRQ.getText());
+                                            Request.Register message = returnRQ.getRequestOut();
+                                            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                                            ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
                                             outputStream.writeObject(message);
-                                            dataSent = bstream.toByteArray();
-                                            packet = new DatagramPacket(dataSent, dataSent.length, InetAddress.getByName(user.getIPAddress()), Integer.parseInt(user.getSocketNumber()));
-                                            socket.send(packet);
-
-                                            //System.out.println("ip " + client.getLocalAddress().getHostAddress() + " socket " + client.getLocalPort());
-                                            //Socket socket = new Socket(user.getIPAddress(), Integer.parseInt(user.getSocketNumber()));
-                                            //Socket socket = client;
-                                            //System.out.println(socket.getLocalPort());
-                                            //ObjectOutputStream clientOutputStream = new ObjectOutputStream(socket.getOutputStream());
-                                            //clientOutputStream.writeObject(new RQ(14, receivedRQ.getName(),
-                                            //receivedRQ.getSubjects(), receivedRQ.getText()).getMessage());
-                                            //socket.close();
-                                            //clientOutputStream.close();
+                                            byte[] dataSent = byteArrayOutputStream.toByteArray();
+                                            DatagramPacket dp = new DatagramPacket(dataSent, dataSent.length, InetAddress.getByName(user.getIPAddress()), Integer.parseInt(user.getSocketNumber()));
+                                            socket.send(dp);
                                         } catch (IOException e) {
                                             e.printStackTrace();
                                         }
                                     }
                                 } else {
-                                    RQ returnRQ = new RQ(15, receivedRQ.getRqNum(), "The subject chosen is not in your list of interests, please update your interests and try again.");
-                                    message = returnRQ.getRequestOut();
-                                    outputStream.writeObject(message);
-                                    dataSent = bstream.toByteArray();
-                                    packet = new DatagramPacket(dataSent, dataSent.length, packet.getAddress(), packet.getPort());
-                                    socket.send(packet);
+                                    try {
+                                        RQ returnRQ = new RQ(15, receivedRQ.getRqNum(), "The subject chosen is not in your list of interests, please update your interests and try again.");
+                                        Request.Register message = returnRQ.getRequestOut();
+                                        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                                        ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
+                                        outputStream.writeObject(message);
+                                        byte[] dataSent = byteArrayOutputStream.toByteArray();
+                                        DatagramPacket dp = new DatagramPacket(dataSent, dataSent.length, packet.getAddress(), packet.getPort());
+                                        socket.send(dp);
+                                    }catch (Exception e){
+                                        e.printStackTrace();
+                                    }
                                 }
                             }
 
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -267,9 +252,9 @@ public class ClientHandler extends Thread {
                     default:
                         throw new IllegalStateException("Unexpected value: " + receivedRQ);
                 }
-            } catch (NullPointerException e) {
-                System.out.println("Nothing from client");
             }
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
         }
     }
 }

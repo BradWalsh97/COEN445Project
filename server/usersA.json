@@ -2,17 +2,41 @@
  {
   "userID": 0,
   "userName": "john",
-  "interests": [],
+  "interests": [
+   "Politics"
+  ],
   "IPAddress": "127.0.0.1",
-  "socketNumber": "56893",
+  "socketNumber": "56481",
   "isDeleted": false
  },
  {
   "userID": 1,
   "userName": "brad",
-  "interests": [],
+  "interests": [
+   "Politics"
+  ],
   "IPAddress": "127.0.0.1",
-  "socketNumber": "50051",
+  "socketNumber": "56482",
+  "isDeleted": false
+ },
+ {
+  "userID": 2,
+  "userName": "joseph",
+  "interests": [
+   "Politics"
+  ],
+  "IPAddress": "127.0.0.1",
+  "socketNumber": "51329",
+  "isDeleted": false
+ },
+ {
+  "userID": 3,
+  "userName": "jo",
+  "interests": [
+   "Sports"
+  ],
+  "IPAddress": "127.0.0.1",
+  "socketNumber": "61237",
   "isDeleted": false
  }
 ]
