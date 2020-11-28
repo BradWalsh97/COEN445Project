@@ -4,100 +4,74 @@ import com.google.protobuf.InvalidProtocolBufferException;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class ServerConnection extends Thread {
-    private Socket server;
-    private ObjectInputStream inputStream;
+    private int serverPort;
+    private ServerSocket serverSocket = null;
+    private boolean isStopped = false;
+    private Thread runningThread = null;
+    //private Lock lock = new ReentrantLock();
 
-    public ServerConnection(Socket s) throws IOException {
-        this.server = s;
-        inputStream = new ObjectInputStream(server.getInputStream());
+    public ServerConnection(int port) throws IOException {
+        this.serverPort = port;
     }
 
     @Override
     public void run() {
-        try {
-            while (true) {
-                Object serverResponse = null;
-
-                serverResponse = inputStream.readObject();
-
-
-                RQ receivedRQ = new RQ((byte[]) serverResponse);
-
-
-                switch (receivedRQ.getRegisterCode()) {
-
-                    case 0:
-
-                    case 1:
-
-                    case 2:
-
-                    case 5:
-
-                    case 7:
-
-                    case 9:
-
-                    case 10:
-
-                    case 12:
-
-                    case 13:
-
-                    case 14:
-
-                    case 15:
-
-                    case 16:
-
-                    case 17:
-                        System.out.println("Backup server ignores client messages while not serving");
-                        break;
-
-                    case 3: //REGISTERED from other server
-                        //todo create 2nd database, choose which db to edit depending on port
-                        System.out.println("Other server has registered user " + receivedRQ.getName());
-                        break;
-
-                    case 4: //REGISTER-DENIED from other server
-                        System.out.println("Other server has denied registration to user " + receivedRQ.getName());
-                        break;
-
-                    case 6://DE-REGISTER (server to server)
-                        //todo add code to delete user user from db from case 5 in serving
-                        /*try {
-                            //helper.deleteUserWithoutCheck(receivedRQ.getName());
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }*/
-                        break;
-
-                    case 8://UPDATE-CONFIRMED (From server to server)
-                        //received the update confirmed. Now update the user accordingly
-                        //todo add code to update ip and socket from db from case 7 in serving
-                        /*try {
-                            //helper.updateUser(new User(receivedRQ.getName(), receivedRQ.getPassword(),
-                                    //receivedRQ.getIp(), Integer.toString(receivedRQ.getSocketNum())));
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }*/
-                        break;
-
-                    case 11: //SUBJECTS UPDATED (server to server)
-                        //todo add code to update subjects in db from case 10 in serving
-                        /*try {
-                            helper.updateUserSubjects(receivedRQ.getName(), receivedRQ.getSubjects());
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
-                        }*/
-                        break;
+        synchronized (this){
+            this.runningThread = Thread.currentThread();
+        }
+        openServerSocket();
+        while(!isStopped()){
+            Socket client = null;
+            try{
+                System.out.println("Waiting for client");
+                client = this.serverSocket.accept();
+                System.out.println("Client Connected");
+            }catch (IOException e){
+                if(isStopped()){
+                    System.out.println("Server Stopped");
+                    return;
                 }
+                throw new RuntimeException("Error accepting client connection", e);
             }
-        } catch (IOException | ClassNotFoundException e){
-            e.printStackTrace();
+            ClientHandlerClass clientThread = null;
+            try {
+                clientThread = new ClientHandlerClass(client, Main.clients);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Main.clients.add(clientThread);
+
+            Main.pool.execute(clientThread);
+        }
+
+        System.out.println("Server stopped");
+
+    }
+
+    private synchronized boolean isStopped(){
+        return this.isStopped;
+    }
+
+    public synchronized void stopServer(){
+        this.isStopped = true;
+        try{
+            this.serverSocket.close();
+        }catch (IOException e){
+            throw new RuntimeException("Error closing server", e);
+        }
+    }
+
+    private void openServerSocket(){
+        try{
+            this.serverSocket = new ServerSocket(this.serverPort);
+        }catch (IOException e){
+            throw new RuntimeException("Error closing server", e);
         }
     }
 }

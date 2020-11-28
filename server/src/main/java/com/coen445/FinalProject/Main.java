@@ -20,17 +20,16 @@ public class Main {
     public static int serverPort;
     public static int altServerPort;
     public static String whichServer;
-    public static boolean backupConnected = false;
+    public static boolean otherServerConnected = false;
     public static boolean backupRegistered = false;
 
-    public static void main(String[] args) throws IOException, ClassNotFoundException {
+    public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
         boolean servingDone = false;
         Scanner scanner = new Scanner(System.in);
         System.out.println("Hello Systems Administrator. Is this server A or B? (A/B)");
         whichServer = scanner.nextLine();
         System.out.println("Is this server the primary server? (Y/N)");
         String isPrimaryString = scanner.nextLine();
-        ServerConnection serverConnection = null;
 
         boolean isPrimary;
         if(isPrimaryString.equalsIgnoreCase("Y")) {
@@ -52,36 +51,38 @@ public class Main {
         //if(available(serverPort))
         if(whichServer.equalsIgnoreCase("a")) {
             serverPort = ServerInfo.SERVER_A_PORT;
-            listener = new ServerSocket(serverPort);
+            //listener = new ServerSocket(serverPort);
             altServerPort = ServerInfo.SERVER_B_PORT;
         }else if(whichServer.equalsIgnoreCase("b")){
             serverPort = ServerInfo.SERVER_B_PORT;
-            listener = new ServerSocket(serverPort);
+            //listener = new ServerSocket(serverPort);
             altServerPort = ServerInfo.SERVER_A_PORT;
         }
 
         //now that the server has been created, start a timer between 3 & 5 minutes
         Random randTimerValue = new Random();
-        Socket socket = null;
-        if(isPrimary){ //start n minute timer
+        if(isPrimary) { //start n minute timer
 //            servingTimer.schedule(Main::toggleIsServer, randTimerValue.nextInt(2) + 3, TimeUnit.MINUTES);
             servingTimer.schedule(Main::toggleIsServer, 5, TimeUnit.MINUTES);
-        }else{
-            socket = new Socket(ServerInfo.SERVER_A_ADDRESS, altServerPort);
-            serverConnection = new ServerConnection(socket);
         }
 
-        if(!isServing){
-            new Thread(serverConnection).start();
-        }
+        //Thread.sleep(5000);
+        ServerConnection serverConnection = new ServerConnection(serverPort);
+        new Thread(serverConnection).start();
+
+        //System.out.println("Stopping server");
+        //serverConnection.stopServer();
+
+
         //server.startSever();
-        while (true) {
+        /*while (true) {
             //server.acceptClient();
             //Thread t = new ClientHandlerClass(server);
             //t.start();
 
             System.out.println("Waiting for client connection...");
             Socket client = listener.accept();
+
 
 
             System.out.println("socket is " + client.getLocalPort() + " and " + client.getPort());
@@ -91,9 +92,10 @@ public class Main {
 
             pool.execute(clientThread);
 
+
             //server.checkMessage();
             //server.endConnection();
-        }
+        }*/
         /*User user = new User("Bob", "Password123");
         user.addInterest("Soccer");
         user.addInterest("Football");
