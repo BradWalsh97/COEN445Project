@@ -14,6 +14,7 @@ public class User implements Serializable {
 
     private String socketNumber;
     private boolean isDeleted;
+    private boolean loggedIn;
 
     User(String Name, String Password, String IPAddress, String socket){
         this.userID = User.nextID;
@@ -24,8 +25,10 @@ public class User implements Serializable {
         this.isDeleted = false;
         this.IPAddress = IPAddress;
         this.socketNumber = socket;
+        this.loggedIn = true; //since user is logging in my registering
     }
-
+    public boolean getLoggedIn() {return loggedIn;}
+    public void setLoggedIn(boolean logStat) {this.loggedIn = logStat;}
     public String getIPAddress() {
         return IPAddress;
     }
