@@ -364,14 +364,13 @@ public class JSONHelper {
 
     public ArrayList<User> getLoggedInUsers(){
         lock.lock();
+        ArrayList<User> loggedInUsers = new ArrayList<>();
         try {
             Gson gson = new Gson();
             final Type USER_TYPE = new TypeToken<List<User>>() {
             }.getType();
             JsonReader jsonReader = new JsonReader(new FileReader("users" + serverName + ".json"));
             List<User> users = gson.fromJson(jsonReader, USER_TYPE);
-            JsonArray jsonArray = new JsonArray();
-            ArrayList<User> loggedInUsers = new ArrayList<>();
 
             //check every user to see if they match. If they don't, add them to the list of users to keep. If they do, update their interest
             for (User user : users) {
@@ -384,6 +383,7 @@ public class JSONHelper {
         } finally {
             lock.unlock();
         }
+        return loggedInUsers;
     }
 
 
