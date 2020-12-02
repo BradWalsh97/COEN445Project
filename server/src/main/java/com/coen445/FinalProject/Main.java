@@ -31,6 +31,7 @@ public class Main {
         boolean servingDone = false;
         boolean correctInput = false;
         boolean correctPortInput = false;
+        boolean correctUpdateInput = false;
         String isPrimaryString = "";
         Scanner scanner = new Scanner(System.in);
 
@@ -38,9 +39,10 @@ public class Main {
         while(!correctInput) {
             //get user inputs
             System.out.println("Hello Systems Administrator. Is this server A or B? (A/B)"); //used for database recognition
-            whichServer = scanner.nextLine();
+            whichServer = scanner.nextLine().toUpperCase();
             System.out.println("Is this server the primary server? (Y/N)");
             isPrimaryString = scanner.nextLine();
+            int serverSwitchTime = 5; //stored in minutes
 
             //check for correct inputs:
             if ((whichServer.equalsIgnoreCase("a") || whichServer.equalsIgnoreCase("b"))
@@ -59,7 +61,7 @@ public class Main {
 
         System.out.println("This server is running on port: " + InetAddress.getLocalHost().getHostAddress());
 
-
+        //get info about the other server
         while(!correctPortInput){
             System.out.println("Please enter the ip which the other server is running on: ");
             altServerIP = scanner.nextLine();
@@ -80,6 +82,22 @@ public class Main {
 
         }
 
+        //now, in the event of a server reset, give the systems administrator the option to update the other server.
+        while(!correctUpdateInput){
+            System.out.println("Do you want to update the other server with your current into? (Y/N)");
+            String input = scanner.nextLine();
+            if(input.equalsIgnoreCase("Y")) {
+                wantToUpdate = true;
+                correctUpdateInput = true;
+            } else if(input.equalsIgnoreCase("N")){
+                wantToUpdate = false;
+                correctUpdateInput = true;
+            }else{
+                System.out.println("Incorrect input, please try again.");
+                correctUpdateInput = false;
+            }
+
+        }
 
         boolean isPrimary;
         if(isPrimaryString.equalsIgnoreCase("Y")) {
@@ -112,8 +130,8 @@ public class Main {
         //now that the server has been created, start a timer between 3 & 5 minutes
         Random randTimerValue = new Random();
         if(isPrimary) { //start n minute timer
-//            servingTimer.schedule(Main::toggleIsServer, randTimerValue.nextInt(2) + 3, TimeUnit.MINUTES);
-            servingTimer.schedule(Main::toggleIsServer, 30, TimeUnit.SECONDS);
+            servingTimer.schedule(Main::toggleIsServer, randTimerValue.nextInt(2) + 3, TimeUnit.MINUTES); //choose a random number between 2 & 5 minutes.
+//            servingTimer.schedule(Main::toggleIsServer, 30, TimeUnit.SECONDS);
         }
 
         //Thread.sleep(5000);
@@ -122,7 +140,7 @@ public class Main {
 
         clientHandler = new ClientHandler(serverPort);
         if(wantToUpdate){
-            updateServer(1);
+            updateServer(altServerPort);
             wantToUpdate = false;
         }
         clientHandler.start();

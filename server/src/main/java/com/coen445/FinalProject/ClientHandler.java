@@ -6,6 +6,7 @@ import javax.xml.crypto.Data;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 public class ClientHandler extends Thread {
@@ -345,10 +346,13 @@ public class ClientHandler extends Thread {
                     case 16: //CHANGE SERVER from serving sevrer
                         System.out.println("CHANGE SERVER, it is my turn to serve!!!");
                         Main.isServing = true;
-                        Main.servingTimer.schedule(Main::toggleIsServer, 30, TimeUnit.SECONDS);
+                        Random randTimerValue = new Random();
+                        Main.servingTimer.schedule(Main::toggleIsServer, randTimerValue.nextInt(2) + 3, TimeUnit.MINUTES); //choose a random number between 2 & 5 minutes.
+                        //Main.servingTimer.schedule(Main::toggleIsServer, 30, TimeUnit.SECONDS); //use for testing purposes
                         break;
 
-                    case 17://todo update server
+                    case 17: //update the serving server with the alt server info
+
                         break;
 
                     case 18:
