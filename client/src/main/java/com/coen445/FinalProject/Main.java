@@ -1,6 +1,8 @@
 package com.coen445.FinalProject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.net.*;
 import java.util.ArrayList;
@@ -10,6 +12,8 @@ import java.util.Scanner;
 public class Main {
     public static boolean registerSuccess = false;
     public static String username = "";
+    public static int servingPort = 5001;
+    public static int altServingPort = 5002;
 
     //todo about updating if logging in from new computer
     //khendek said that the update can server as a login (since you're updating the ip address). If you update from a
@@ -19,49 +23,45 @@ public class Main {
         //for now, ask a user to register every time
         int rq = 1;
         Scanner scanner = new Scanner(System.in);
-        InetAddress clientAddress = InetAddress.getLocalHost();
+        InetAddress clientAddress = InetAddress.getByName("localhost");
         System.out.println("Hello, lets get some info about the servers you want to connect to. \nWhat is the ip of server a?");
         String serverAIp = scanner.nextLine();
         System.out.println("What about server b's address?");
         String serverBIp = scanner.nextLine();
-        String currentUser = "";
         boolean validChoice = false;
-        Socket socketA = null;
-        ServerConnection serverConnectionA = null;
-        ObjectOutputStream outputStreamA = null;
-        Socket socketB = null;
-        ServerConnection serverConnectionB = null;
-        ObjectOutputStream outputStreamB = null;
-        boolean serverConnect = false;
+        DatagramSocket socket = null;
+        ServerConnection serverConnection = null;
 
-        try{
-            socketA = new Socket(ServerInfo.SERVER_A_ADDRESS, ServerInfo.SERVER_A_PORT);
-            socketA.setSoTimeout(500);
-            serverConnectionA = new ServerConnection(socketA);
-            outputStreamA = new ObjectOutputStream(socketA.getOutputStream());
+        try {
+            socket = new DatagramSocket();
+            serverConnection = new ServerConnection(socket); //todo get port from user
             System.out.println("Connected to server A");
-            serverConnect = true;
-            new Thread(serverConnectionA).start();
+            new Thread(serverConnection).start();
         } catch (ConnectException e) {
-            System.out.println("Server A currently unavailable. Trying server B");
+            System.out.println("Socket unnable to connect");
         }
-        if(!serverConnect) {
-            try {
-                socketB = new Socket(ServerInfo.SERVER_B_ADDRESS, ServerInfo.SERVER_B_PORT);
-                socketB.setSoTimeout(1000);
-                serverConnectionB = new ServerConnection(socketB);
-                outputStreamB = new ObjectOutputStream(socketB.getOutputStream());
-                System.out.println("Connected to server B");
-                new Thread(serverConnectionB).start();
-
-            } catch (Exception e) {
-                System.out.println("The RSS server is currently experiencing an outage. \n" +
-                        "Please try again in a few minutes while we work to restore the service! <3");
-                return;
+        /*try {
+            socketB = new DatagramSocket();
+            while(!available(clientPortB)){
+                clientPortB++;
             }
+            serverConnectionB = new ServerConnection(socketB.getLocalPort()); //todo get port from user
+            //outputStreamB = new ObjectOutputStream(socketB.getOutputStream());
+            System.out.println("Connected to server B");
+            serverBConnect = true;
+            new Thread(serverConnectionB).start();
+
+        } catch (Exception e) {
+            System.out.println("Server B is unavailable");
         }
 
-        while(true) {
+        if (!serverAConnect || !serverBConnect) {
+            System.out.println("The RSS server is currently experiencing an outage. \n" +
+                    "Please try again in a few minutes while we work to restore the service! <3");
+            return;
+        }*/
+
+        while (true) {
             do {
                 do {
                     System.out.println("\n\nWould you like to login or register? LOGIN/REGISTER");
@@ -74,38 +74,58 @@ public class Main {
                         System.out.println("Please enter your password");
                         String password = scanner.nextLine();
 
-                        RQ updateRQ = new RQ(7, rq++, username, socketA.getLocalAddress().getHostAddress(), socketA.getLocalPort());
-                        System.out.println("Logging in Client: " + updateRQ.getName());
-                        outputStreamA.writeObject(updateRQ.getMessage());
+                        try {
+                            RQ updateRQ = new RQ(7, rq++, username, clientAddress.getHostAddress(), socket.getLocalPort());
+                            Request.Register message = updateRQ.getRequestOut();
+                            System.out.println("Logging in Client: " + updateRQ.getName());
+                            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                            ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
+                            outputStream.writeObject(message);
+                            byte[] data = byteArrayOutputStream.toByteArray();
+                            DatagramPacket dp = new DatagramPacket(data, data.length, clientAddress, servingPort);
+                            socket.send(dp);
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+
                         Thread.sleep(1000);
 
 
                     } else if (loginOrRegister.equalsIgnoreCase("register")) {
                         validChoice = true;
                         //do {
-                            //todo: make it loop until its correct
-                            System.out.println("Please enter a username: ");
-                            username = scanner.nextLine();
-                            System.out.println("Your username is : " + username + "\n" + "Please enter a password: ");
-                            String password = scanner.nextLine();
-                            System.out.println("Your password is: " + password);
+                        //todo: make it loop until its correct
+                        System.out.println("Please enter a username: ");
+                        username = scanner.nextLine();
+                        System.out.println("Your username is : " + username + "\n" + "Please enter a password: ");
+                        String password = scanner.nextLine();
+                        System.out.println("Your password is: " + password);
 
-                            int portCheck = 5003; //5001/2 are reserved for the servers
-                            while (!available(portCheck)) {
-                                System.out.println("Port: " + portCheck + " is occupied");
-                                portCheck++;
-                            }
-                            RQ registerRQ = new RQ(0, rq++, username, socketA.getLocalAddress().getHostAddress(), socketA.getLocalPort());
+                        //send REGISTER to server A and server B
+                        try {
+                            RQ registerRQ = new RQ(0, rq++, username, clientAddress.getHostAddress(), socket.getLocalPort());
+                            Request.Register message = registerRQ.getRequestOut();
                             System.out.println("Registering Client: " + registerRQ.getName());
-                            outputStreamA.writeObject(registerRQ.getMessage());
-                            Thread.sleep(1000);
-                       // } while (!registerSuccess);
+                            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                            ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
+                            outputStream.writeObject(message);
+                            byte[] data = byteArrayOutputStream.toByteArray();
+                            DatagramPacket dpA = new DatagramPacket(data, data.length, clientAddress, servingPort);
+                            socket.send(dpA);
+                            DatagramPacket dpB = new DatagramPacket(data, data.length, clientAddress, altServingPort);
+                            socket.send(dpB);
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+
+                        Thread.sleep(1000);
+                        // } while (!registerSuccess);
                     } else //invalid choice
                         System.out.println("Please enter a valid input.");
-                }while (!registerSuccess);
-            }while(!validChoice);
+                } while (!registerSuccess);
+            } while (!validChoice);
 
-            while(true){
+            while (true) {
                 System.out.println("Command list: +" +
                         //"\nTo update your user: UPDATE" +
                         "\nTo delete a user: DE-REGISTER" +
@@ -117,7 +137,6 @@ public class Main {
 
                 //Clear the console
                 //clearScreen(); //todo: fix clear screen
-
 
                 switch (userCommand) {
 //                    case "UPDATE":
@@ -139,10 +158,22 @@ public class Main {
                         System.out.println("Are you sure you want to de-register? You will need to recreate an account to " +
                                 "continue using this service! (Y/N)");
                         String areYouSureOrNAWH = scanner.nextLine();
-                        if(areYouSureOrNAWH.equalsIgnoreCase("y")) {
-                            RQ deRegisterRQ = new RQ(5, rq++, username);
+                        if (areYouSureOrNAWH.equalsIgnoreCase("y")) {
+
+                            try {
+                                RQ deRegisterRQ = new RQ(5, rq++, username);
+                                Request.Register message = deRegisterRQ.getRequestOut();
+                                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                                ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
+                                outputStream.writeObject(message);
+                                byte[] data = byteArrayOutputStream.toByteArray();
+                                DatagramPacket dp = new DatagramPacket(data, data.length, clientAddress, servingPort);
+                                socket.send(dp);
+                            }catch (Exception e){
+                                e.printStackTrace();
+                            }
                             //client.sendMessage(deRegisterRQ.getMessage());
-                            outputStreamA.writeObject(deRegisterRQ.getMessage());
+                            //outputStreamA.writeObject(deRegisterRQ.getMessage());
                         }
                         Thread.sleep(1000);
                         //RQ receivedDeRegisterRq = new RQ((byte[]) client.readObjectFromServer());
@@ -179,15 +210,26 @@ public class Main {
                         }
 
                         //now send the server the subjects.
-                        RQ subjectsRQ = new RQ(10, rq++, username, interestList);
+                        try {
+                            RQ subjectsRQ = new RQ(10, rq++, username, interestList);
+                            Request.Register message = subjectsRQ.getRequestOut();
+                            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                            ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
+                            outputStream.writeObject(message);
+                            byte[] data = byteArrayOutputStream.toByteArray();
+                            DatagramPacket dp = new DatagramPacket(data, data.length, clientAddress, servingPort);
+                            socket.send(dp);
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
                         //client.sendMessage(subjectsRQ.getMessage());
-                        outputStreamA.writeObject(subjectsRQ.getMessage());
+                        //outputStreamA.writeObject(subjectsRQ.getMessage());
                         Thread.sleep(1000);
                         //RQ receivedSubjectsRq = new RQ((byte[]) client.readObjectFromServer());
 
                         break;
                     case "PUBLISH":
-                        System.out.println(socketA.getLocalPort());
+                        System.out.println(socket.getLocalPort());
                         //todo: the system needs to be implemented such that when the client is booted up
                         //you must either register or update. Once this is done, you will have the username
                         //to do the rest of the stuff. So, if update get the username and see if it exists. If it does
@@ -219,17 +261,41 @@ public class Main {
                         }
                         System.out.println("Type in the message you would like to publish"); //todo: add error checking (no empty messages)
                         String publishedMessage = scanner.nextLine();
-                        RQ publishRQ = new RQ(13, rq++, userPublish, userList, publishedMessage);
+                        try {
+                            RQ publishRQ = new RQ(13, rq++, userPublish, userList, publishedMessage);
+                            Request.Register message = publishRQ.getRequestOut();
+                            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                            ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
+                            outputStream.writeObject(message);
+                            byte[] data = byteArrayOutputStream.toByteArray();
+                            DatagramPacket dp = new DatagramPacket(data, data.length, clientAddress, servingPort);
+                            socket.send(dp);
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
                         //client.sendMessage(publishRQ.getMessage());
-                        outputStreamA.writeObject(publishRQ.getMessage());
+                        //outputStreamA.writeObject(publishRQ.getMessage());
                         Thread.sleep(1000);
                         //RQ receivedPublishRq = new RQ((byte[]) client.readObjectFromServer());
                         break;
 
                     case "DONE":
                         //client.closeConnections();
-                        socketA.close();
-                        outputStreamA.close();
+                        try {
+                            RQ logOutRQ = new RQ(18, username);
+                            Request.Register message = logOutRQ.getRequestOut();
+                            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                            ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
+                            outputStream.writeObject(message);
+                            byte[] data = byteArrayOutputStream.toByteArray();
+                            DatagramPacket dp = new DatagramPacket(data, data.length, clientAddress, servingPort);
+                            socket.send(dp);
+                        }catch (Exception e){
+                        e.printStackTrace();
+                        }
+
+                        socket.close();
+                        //outputStreamA.close();
                         System.out.println("Client disconnected from server. Have a nice day! :)");
                         return;
 
@@ -239,7 +305,6 @@ public class Main {
             }
         }
     }
-
 
 
 //        //start by trying to connect to server a

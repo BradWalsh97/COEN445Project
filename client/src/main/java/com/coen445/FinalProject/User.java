@@ -14,6 +14,7 @@ public class User implements Serializable {
 
     private String socketNumber;
     private boolean isDeleted;
+    private boolean loggedIn;
 
     User(String Name, String Password, String IPAddress, String socket){
         this.userID = User.nextID;

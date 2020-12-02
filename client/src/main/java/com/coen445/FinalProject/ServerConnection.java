@@ -1,42 +1,54 @@
 package com.coen445.FinalProject;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.Socket;
 import java.net.SocketException;
 
 public class ServerConnection extends Thread {
-    private Socket server;
-    private ObjectInputStream inputStream;
+    private DatagramSocket server;
+    //private ObjectInputStream inputStream;
 
-    public ServerConnection(Socket s) throws IOException {
-        this.server = s;
-        inputStream = new ObjectInputStream(server.getInputStream());
+    public ServerConnection(DatagramSocket socket) throws IOException {
+        this.server = socket;
+        //inputStream = new ObjectInputStream(server.getInputStream());
     }
 
     @Override
     public void run() {
         try{
             while(true){
-                Object serverResponse = inputStream.readObject();
+                //Object serverResponse = inputStream.readObject();
+                byte[] receive = new byte[65535];
+                DatagramPacket dp = new DatagramPacket(receive, receive.length);
+                server.receive(dp);
+                byte[] data = dp.getData();
+                ByteArrayInputStream in = new ByteArrayInputStream(data);
+                ObjectInputStream inputStream = new ObjectInputStream(in);
 
-                if(serverResponse == null) break;
+                Request.Register rq = (Request.Register) inputStream.readObject();
 
-                RQ receivedRq = new RQ((byte[]) serverResponse);
+                RQ receivedRQ = new RQ(rq);
 
-                switch(receivedRq.getRegisterCode()){
+
+                if(receivedRQ == null) break;
+
+                switch(receivedRQ.getRegisterCode()){
                     case 1:
                         System.out.println(Main.username + " has been registered!");
                         Main.registerSuccess = true;
                         break;
 
                     case 2:
-                        System.out.println(Main.username + " already exists. Please chose another name");
+                        System.out.println(receivedRQ.getText());
                         break;
 
                     case 14:
-                        System.out.println(receivedRq.getSubjects().get(0) + ": " + receivedRq.getText() + " from " + receivedRq.getName());
+                        System.out.println(receivedRQ.getSubjects().get(0) + ": " + receivedRQ.getText() + " from " + receivedRQ.getName());
                         break;
 
                     case 8:
@@ -45,11 +57,20 @@ public class ServerConnection extends Thread {
                         break;
 
                     case 9:
-                        System.out.println(receivedRq.getText());
+                        System.out.println(receivedRQ.getText());
                         break;
 
+                    case 13:
+                        System.out.println("Message from");
+
                     case 15:
-                        System.out.println("Message could not be published.. " + receivedRq.getText());
+                        System.out.println("Message could not be published.. " + receivedRQ.getText());
+                        break;
+
+                    case 16:
+                        System.out.println("Serving server is changing");
+                        Main.altServingPort = Main.servingPort;
+                        Main.servingPort = receivedRQ.getSocketNum();
                         break;
                 }
 
@@ -62,11 +83,8 @@ public class ServerConnection extends Thread {
             }else
                 e.printStackTrace();
         }finally {
-            try{
-                inputStream.close();
-            }catch (IOException e){
-                e.printStackTrace();
-            }
+            server.close();
+            //inputStream.close();
         }
     }
 }

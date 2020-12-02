@@ -22,14 +22,18 @@ public class RQ {
     private Request.Register requestIn = Request.Register.newBuilder().build();
 
     //For deserializing a request
-    public RQ(byte[] RQIn) throws InvalidProtocolBufferException {
-        this.requestIn = Request.Register.parseFrom(RQIn);
+    public RQ(Request.Register RQIn) throws InvalidProtocolBufferException {
+        this.requestIn = RQIn;
 
         System.out.println(requestIn);
 
         this.registerCode = requestIn.getRegisterCode();
         generateRQ();
 
+    }
+
+    public Request.Register getRequestOut(){
+        return requestOut.build();
     }
 
     private void generateRQ(){
@@ -67,6 +71,10 @@ public class RQ {
                 break;
 
             case 6:
+
+            case 18:
+
+            case 19:
                 this.name = requestIn.getName();
                 break;
 
@@ -126,6 +134,8 @@ public class RQ {
         requestOut.setIp(ip);
         requestOut.setSocketNum(socketNum);
 
+        System.out.println(requestOut);
+
         message = requestOut.build().toByteArray();
     }
 
@@ -136,6 +146,8 @@ public class RQ {
 
         requestOut.setRegisterCode(registerCode);
         requestOut.setRqNum(rqNum);
+
+        System.out.println(requestOut);
 
         message = requestOut.build().toByteArray();
     }
@@ -155,6 +167,8 @@ public class RQ {
         } else {
           requestOut.setText(text);
         }
+
+        System.out.println(requestOut);
 
         message = requestOut.build().toByteArray();
     }
@@ -178,13 +192,15 @@ public class RQ {
         message = requestOut.build().toByteArray();
     }
 
-    //For de-register info pass to back-up server (6)
+    //For de-register info pass to back-up server & logging out & server to server log out (6/18/19)
     public RQ(int registerCode, String name) {
         this.registerCode = registerCode;
         this.name = name;
 
         requestOut.setRegisterCode(registerCode);
         requestOut.setName(name);
+
+        System.out.println(requestOut);
 
         message = requestOut.build().toByteArray();
     }
@@ -200,6 +216,8 @@ public class RQ {
         requestOut.setRqNum(rqNum);
         requestOut.setName(name);
         requestOut.setSubjects(generateSubjectList(subjects));
+
+        System.out.println(requestOut);
 
         message = requestOut.build().toByteArray();
     }
@@ -217,6 +235,8 @@ public class RQ {
         requestOut.setSubjects(generateSubjectList(subjects));
         requestOut.setText(text);
 
+        System.out.println(requestOut);
+
         message = requestOut.build().toByteArray();
 
     }
@@ -231,6 +251,9 @@ public class RQ {
         requestOut.setName(name);
         requestOut.setSubjects(generateSubjectList(subjects));
         requestOut.setText(text);
+
+        System.out.println(requestOut);
+
 
         message = requestOut.build().toByteArray();
     }

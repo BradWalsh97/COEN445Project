@@ -1,0 +1,13 @@
+[
+ {
+  "userID": 0,
+  "userName": "john",
+  "interests": [
+   "Politics"
+  ],
+  "IPAddress": "127.0.0.1",
+  "socketNumber": "63145",
+  "isDeleted": false,
+  "loggedIn": true
+ }
+]
