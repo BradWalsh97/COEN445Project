@@ -2,10 +2,12 @@
  {
   "userID": 0,
   "userName": "john",
-  "interests": [],
+  "interests": [
+   "Politics"
+  ],
   "IPAddress": "127.0.0.1",
-  "socketNumber": "59716",
+  "socketNumber": "63145",
   "isDeleted": false,
-  "loggedIn": false
+  "loggedIn": true
  }
 ]

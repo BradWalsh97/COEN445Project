@@ -66,6 +66,12 @@ public class ServerConnection extends Thread {
                     case 15:
                         System.out.println("Message could not be published.. " + receivedRQ.getText());
                         break;
+
+                    case 16:
+                        System.out.println("Serving server is changing");
+                        Main.altServingPort = Main.servingPort;
+                        Main.servingPort = receivedRQ.getSocketNum();
+                        break;
                 }
 
                 //System.out.println(receivedRq);

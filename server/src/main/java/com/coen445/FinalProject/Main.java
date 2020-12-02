@@ -23,6 +23,8 @@ public class Main {
     public static String whichServer;
     public static boolean otherServerConnected = false;
     public static boolean backupRegistered = false;
+    public static ClientHandler clientHandler = null;
+    public static boolean wantToUpdate = false;
 
     public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
         boolean servingDone = false;
@@ -64,14 +66,19 @@ public class Main {
         Random randTimerValue = new Random();
         if(isPrimary) { //start n minute timer
 //            servingTimer.schedule(Main::toggleIsServer, randTimerValue.nextInt(2) + 3, TimeUnit.MINUTES);
-            servingTimer.schedule(Main::toggleIsServer, 5, TimeUnit.MINUTES);
+            servingTimer.schedule(Main::toggleIsServer, 30, TimeUnit.SECONDS);
         }
 
         //Thread.sleep(5000);
         //ServerConnection serverConnection = new ServerConnection(serverPort);
         //new Thread(serverConnection).start();
 
-        new ClientHandler(serverPort).start();
+        clientHandler = new ClientHandler(serverPort);
+        if(wantToUpdate){
+            updateServer(1);
+            wantToUpdate = false;
+        }
+        clientHandler.start();
 
         //System.out.println("Stopping server");
         //serverConnection.stopServer();
@@ -147,20 +154,56 @@ public class Main {
         return false;
     }
 
-    public static void toggleIsServer(){
-
+    public static void updateServer(int otherServerPort){
         try {
-            RQ returnRQ = new RQ(16, );
+            RQ returnRQ = new RQ(17, ServerInfo.SERVER_A_ADDRESS, serverPort);
             Request.Register message = returnRQ.getRequestOut();
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
             outputStream.writeObject(message);
             byte[] dataSent = byteArrayOutputStream.toByteArray();
-            DatagramPacket dp = new DatagramPacket(dataSent, dataSent.length, packet.getAddress(), packet.getPort());
-            socket.send(dp);
-        }catch (Exception e){
+            DatagramPacket dp = new DatagramPacket(dataSent, dataSent.length, InetAddress.getByName(ServerInfo.SERVER_A_ADDRESS), otherServerPort);
+            clientHandler.getSocket().send(dp);
+        } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static void toggleIsServer(){
+
+        JSONHelper helper = new JSONHelper(whichServer);
+        ArrayList<User> users = new ArrayList<>(helper.getLoggedInUsers());
+
+        //CHANGE SERVER to clients
+        for(User user : users) {
+            try {
+                RQ returnRQ = new RQ(16, ServerInfo.SERVER_A_ADDRESS, altServerPort);
+                Request.Register message = returnRQ.getRequestOut();
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
+                outputStream.writeObject(message);
+                byte[] dataSent = byteArrayOutputStream.toByteArray();
+                DatagramPacket dp = new DatagramPacket(dataSent, dataSent.length, InetAddress.getByName(user.getIPAddress()), Integer.parseInt(user.getSocketNumber()));
+                clientHandler.getSocket().send(dp);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        //CHANGE SERVER to other server
+        try {
+            RQ returnRQ = new RQ(16, ServerInfo.SERVER_A_ADDRESS, altServerPort);
+            Request.Register message = returnRQ.getRequestOut();
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
+            outputStream.writeObject(message);
+            byte[] dataSent = byteArrayOutputStream.toByteArray();
+            DatagramPacket dp = new DatagramPacket(dataSent, dataSent.length, InetAddress.getByName(ServerInfo.SERVER_A_ADDRESS), altServerPort);
+            clientHandler.getSocket().send(dp);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         isServing = !isServing;
     }
 }

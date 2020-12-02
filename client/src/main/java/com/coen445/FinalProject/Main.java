@@ -12,6 +12,8 @@ import java.util.Scanner;
 public class Main {
     public static boolean registerSuccess = false;
     public static String username = "";
+    public static int servingPort = 5001;
+    public static int altServingPort = 5002;
 
     //todo about updating if logging in from new computer
     //khendek said that the update can server as a login (since you're updating the ip address). If you update from a
@@ -29,7 +31,6 @@ public class Main {
         boolean validChoice = false;
         DatagramSocket socket = null;
         ServerConnection serverConnection = null;
-        boolean serverAServing = true;
 
         try {
             socket = new DatagramSocket();
@@ -81,7 +82,7 @@ public class Main {
                             ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
                             outputStream.writeObject(message);
                             byte[] data = byteArrayOutputStream.toByteArray();
-                            DatagramPacket dp = new DatagramPacket(data, data.length, clientAddress, 5001);
+                            DatagramPacket dp = new DatagramPacket(data, data.length, clientAddress, servingPort);
                             socket.send(dp);
                         }catch (Exception e){
                             e.printStackTrace();
@@ -109,9 +110,9 @@ public class Main {
                             ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
                             outputStream.writeObject(message);
                             byte[] data = byteArrayOutputStream.toByteArray();
-                            DatagramPacket dpA = new DatagramPacket(data, data.length, clientAddress, 5001);
+                            DatagramPacket dpA = new DatagramPacket(data, data.length, clientAddress, servingPort);
                             socket.send(dpA);
-                            DatagramPacket dpB = new DatagramPacket(data, data.length, clientAddress, 5002);
+                            DatagramPacket dpB = new DatagramPacket(data, data.length, clientAddress, altServingPort);
                             socket.send(dpB);
                         }catch (Exception e){
                             e.printStackTrace();
@@ -166,7 +167,7 @@ public class Main {
                                 ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
                                 outputStream.writeObject(message);
                                 byte[] data = byteArrayOutputStream.toByteArray();
-                                DatagramPacket dp = new DatagramPacket(data, data.length, clientAddress, 5001);
+                                DatagramPacket dp = new DatagramPacket(data, data.length, clientAddress, servingPort);
                                 socket.send(dp);
                             }catch (Exception e){
                                 e.printStackTrace();
@@ -216,7 +217,7 @@ public class Main {
                             ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
                             outputStream.writeObject(message);
                             byte[] data = byteArrayOutputStream.toByteArray();
-                            DatagramPacket dp = new DatagramPacket(data, data.length, clientAddress, 5001);
+                            DatagramPacket dp = new DatagramPacket(data, data.length, clientAddress, servingPort);
                             socket.send(dp);
                         }catch (Exception e){
                             e.printStackTrace();
@@ -267,7 +268,7 @@ public class Main {
                             ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
                             outputStream.writeObject(message);
                             byte[] data = byteArrayOutputStream.toByteArray();
-                            DatagramPacket dp = new DatagramPacket(data, data.length, clientAddress, 5001);
+                            DatagramPacket dp = new DatagramPacket(data, data.length, clientAddress, servingPort);
                             socket.send(dp);
                         }catch (Exception e){
                             e.printStackTrace();
@@ -287,7 +288,7 @@ public class Main {
                             ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
                             outputStream.writeObject(message);
                             byte[] data = byteArrayOutputStream.toByteArray();
-                            DatagramPacket dp = new DatagramPacket(data, data.length, clientAddress, 5001);
+                            DatagramPacket dp = new DatagramPacket(data, data.length, clientAddress, servingPort);
                             socket.send(dp);
                         }catch (Exception e){
                         e.printStackTrace();

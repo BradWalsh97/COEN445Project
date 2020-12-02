@@ -6,6 +6,7 @@ import javax.xml.crypto.Data;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 public class ClientHandler extends Thread {
     private DatagramSocket socket = null;
@@ -13,6 +14,8 @@ public class ClientHandler extends Thread {
     public ClientHandler(int port) throws IOException {
         socket = new DatagramSocket(port);
     }
+
+    public DatagramSocket getSocket(){return socket;}
 
     public StringBuilder data(byte[] a) {
         if (a == null)
@@ -337,6 +340,12 @@ public class ClientHandler extends Thread {
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
+                        break;
+
+                    case 16: //CHANGE SERVER from serving sevrer
+                        System.out.println("CHANGE SERVER, it is my turn to serve!!!");
+                        Main.isServing = true;
+                        Main.servingTimer.schedule(Main::toggleIsServer, 30, TimeUnit.SECONDS);
                         break;
 
                     case 17://todo update server
