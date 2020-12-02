@@ -327,4 +327,40 @@ public class JSONHelper {
 
         return true;
     }
+
+    public void userLogOnLogOff(boolean logOn, String username) { //true == user logging on, false == user logging off
+        lock.lock();
+        try {
+            Gson gson = new Gson();
+            final Type USER_TYPE = new TypeToken<List<User>>() {
+            }.getType();
+            JsonReader jsonReader = new JsonReader(new FileReader("users" + serverName + ".json"));
+            List<User> users = gson.fromJson(jsonReader, USER_TYPE);
+            JsonArray jsonArray = new JsonArray();
+
+            //check every user to see if they match. If they don't, add them to the list of users to keep. If they do, update their interest
+            for (User user : users) {
+                if (!username.equalsIgnoreCase(user.getUserName())) {
+                    jsonArray.add(gson.toJsonTree(user, User.class));
+                }
+                else{ //toggle login status and save the user again
+                    user.setLoggedIn(!user.getLoggedIn());
+                    jsonArray.add(gson.toJsonTree(user, User.class));
+                }
+            }
+
+            //write change to the file
+            FileWriter writer = new FileWriter("users" + serverName + ".json", false);
+            JsonWriter jsonWriter = new JsonWriter(writer);
+            jsonWriter.setIndent(" ");
+            gson.toJson(jsonArray, jsonWriter);
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+
 }
