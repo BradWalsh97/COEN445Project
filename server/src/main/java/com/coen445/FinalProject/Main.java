@@ -149,14 +149,18 @@ public class Main {
 
     public static void toggleIsServer(){
 
-        /*RQ returnRQ = new RQ(15, receivedRQ.getRqNum(), "The subject chosen is not in your list of interests, please update your interests and try again.");
-        Request.Register message = returnRQ.getRequestOut();
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
-        outputStream.writeObject(message);
-        byte[] dataSent = byteArrayOutputStream.toByteArray();
-        DatagramPacket dp = new DatagramPacket(dataSent, dataSent.length, packet.getAddress(), packet.getPort());
-        socket.send(dp);*/
+        try {
+            RQ returnRQ = new RQ(16, );
+            Request.Register message = returnRQ.getRequestOut();
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
+            outputStream.writeObject(message);
+            byte[] dataSent = byteArrayOutputStream.toByteArray();
+            DatagramPacket dp = new DatagramPacket(dataSent, dataSent.length, packet.getAddress(), packet.getPort());
+            socket.send(dp);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         isServing = !isServing;
     }
 }

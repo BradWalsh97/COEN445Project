@@ -344,6 +344,24 @@ public class ClientHandler extends Thread {
 
                     case 18:
                         System.out.println("LOGGING OUT, " + receivedRQ.getName() + " will be logged out.");
+                        helper.userLogOnLogOff(receivedRQ.getName());
+                        try{
+                            RQ toServerRQ = new RQ(19, receivedRQ.getName());
+                            Request.Register messageToServer = toServerRQ.getRequestOut();
+                            ByteArrayOutputStream byteArrayOutputStreamToServer = new ByteArrayOutputStream();
+                            ObjectOutputStream outputStreamToServer = new ObjectOutputStream(byteArrayOutputStreamToServer);
+                            outputStreamToServer.writeObject(messageToServer);
+                            byte[] dataSentToServer = byteArrayOutputStreamToServer.toByteArray();
+                            DatagramPacket dpToServer = new DatagramPacket(dataSentToServer, dataSentToServer.length, InetAddress.getByName(ServerInfo.SERVER_A_ADDRESS), Main.altServerPort);
+                            socket.send(dpToServer);
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                        break;
+
+                    case 19: //LOGGING OUT from other server
+                        System.out.println("LOGGING OUT from serving server, " + receivedRQ.getName() + " will be logged out.");
+                        helper.userLogOnLogOff(receivedRQ.getName());
                         break;
 
                     default:

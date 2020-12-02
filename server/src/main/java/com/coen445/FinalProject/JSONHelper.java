@@ -59,6 +59,9 @@ public class JSONHelper {
                     if (updatedUser.getSocketNumber() != users.get(i).getSocketNumber()) { //update socket number
                         users.get(i).setSocketNumber(updatedUser.getSocketNumber());
                     }
+                    if(updatedUser.getLoggedIn() != users.get(i).getLoggedIn()){
+                        users.get(i).setLoggedIn(updatedUser.getLoggedIn());
+                    }
 //                    if (!updatedUser.getUserName().equals(users.get(i).getUserName())) { //todo: this should probably be deprecated
 //                        users.get(i).setUserName(updatedUser.getUserName());
 //                    }
@@ -328,7 +331,7 @@ public class JSONHelper {
         return true;
     }
 
-    public void userLogOnLogOff(boolean logOn, String username) { //true == user logging on, false == user logging off
+    public void userLogOnLogOff(String username) { //true == user logging on, false == user logging off
         lock.lock();
         try {
             Gson gson = new Gson();
