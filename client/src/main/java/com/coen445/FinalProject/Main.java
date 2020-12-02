@@ -26,30 +26,18 @@ public class Main {
         String serverAIp = scanner.nextLine();
         System.out.println("What about server b's address?");
         String serverBIp = scanner.nextLine();
-        String currentUser = "";
         boolean validChoice = false;
-        DatagramSocket socketA = null;
-        ServerConnection serverConnectionA = null;
-        DatagramSocket socketB = null;
-        ServerConnection serverConnectionB = null;
-        //ObjectOutputStream outputStreamB = null;
-        boolean serverAConnect = false;
-        boolean serverBConnect = false;
-        int clientPortA = 6000;
-        int clientPortB = 6001;
+        DatagramSocket socket = null;
+        ServerConnection serverConnection = null;
+        boolean serverAServing = true;
 
         try {
-            socketA = new DatagramSocket();
-            while(!available(clientPortA)){
-                clientPortA++;
-            }
-            serverConnectionA = new ServerConnection(socketA); //todo get port from user
-            //outputStreamA = new ObjectOutputStream(socketA.get);
+            socket = new DatagramSocket();
+            serverConnection = new ServerConnection(socket); //todo get port from user
             System.out.println("Connected to server A");
-            serverAConnect = true;
-            new Thread(serverConnectionA).start();
+            new Thread(serverConnection).start();
         } catch (ConnectException e) {
-            System.out.println("Server A currently unavailable");
+            System.out.println("Socket unnable to connect");
         }
         /*try {
             socketB = new DatagramSocket();
@@ -86,7 +74,7 @@ public class Main {
                         String password = scanner.nextLine();
 
                         try {
-                            RQ updateRQ = new RQ(7, rq++, username, clientAddress.getHostAddress(), socketA.getLocalPort());
+                            RQ updateRQ = new RQ(7, rq++, username, clientAddress.getHostAddress(), socket.getLocalPort());
                             Request.Register message = updateRQ.getRequestOut();
                             System.out.println("Logging in Client: " + updateRQ.getName());
                             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -94,7 +82,7 @@ public class Main {
                             outputStream.writeObject(message);
                             byte[] data = byteArrayOutputStream.toByteArray();
                             DatagramPacket dp = new DatagramPacket(data, data.length, clientAddress, 5001);
-                            socketA.send(dp);
+                            socket.send(dp);
                         }catch (Exception e){
                             e.printStackTrace();
                         }
@@ -112,24 +100,19 @@ public class Main {
                         String password = scanner.nextLine();
                         System.out.println("Your password is: " + password);
 
-                        int portCheck = 5003; //5001/2 are reserved for the servers
-                        while (!available(portCheck)) {
-                            System.out.println("Port: " + portCheck + " is occupied");
-                            portCheck++;
-                        }
-
+                        //send REGISTER to server A and server B
                         try {
-                            RQ registerRQ = new RQ(0, rq++, username, clientAddress.getHostAddress(), socketA.getLocalPort());
+                            RQ registerRQ = new RQ(0, rq++, username, clientAddress.getHostAddress(), socket.getLocalPort());
                             Request.Register message = registerRQ.getRequestOut();
                             System.out.println("Registering Client: " + registerRQ.getName());
                             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                             ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
                             outputStream.writeObject(message);
                             byte[] data = byteArrayOutputStream.toByteArray();
-                            DatagramPacket dp = new DatagramPacket(data, data.length, clientAddress, 5001);
-                            socketA.send(dp);
-                            //outputStreamA.writeObject(registerRQ.getMessage());
-                            //outputStreamB.writeObject(registerRQ.getMessage());
+                            DatagramPacket dpA = new DatagramPacket(data, data.length, clientAddress, 5001);
+                            socket.send(dpA);
+                            DatagramPacket dpB = new DatagramPacket(data, data.length, clientAddress, 5002);
+                            socket.send(dpB);
                         }catch (Exception e){
                             e.printStackTrace();
                         }
@@ -184,7 +167,7 @@ public class Main {
                                 outputStream.writeObject(message);
                                 byte[] data = byteArrayOutputStream.toByteArray();
                                 DatagramPacket dp = new DatagramPacket(data, data.length, clientAddress, 5001);
-                                socketA.send(dp);
+                                socket.send(dp);
                             }catch (Exception e){
                                 e.printStackTrace();
                             }
@@ -234,7 +217,7 @@ public class Main {
                             outputStream.writeObject(message);
                             byte[] data = byteArrayOutputStream.toByteArray();
                             DatagramPacket dp = new DatagramPacket(data, data.length, clientAddress, 5001);
-                            socketA.send(dp);
+                            socket.send(dp);
                         }catch (Exception e){
                             e.printStackTrace();
                         }
@@ -245,7 +228,7 @@ public class Main {
 
                         break;
                     case "PUBLISH":
-                        System.out.println(socketA.getLocalPort());
+                        System.out.println(socket.getLocalPort());
                         //todo: the system needs to be implemented such that when the client is booted up
                         //you must either register or update. Once this is done, you will have the username
                         //to do the rest of the stuff. So, if update get the username and see if it exists. If it does
@@ -285,7 +268,7 @@ public class Main {
                             outputStream.writeObject(message);
                             byte[] data = byteArrayOutputStream.toByteArray();
                             DatagramPacket dp = new DatagramPacket(data, data.length, clientAddress, 5001);
-                            socketA.send(dp);
+                            socket.send(dp);
                         }catch (Exception e){
                             e.printStackTrace();
                         }
@@ -297,7 +280,20 @@ public class Main {
 
                     case "DONE":
                         //client.closeConnections();
-                        socketA.close();
+                        try {
+                            RQ logOutRQ = new RQ(18, username);
+                            Request.Register message = logOutRQ.getRequestOut();
+                            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                            ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
+                            outputStream.writeObject(message);
+                            byte[] data = byteArrayOutputStream.toByteArray();
+                            DatagramPacket dp = new DatagramPacket(data, data.length, clientAddress, 5001);
+                            socket.send(dp);
+                        }catch (Exception e){
+                        e.printStackTrace();
+                        }
+
+                        socket.close();
                         //outputStreamA.close();
                         System.out.println("Client disconnected from server. Have a nice day! :)");
                         return;

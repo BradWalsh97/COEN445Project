@@ -44,7 +44,7 @@ public class ServerConnection extends Thread {
                         break;
 
                     case 2:
-                        System.out.println(Main.username + " already exists. Please chose another name");
+                        System.out.println(receivedRQ.getText());
                         break;
 
                     case 14:

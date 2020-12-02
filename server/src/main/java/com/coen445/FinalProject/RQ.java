@@ -71,6 +71,8 @@ public class RQ {
                 break;
 
             case 6:
+
+            case 18:
                 this.name = requestIn.getName();
                 break;
 
@@ -188,7 +190,7 @@ public class RQ {
         message = requestOut.build().toByteArray();
     }
 
-    //For de-register info pass to back-up server (6)
+    //For de-register info pass to back-up server & logging out (6/18)
     public RQ(int registerCode, String name) {
         this.registerCode = registerCode;
         this.name = name;

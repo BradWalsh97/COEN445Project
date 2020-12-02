@@ -1,5 +1,6 @@
 package com.coen445.FinalProject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.*;
@@ -70,7 +71,7 @@ public class Main {
         //ServerConnection serverConnection = new ServerConnection(serverPort);
         //new Thread(serverConnection).start();
 
-        new ClientHandler(5001).start();
+        new ClientHandler(serverPort).start();
 
         //System.out.println("Stopping server");
         //serverConnection.stopServer();
@@ -147,6 +148,15 @@ public class Main {
     }
 
     public static void toggleIsServer(){
+
+        /*RQ returnRQ = new RQ(15, receivedRQ.getRqNum(), "The subject chosen is not in your list of interests, please update your interests and try again.");
+        Request.Register message = returnRQ.getRequestOut();
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
+        outputStream.writeObject(message);
+        byte[] dataSent = byteArrayOutputStream.toByteArray();
+        DatagramPacket dp = new DatagramPacket(dataSent, dataSent.length, packet.getAddress(), packet.getPort());
+        socket.send(dp);*/
         isServing = !isServing;
     }
 }
