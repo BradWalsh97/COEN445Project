@@ -77,7 +77,7 @@ public class ClientHandler extends Thread {
                                         ObjectOutputStream outputStreamToServer = new ObjectOutputStream(byteArrayOutputStreamToServer);
                                         outputStreamToServer.writeObject(messageToServer);
                                         byte[] dataSentToServer = byteArrayOutputStreamToServer.toByteArray();
-                                        DatagramPacket dpToServer = new DatagramPacket(dataSentToServer, dataSentToServer.length, InetAddress.getByName(ServerInfo.SERVER_A_ADDRESS), Main.altServerPort);
+                                        DatagramPacket dpToServer = new DatagramPacket(dataSentToServer, dataSentToServer.length, InetAddress.getByName(Main.altServerIP), Main.altServerPort);
                                         socket.send(dpToServer);
                                     } catch (Exception e) {
                                         e.printStackTrace();
@@ -104,7 +104,7 @@ public class ClientHandler extends Thread {
                                         ObjectOutputStream outputStreamToServer = new ObjectOutputStream(byteArrayOutputStreamToServer);
                                         outputStreamToServer.writeObject(messageToServer);
                                         byte[] dataSentToServer = byteArrayOutputStreamToServer.toByteArray();
-                                        DatagramPacket dpToServer = new DatagramPacket(dataSentToServer, dataSentToServer.length, InetAddress.getByName(ServerInfo.SERVER_A_ADDRESS), Main.altServerPort);
+                                        DatagramPacket dpToServer = new DatagramPacket(dataSentToServer, dataSentToServer.length, InetAddress.getByName(Main.altServerIP), Main.altServerPort);
                                         socket.send(dpToServer);
                                     } catch (Exception e) {
                                         e.printStackTrace();
@@ -157,7 +157,7 @@ public class ClientHandler extends Thread {
                                         ObjectOutputStream outputStreamToServer = new ObjectOutputStream(byteArrayOutputStreamToServer);
                                         outputStreamToServer.writeObject(messageToServer);
                                         byte[] dataSentToServer = byteArrayOutputStreamToServer.toByteArray();
-                                        DatagramPacket dpToServer = new DatagramPacket(dataSentToServer, dataSentToServer.length, InetAddress.getByName(ServerInfo.SERVER_A_ADDRESS), Main.altServerPort);
+                                        DatagramPacket dpToServer = new DatagramPacket(dataSentToServer, dataSentToServer.length, InetAddress.getByName(Main.altServerIP), Main.altServerPort);
                                         socket.send(dpToServer);
 
                                     } catch (Exception e) {
@@ -206,7 +206,7 @@ public class ClientHandler extends Thread {
                                         ObjectOutputStream outputStreamToServer = new ObjectOutputStream(byteArrayOutputStreamToServer);
                                         outputStreamToServer.writeObject(messageToServer);
                                         byte[] dataSentToServer = byteArrayOutputStreamToServer.toByteArray();
-                                        DatagramPacket dpToServer = new DatagramPacket(dataSentToServer, dataSentToServer.length, InetAddress.getByName(ServerInfo.SERVER_A_ADDRESS), Main.altServerPort);
+                                        DatagramPacket dpToServer = new DatagramPacket(dataSentToServer, dataSentToServer.length, InetAddress.getByName(Main.altServerIP), Main.altServerPort);
                                         socket.send(dpToServer);
                                     } catch (IOException e) {
                                         e.printStackTrace();
@@ -263,7 +263,7 @@ public class ClientHandler extends Thread {
                                         ObjectOutputStream outputStreamToServer = new ObjectOutputStream(byteArrayOutputStreamToServer);
                                         outputStreamToServer.writeObject(messageToServer);
                                         byte[] dataSentToServer = byteArrayOutputStreamToServer.toByteArray();
-                                        DatagramPacket dpToServer = new DatagramPacket(dataSentToServer, dataSentToServer.length, InetAddress.getByName(ServerInfo.SERVER_A_ADDRESS), Main.altServerPort);
+                                        DatagramPacket dpToServer = new DatagramPacket(dataSentToServer, dataSentToServer.length, InetAddress.getByName(Main.altServerIP), Main.altServerPort);
                                         socket.send(dpToServer);
                                     } catch (Exception e) {
                                         e.printStackTrace();
@@ -343,21 +343,27 @@ public class ClientHandler extends Thread {
                         }
                         break;
 
-                    case 16: //CHANGE SERVER from serving sevrer
+                    case 16: //CHANGE SERVER from serving server
                         System.out.println("CHANGE SERVER, it is my turn to serve!!!");
                         Main.isServing = true;
                         Random randTimerValue = new Random();
-                        Main.servingTimer.schedule(Main::toggleIsServer, randTimerValue.nextInt(2) + 3, TimeUnit.MINUTES); //choose a random number between 2 & 5 minutes.
+                        int delay = randTimerValue.nextInt(2) + 3;
+                        System.out.println("Server will stop serving in " + delay + "minutes.");
+                        Main.servingTimer.schedule(Main::toggleIsServer, delay, TimeUnit.MINUTES); //choose a random number between 2 & 5 minutes.
                         //Main.servingTimer.schedule(Main::toggleIsServer, 30, TimeUnit.SECONDS); //use for testing purposes
                         break;
 
                     case 17: //update the serving server with the alt server info
-
+                        System.out.println("UPDATE SERVER sent from other server.");
+                        Main.altServerIP = receivedRQ.getIp();
+                        Main.altServerPort = receivedRQ.getSocketNum();
                         break;
 
                     case 18:
                         System.out.println("LOGGING OUT, " + receivedRQ.getName() + " will be logged out.");
                         helper.userLogOnLogOff(receivedRQ.getName());
+
+                        //LOGGING OUT to other server
                         try{
                             RQ toServerRQ = new RQ(19, receivedRQ.getName());
                             Request.Register messageToServer = toServerRQ.getRequestOut();
@@ -365,7 +371,7 @@ public class ClientHandler extends Thread {
                             ObjectOutputStream outputStreamToServer = new ObjectOutputStream(byteArrayOutputStreamToServer);
                             outputStreamToServer.writeObject(messageToServer);
                             byte[] dataSentToServer = byteArrayOutputStreamToServer.toByteArray();
-                            DatagramPacket dpToServer = new DatagramPacket(dataSentToServer, dataSentToServer.length, InetAddress.getByName(ServerInfo.SERVER_A_ADDRESS), Main.altServerPort);
+                            DatagramPacket dpToServer = new DatagramPacket(dataSentToServer, dataSentToServer.length, InetAddress.getByName(Main.altServerIP), Main.altServerPort);
                             socket.send(dpToServer);
                         }catch (Exception e){
                             e.printStackTrace();

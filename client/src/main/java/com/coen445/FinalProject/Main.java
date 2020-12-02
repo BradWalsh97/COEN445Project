@@ -14,6 +14,8 @@ public class Main {
     public static String username = "";
     public static int servingPort = 5001;
     public static int altServingPort = 5002;
+    public static String servingIP = "";
+    public static String altIP = "";
 
     //todo about updating if logging in from new computer
     //khendek said that the update can server as a login (since you're updating the ip address). If you update from a
@@ -24,10 +26,14 @@ public class Main {
         int rq = 1;
         Scanner scanner = new Scanner(System.in);
         InetAddress clientAddress = InetAddress.getByName("localhost");
-        System.out.println("Hello, lets get some info about the servers you want to connect to. \nWhat is the ip of server a?");
-        String serverAIp = scanner.nextLine();
-        System.out.println("What about server b's address?");
-        String serverBIp = scanner.nextLine();
+        System.out.println("Hello, lets get some info about the servers you want to connect to. \nWhat is the ip of the serving server?");
+        servingIP = scanner.nextLine();
+        System.out.println("What about the alternate server's ip?");
+        altIP = scanner.nextLine();
+        System.out.println("What is the serving server's port?");
+        servingPort = Integer.parseInt(scanner.nextLine());
+        System.out.println("What is the alternate server's port?");
+        altServingPort = Integer.parseInt(scanner.nextLine());
         boolean validChoice = false;
         DatagramSocket socket = null;
         ServerConnection serverConnection = null;
@@ -74,6 +80,7 @@ public class Main {
                         System.out.println("Please enter your password");
                         String password = scanner.nextLine();
 
+                        //UPDATE to serving server
                         try {
                             RQ updateRQ = new RQ(7, rq++, username, clientAddress.getHostAddress(), socket.getLocalPort());
                             Request.Register message = updateRQ.getRequestOut();
@@ -82,7 +89,7 @@ public class Main {
                             ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
                             outputStream.writeObject(message);
                             byte[] data = byteArrayOutputStream.toByteArray();
-                            DatagramPacket dp = new DatagramPacket(data, data.length, clientAddress, servingPort);
+                            DatagramPacket dp = new DatagramPacket(data, data.length, InetAddress.getByName(servingIP), servingPort);
                             socket.send(dp);
                         }catch (Exception e){
                             e.printStackTrace();
@@ -110,9 +117,9 @@ public class Main {
                             ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
                             outputStream.writeObject(message);
                             byte[] data = byteArrayOutputStream.toByteArray();
-                            DatagramPacket dpA = new DatagramPacket(data, data.length, clientAddress, servingPort);
+                            DatagramPacket dpA = new DatagramPacket(data, data.length, InetAddress.getByName(servingIP), servingPort);
                             socket.send(dpA);
-                            DatagramPacket dpB = new DatagramPacket(data, data.length, clientAddress, altServingPort);
+                            DatagramPacket dpB = new DatagramPacket(data, data.length, InetAddress.getByName(altIP), altServingPort);
                             socket.send(dpB);
                         }catch (Exception e){
                             e.printStackTrace();
@@ -160,6 +167,7 @@ public class Main {
                         String areYouSureOrNAWH = scanner.nextLine();
                         if (areYouSureOrNAWH.equalsIgnoreCase("y")) {
 
+                            //DE-REGISTER to serving server
                             try {
                                 RQ deRegisterRQ = new RQ(5, rq++, username);
                                 Request.Register message = deRegisterRQ.getRequestOut();
@@ -167,7 +175,7 @@ public class Main {
                                 ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
                                 outputStream.writeObject(message);
                                 byte[] data = byteArrayOutputStream.toByteArray();
-                                DatagramPacket dp = new DatagramPacket(data, data.length, clientAddress, servingPort);
+                                DatagramPacket dp = new DatagramPacket(data, data.length, InetAddress.getByName(servingIP), servingPort);
                                 socket.send(dp);
                             }catch (Exception e){
                                 e.printStackTrace();
@@ -217,7 +225,7 @@ public class Main {
                             ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
                             outputStream.writeObject(message);
                             byte[] data = byteArrayOutputStream.toByteArray();
-                            DatagramPacket dp = new DatagramPacket(data, data.length, clientAddress, servingPort);
+                            DatagramPacket dp = new DatagramPacket(data, data.length, InetAddress.getByName(servingIP), servingPort);
                             socket.send(dp);
                         }catch (Exception e){
                             e.printStackTrace();
@@ -268,7 +276,7 @@ public class Main {
                             ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
                             outputStream.writeObject(message);
                             byte[] data = byteArrayOutputStream.toByteArray();
-                            DatagramPacket dp = new DatagramPacket(data, data.length, clientAddress, servingPort);
+                            DatagramPacket dp = new DatagramPacket(data, data.length, InetAddress.getByName(servingIP), servingPort);
                             socket.send(dp);
                         }catch (Exception e){
                             e.printStackTrace();
@@ -288,7 +296,7 @@ public class Main {
                             ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
                             outputStream.writeObject(message);
                             byte[] data = byteArrayOutputStream.toByteArray();
-                            DatagramPacket dp = new DatagramPacket(data, data.length, clientAddress, servingPort);
+                            DatagramPacket dp = new DatagramPacket(data, data.length, InetAddress.getByName(servingIP), servingPort);
                             socket.send(dp);
                         }catch (Exception e){
                         e.printStackTrace();

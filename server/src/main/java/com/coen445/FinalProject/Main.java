@@ -34,6 +34,7 @@ public class Main {
         boolean correctUpdateInput = false;
         String isPrimaryString = "";
         Scanner scanner = new Scanner(System.in);
+        String serverIP = InetAddress.getLocalHost().getHostAddress();
 
         //Start by getting some initial info
         while(!correctInput) {
@@ -130,7 +131,9 @@ public class Main {
         //now that the server has been created, start a timer between 3 & 5 minutes
         Random randTimerValue = new Random();
         if(isPrimary) { //start n minute timer
-            servingTimer.schedule(Main::toggleIsServer, randTimerValue.nextInt(2) + 3, TimeUnit.MINUTES); //choose a random number between 2 & 5 minutes.
+            int delay = randTimerValue.nextInt(2) + 3;
+            System.out.println("Server will stop serving in " + delay + "minutes.");
+            servingTimer.schedule(Main::toggleIsServer, delay, TimeUnit.MINUTES); //choose a random number between 2 & 5 minutes.
 //            servingTimer.schedule(Main::toggleIsServer, 30, TimeUnit.SECONDS);
         }
 
@@ -140,7 +143,7 @@ public class Main {
 
         clientHandler = new ClientHandler(serverPort);
         if(wantToUpdate){
-            updateServer(altServerPort);
+            updateServer(serverIP, altServerPort);
             wantToUpdate = false;
         }
         clientHandler.start();
@@ -219,15 +222,15 @@ public class Main {
         return false;
     }
 
-    public static void updateServer(int otherServerPort){
+    public static void updateServer(String serverIP, int otherServerPort){
         try {
-            RQ returnRQ = new RQ(17, ServerInfo.SERVER_A_ADDRESS, serverPort);
+            RQ returnRQ = new RQ(17, serverIP, serverPort);
             Request.Register message = returnRQ.getRequestOut();
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
             outputStream.writeObject(message);
             byte[] dataSent = byteArrayOutputStream.toByteArray();
-            DatagramPacket dp = new DatagramPacket(dataSent, dataSent.length, InetAddress.getByName(ServerInfo.SERVER_A_ADDRESS), otherServerPort);
+            DatagramPacket dp = new DatagramPacket(dataSent, dataSent.length, InetAddress.getByName(altServerIP), otherServerPort);
             clientHandler.getSocket().send(dp);
         } catch (Exception e) {
             e.printStackTrace();
@@ -242,7 +245,7 @@ public class Main {
         //CHANGE SERVER to clients
         for(User user : users) {
             try {
-                RQ returnRQ = new RQ(16, ServerInfo.SERVER_A_ADDRESS, altServerPort);
+                RQ returnRQ = new RQ(16, altServerIP, altServerPort);
                 Request.Register message = returnRQ.getRequestOut();
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                 ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
@@ -257,13 +260,13 @@ public class Main {
 
         //CHANGE SERVER to other server
         try {
-            RQ returnRQ = new RQ(16, ServerInfo.SERVER_A_ADDRESS, altServerPort);
+            RQ returnRQ = new RQ(16, altServerIP, altServerPort);
             Request.Register message = returnRQ.getRequestOut();
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
             outputStream.writeObject(message);
             byte[] dataSent = byteArrayOutputStream.toByteArray();
-            DatagramPacket dp = new DatagramPacket(dataSent, dataSent.length, InetAddress.getByName(ServerInfo.SERVER_A_ADDRESS), altServerPort);
+            DatagramPacket dp = new DatagramPacket(dataSent, dataSent.length, InetAddress.getByName(altServerIP), altServerPort);
             clientHandler.getSocket().send(dp);
         } catch (Exception e) {
             e.printStackTrace();
