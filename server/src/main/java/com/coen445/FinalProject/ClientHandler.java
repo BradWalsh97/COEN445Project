@@ -12,8 +12,8 @@ import java.util.concurrent.TimeUnit;
 public class ClientHandler extends Thread {
     private DatagramSocket socket = null;
 
-    public ClientHandler(int port) throws IOException {
-        socket = new DatagramSocket(port);
+    public ClientHandler(DatagramSocket socket) throws IOException {
+        this.socket = socket;
     }
 
     public DatagramSocket getSocket(){return socket;}
@@ -348,7 +348,7 @@ public class ClientHandler extends Thread {
                         Main.isServing = true;
                         Random randTimerValue = new Random();
                         int delay = randTimerValue.nextInt(2) + 3;
-                        System.out.println("Server will stop serving in " + delay + "minutes.");
+                        System.out.println("Server will stop serving in " + delay + " minutes.");
                         Main.servingTimer.schedule(Main::toggleIsServer, delay, TimeUnit.MINUTES); //choose a random number between 2 & 5 minutes.
                         //Main.servingTimer.schedule(Main::toggleIsServer, 30, TimeUnit.SECONDS); //use for testing purposes
                         break;

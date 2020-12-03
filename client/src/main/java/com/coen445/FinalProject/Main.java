@@ -25,7 +25,7 @@ public class Main {
         //for now, ask a user to register every time
         int rq = 1;
         Scanner scanner = new Scanner(System.in);
-        InetAddress clientAddress = InetAddress.getByName("localhost");
+        InetAddress clientAddress = InetAddress.getLocalHost();
         System.out.println("Hello, lets get some info about the servers you want to connect to. \nWhat is the ip of the serving server?");
         servingIP = scanner.nextLine();
         System.out.println("What about the alternate server's ip?");
@@ -35,6 +35,7 @@ public class Main {
         System.out.println("What is the alternate server's port?");
         altServingPort = Integer.parseInt(scanner.nextLine());
         boolean validChoice = false;
+        boolean loop = true;
         DatagramSocket socket = null;
         ServerConnection serverConnection = null;
 
@@ -132,14 +133,14 @@ public class Main {
                 } while (!registerSuccess);
             } while (!validChoice);
 
-            while (true) {
+            while (loop) {
                 System.out.println("Command list: +" +
                         //"\nTo update your user: UPDATE" +
                         "\nTo delete a user: DE-REGISTER" +
                         "\nTo update your subjects: SUBJECTS " +
                         "\nTo publish a message: PUBLISH" +
                         "\nFor a joke: JOKE" +
-                        "\nTo exit: DONE");
+                        "\nTo exit: LOG OUT");
                 String userCommand = scanner.nextLine().toUpperCase();
 
                 //Clear the console
@@ -186,6 +187,7 @@ public class Main {
                         Thread.sleep(1000);
                         //RQ receivedDeRegisterRq = new RQ((byte[]) client.readObjectFromServer());
 
+                        loop = false;
                         break;
                     case "SUBJECTS":
                         System.out.println("Changing the interests for user " + username);
@@ -243,8 +245,8 @@ public class Main {
                         //to do the rest of the stuff. So, if update get the username and see if it exists. If it does
                         //check to see if the database ip and socketA are different from what the user currently runs on
                         //if they are different send the auto update, if not
-                        System.out.println("Please enter the user for which you want ");
-                        String userPublish = scanner.nextLine(); //todo: set this to the currently logged in user
+                        //System.out.println("Please enter the user for which you want ");
+                        //String userPublish = scanner.nextLine(); //todo: set this to the currently logged in user
                         System.out.println("Select the subject you want to publish to:");
                         System.out.println(Subjects.INTEREST1 + "\n" + Subjects.INTEREST2 + "\n" + Subjects.INTEREST3 + "\n" +
                                 Subjects.INTEREST4 + "\n" + Subjects.INTEREST5);
@@ -270,7 +272,7 @@ public class Main {
                         System.out.println("Type in the message you would like to publish"); //todo: add error checking (no empty messages)
                         String publishedMessage = scanner.nextLine();
                         try {
-                            RQ publishRQ = new RQ(13, rq++, userPublish, userList, publishedMessage);
+                            RQ publishRQ = new RQ(13, rq++, username, userList, publishedMessage);
                             Request.Register message = publishRQ.getRequestOut();
                             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                             ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
@@ -287,7 +289,7 @@ public class Main {
                         //RQ receivedPublishRq = new RQ((byte[]) client.readObjectFromServer());
                         break;
 
-                    case "DONE":
+                    case "LOG OUT":
                         //client.closeConnections();
                         try {
                             RQ logOutRQ = new RQ(18, username);
@@ -302,10 +304,11 @@ public class Main {
                         e.printStackTrace();
                         }
 
-                        socket.close();
+                        //socket.close();
                         //outputStreamA.close();
                         System.out.println("Client disconnected from server. Have a nice day! :)");
-                        return;
+                        loop = false;
+                        break;
 
                     case "JOKE":
                         break;

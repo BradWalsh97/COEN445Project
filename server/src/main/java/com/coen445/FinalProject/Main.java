@@ -35,6 +35,7 @@ public class Main {
         String isPrimaryString = "";
         Scanner scanner = new Scanner(System.in);
         String serverIP = InetAddress.getLocalHost().getHostAddress();
+        DatagramSocket socket = null;
 
         //Start by getting some initial info
         while(!correctInput) {
@@ -58,6 +59,7 @@ public class Main {
         serverPort = 5001;
         while(!available(serverPort)) //get the server to run on a available port
             serverPort++;
+        socket = new DatagramSocket(serverPort);
         System.out.println("This server is listening on port: " + serverPort);
 
         System.out.println("This server is running on port: " + InetAddress.getLocalHost().getHostAddress());
@@ -77,7 +79,7 @@ public class Main {
             }
             System.out.println("Please enter the port which the other server is listening on: ");
             altServerPort = Integer.parseInt(scanner.nextLine());
-            if(altServerPort > 5001 && altServerPort < 65535)
+            if(altServerPort >= 5001 && altServerPort <= 65535)
                 correctPortInput = true;
             else System.out.println("Invalid port number, please try again. \n\n");
 
@@ -132,7 +134,7 @@ public class Main {
         Random randTimerValue = new Random();
         if(isPrimary) { //start n minute timer
             int delay = randTimerValue.nextInt(2) + 3;
-            System.out.println("Server will stop serving in " + delay + "minutes.");
+            System.out.println("Server will stop serving in " + delay + " minutes.");
             servingTimer.schedule(Main::toggleIsServer, delay, TimeUnit.MINUTES); //choose a random number between 2 & 5 minutes.
 //            servingTimer.schedule(Main::toggleIsServer, 30, TimeUnit.SECONDS);
         }
@@ -141,7 +143,7 @@ public class Main {
         //ServerConnection serverConnection = new ServerConnection(serverPort);
         //new Thread(serverConnection).start();
 
-        clientHandler = new ClientHandler(serverPort);
+        clientHandler = new ClientHandler(socket);
         if(wantToUpdate){
             updateServer(serverIP, altServerPort);
             wantToUpdate = false;
