@@ -20,6 +20,7 @@ public class Main {
     public static ScheduledExecutorService servingTimer = Executors.newScheduledThreadPool(1);
     public static int serverPort;
     public static int altServerPort;
+    public static String altServerIP;
     public static String whichServer;
     public static boolean otherServerConnected = false;
     public static boolean backupRegistered = false;
@@ -28,11 +29,78 @@ public class Main {
 
     public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
         boolean servingDone = false;
+        boolean correctInput = false;
+        boolean correctPortInput = false;
+        boolean correctUpdateInput = false;
+        String isPrimaryString = "";
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Hello Systems Administrator. Is this server A or B? (A/B)");
-        whichServer = scanner.nextLine();
-        System.out.println("Is this server the primary server? (Y/N)");
-        String isPrimaryString = scanner.nextLine();
+        String serverIP = InetAddress.getLocalHost().getHostAddress();
+        DatagramSocket socket = null;
+
+        //Start by getting some initial info
+        while(!correctInput) {
+            //get user inputs
+            System.out.println("Hello Systems Administrator. Is this server A or B? (A/B)"); //used for database recognition
+            whichServer = scanner.nextLine().toUpperCase();
+            System.out.println("Is this server the primary server? (Y/N)");
+            isPrimaryString = scanner.nextLine();
+            int serverSwitchTime = 5; //stored in minutes
+
+            //check for correct inputs:
+            if ((whichServer.equalsIgnoreCase("a") || whichServer.equalsIgnoreCase("b"))
+            && (isPrimaryString.equalsIgnoreCase("Y") || isPrimaryString.equalsIgnoreCase("N"))){
+                correctInput = true;
+            } else {
+                System.out.println("Invalid inputs, please try again :)");
+            }
+        }
+
+        //get which port the server will listen on and then print it to the terminal.
+        serverPort = 5001;
+        while(!available(serverPort)) //get the server to run on a available port
+            serverPort++;
+        socket = new DatagramSocket(serverPort);
+        System.out.println("This server is listening on port: " + serverPort);
+
+        System.out.println("This server is running on port: " + InetAddress.getLocalHost().getHostAddress());
+
+        //get info about the other server
+        while(!correctPortInput){
+            System.out.println("Please enter the ip which the other server is running on: ");
+            altServerIP = scanner.nextLine();
+
+            //Pattern sourced from: https://stackoverflow.com/questions/5667371/validate-ipv4-address-in-java
+            String ipv4Pattern = "^((0|1\\d?\\d?|2[0-4]?\\d?|25[0-5]?|[3-9]\\d?)\\.){3}(0|1\\d?\\d?|2[0-4]?\\d?|25[0-5]?|[3-9]\\d?)$";
+            if(altServerIP.matches(ipv4Pattern)){
+                correctInput = true;
+            } else{
+                System.out.println("Hmm, that IP address doesn't look right. Please try again");
+                continue;
+            }
+            System.out.println("Please enter the port which the other server is listening on: ");
+            altServerPort = Integer.parseInt(scanner.nextLine());
+            if(altServerPort >= 5001 && altServerPort <= 65535)
+                correctPortInput = true;
+            else System.out.println("Invalid port number, please try again. \n\n");
+
+        }
+
+        //now, in the event of a server reset, give the systems administrator the option to update the other server.
+        while(!correctUpdateInput){
+            System.out.println("Do you want to update the other server with your current into? (Y/N)");
+            String input = scanner.nextLine();
+            if(input.equalsIgnoreCase("Y")) {
+                wantToUpdate = true;
+                correctUpdateInput = true;
+            } else if(input.equalsIgnoreCase("N")){
+                wantToUpdate = false;
+                correctUpdateInput = true;
+            }else{
+                System.out.println("Incorrect input, please try again.");
+                correctUpdateInput = false;
+            }
+
+        }
 
         boolean isPrimary;
         if(isPrimaryString.equalsIgnoreCase("Y")) {
@@ -52,30 +120,32 @@ public class Main {
         //ServerSocket listener = null;
         //Socket otherServerSocket = null;
         //if(available(serverPort))
-        if(whichServer.equalsIgnoreCase("a")) {
-            serverPort = ServerInfo.SERVER_A_PORT;
-            //listener = new ServerSocket(serverPort);
-            altServerPort = ServerInfo.SERVER_B_PORT;
-        }else if(whichServer.equalsIgnoreCase("b")){
-            serverPort = ServerInfo.SERVER_B_PORT;
-            //listener = new ServerSocket(serverPort);
-            altServerPort = ServerInfo.SERVER_A_PORT;
-        }
+//        if(whichServer.equalsIgnoreCase("a")) {
+//            serverPort = ServerInfo.SERVER_A_PORT;
+//            //listener = new ServerSocket(serverPort);
+//            altServerPort = ServerInfo.SERVER_B_PORT;
+//        }else if(whichServer.equalsIgnoreCase("b")){
+//            serverPort = ServerInfo.SERVER_B_PORT;
+//            //listener = new ServerSocket(serverPort);
+//            altServerPort = ServerInfo.SERVER_A_PORT;
+//        }
 
         //now that the server has been created, start a timer between 3 & 5 minutes
         Random randTimerValue = new Random();
         if(isPrimary) { //start n minute timer
-//            servingTimer.schedule(Main::toggleIsServer, randTimerValue.nextInt(2) + 3, TimeUnit.MINUTES);
-            servingTimer.schedule(Main::toggleIsServer, 30, TimeUnit.SECONDS);
+            int delay = randTimerValue.nextInt(2) + 3;
+            System.out.println("Server will stop serving in " + delay + " minutes.");
+            servingTimer.schedule(Main::toggleIsServer, delay, TimeUnit.MINUTES); //choose a random number between 2 & 5 minutes.
+//            servingTimer.schedule(Main::toggleIsServer, 30, TimeUnit.SECONDS);
         }
 
         //Thread.sleep(5000);
         //ServerConnection serverConnection = new ServerConnection(serverPort);
         //new Thread(serverConnection).start();
 
-        clientHandler = new ClientHandler(serverPort);
+        clientHandler = new ClientHandler(socket);
         if(wantToUpdate){
-            updateServer(1);
+            updateServer(serverIP, altServerPort);
             wantToUpdate = false;
         }
         clientHandler.start();
@@ -154,15 +224,15 @@ public class Main {
         return false;
     }
 
-    public static void updateServer(int otherServerPort){
+    public static void updateServer(String serverIP, int otherServerPort){
         try {
-            RQ returnRQ = new RQ(17, ServerInfo.SERVER_A_ADDRESS, serverPort);
+            RQ returnRQ = new RQ(17, serverIP, serverPort);
             Request.Register message = returnRQ.getRequestOut();
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
             outputStream.writeObject(message);
             byte[] dataSent = byteArrayOutputStream.toByteArray();
-            DatagramPacket dp = new DatagramPacket(dataSent, dataSent.length, InetAddress.getByName(ServerInfo.SERVER_A_ADDRESS), otherServerPort);
+            DatagramPacket dp = new DatagramPacket(dataSent, dataSent.length, InetAddress.getByName(altServerIP), otherServerPort);
             clientHandler.getSocket().send(dp);
         } catch (Exception e) {
             e.printStackTrace();
@@ -177,7 +247,7 @@ public class Main {
         //CHANGE SERVER to clients
         for(User user : users) {
             try {
-                RQ returnRQ = new RQ(16, ServerInfo.SERVER_A_ADDRESS, altServerPort);
+                RQ returnRQ = new RQ(16, altServerIP, altServerPort);
                 Request.Register message = returnRQ.getRequestOut();
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                 ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
@@ -192,13 +262,13 @@ public class Main {
 
         //CHANGE SERVER to other server
         try {
-            RQ returnRQ = new RQ(16, ServerInfo.SERVER_A_ADDRESS, altServerPort);
+            RQ returnRQ = new RQ(16, altServerIP, altServerPort);
             Request.Register message = returnRQ.getRequestOut();
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
             outputStream.writeObject(message);
             byte[] dataSent = byteArrayOutputStream.toByteArray();
-            DatagramPacket dp = new DatagramPacket(dataSent, dataSent.length, InetAddress.getByName(ServerInfo.SERVER_A_ADDRESS), altServerPort);
+            DatagramPacket dp = new DatagramPacket(dataSent, dataSent.length, InetAddress.getByName(altServerIP), altServerPort);
             clientHandler.getSocket().send(dp);
         } catch (Exception e) {
             e.printStackTrace();

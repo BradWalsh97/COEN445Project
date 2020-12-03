@@ -69,6 +69,8 @@ public class ServerConnection extends Thread {
 
                     case 16:
                         System.out.println("Serving server is changing");
+                        Main.altIP = Main.servingIP;
+                        Main.servingIP = receivedRQ.getIp();
                         Main.altServingPort = Main.servingPort;
                         Main.servingPort = receivedRQ.getSocketNum();
                         break;
