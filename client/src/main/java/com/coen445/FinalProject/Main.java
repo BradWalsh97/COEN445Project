@@ -47,6 +47,7 @@ public class Main {
         } catch (ConnectException e) {
             System.out.println("Socket unnable to connect");
         }
+        //todo add code for user asking whos serving
         /*try {
             socketB = new DatagramSocket();
             while(!available(clientPortB)){

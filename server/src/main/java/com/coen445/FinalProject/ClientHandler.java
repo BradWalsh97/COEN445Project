@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ClientHandler extends Thread {
     private DatagramSocket socket = null;
+    private LogHelper logger = new LogHelper("logs" + Main.whichServer + ".log");
 
     public ClientHandler(DatagramSocket socket) throws IOException {
         this.socket = socket;
@@ -44,6 +45,7 @@ public class ClientHandler extends Thread {
                 Request.Register rq = (Request.Register) inputStream.readObject();
 
                 RQ receivedRQ = new RQ(rq);
+                logger.writeInfo(receivedRQ);
                 JSONHelper helper = new JSONHelper(Main.whichServer);
 
                 switch (receivedRQ.getRegisterCode()) {
@@ -52,7 +54,7 @@ public class ClientHandler extends Thread {
                             try {
                                 //start by receiving the message and logging its info
                                 System.out.println("Registering new user " + receivedRQ.getName() + " " + receivedRQ.getIp() + " " + receivedRQ.getSocketNum());
-
+                                logger.writeInfo("Registering new user " + receivedRQ.getName() + " " + receivedRQ.getIp() + " " + receivedRQ.getSocketNum());
                                 //check validity of new user, start by making sure that their username is unique.
                                 //This is done with the json helper's return value.
                                 User newUser = new User(receivedRQ.getName(), receivedRQ.getPassword(),
@@ -62,6 +64,7 @@ public class ClientHandler extends Thread {
                                     try {
                                         //sending RQ to client
                                         RQ returnRQ = new RQ(2, receivedRQ.getRqNum(), "The user already exists");
+                                        logger.writeWarning("The user already exists");
                                         Request.Register message = returnRQ.getRequestOut();
                                         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                                         ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
@@ -72,6 +75,7 @@ public class ClientHandler extends Thread {
 
                                         //sending RQ to other server
                                         RQ toServerRQ = new RQ(4, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getIp(), receivedRQ.getSocketNum());
+                                        logger.writeInfo("Informing server that " + receivedRQ.getName() + " already exists.");
                                         Request.Register messageToServer = toServerRQ.getRequestOut();
                                         ByteArrayOutputStream byteArrayOutputStreamToServer = new ByteArrayOutputStream();
                                         ObjectOutputStream outputStreamToServer = new ObjectOutputStream(byteArrayOutputStreamToServer);
@@ -86,6 +90,7 @@ public class ClientHandler extends Thread {
                                 } else {
                                     //server.sendObject("REGISTERED");
                                     System.out.println("New user added to database");
+                                    logger.writeInfo("Added user: " + receivedRQ.getName() + " to database.");
                                     try {
                                         //sending RQ to client
                                         RQ returnRQ = new RQ(1, receivedRQ.getRqNum()); //todo: what to do with the 1
@@ -99,6 +104,7 @@ public class ClientHandler extends Thread {
 
                                         //sending RQ to other server
                                         RQ toServerRQ = new RQ(3, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getIp(), receivedRQ.getSocketNum());
+                                        logger.writeInfo("Informing server that " + receivedRQ.getName() + " is registered.");
                                         Request.Register messageToServer = toServerRQ.getRequestOut();
                                         ByteArrayOutputStream byteArrayOutputStreamToServer = new ByteArrayOutputStream();
                                         ObjectOutputStream outputStreamToServer = new ObjectOutputStream(byteArrayOutputStreamToServer);
@@ -124,12 +130,14 @@ public class ClientHandler extends Thread {
 
                     case 3: //REGISTERED from serving server
                         System.out.println("REGISTERED from serving server");
+                        logger.writeInfo("REGISTERED from other server");
                         helper.saveNewUser(new User(receivedRQ.getName(), receivedRQ.getPassword(),
                                 receivedRQ.getIp(), Integer.toString(receivedRQ.getSocketNum())));
                         break;
 
                     case 4: //REGISTERED-DENIED from serving server
                         System.out.println("REGISTERED-DENIED from serving server, " + receivedRQ.getName() + " will not be saved");
+                        logger.writeInfo(receivedRQ.getName() + " will not be saved.");
                         break;
 
                     case 5://DE-REGISTER
