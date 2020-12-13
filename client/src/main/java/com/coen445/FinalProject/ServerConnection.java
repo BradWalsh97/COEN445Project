@@ -74,6 +74,22 @@ public class ServerConnection extends Thread {
                         Main.altServingPort = Main.servingPort;
                         Main.servingPort = receivedRQ.getSocketNum();
                         break;
+
+                    case 21:
+                        System.out.println("Serving server is " + receivedRQ.getName());
+                        if(receivedRQ.getName().equalsIgnoreCase("ServerA")){
+                            Main.servingPort = Main.serverAPort;
+                            Main.altServingPort = Main.serverBPort;
+                            Main.servingIP = Main.serverAip;
+                            Main.altIP = Main.serverBip;
+                        }else{
+                            Main.servingPort = Main.serverBPort;
+                            Main.altServingPort = Main.serverAPort;
+                            Main.servingIP = Main.serverBip;
+                            Main.altIP = Main.serverAip;
+                        }
+                        Main.whoServing = true;
+                        break;
                 }
 
                 //System.out.println(receivedRq);

@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE log SYSTEM "logger.dtd">
+<log>
+<record>
+  <date>2020-12-12T22:03:44.152454500Z</date>
+  <millis>1607810624152</millis>
+  <nanos>454500</nanos>
+  <sequence>0</sequence>
+  <logger>com.coen445.FinalProject</logger>
+  <level>INFO</level>
+  <class>com.coen445.FinalProject.LogHelper</class>
+  <method>writeInfo</method>
+  <thread>14</thread>
+  <message>com.coen445.FinalProject.RQ@5f7ba8bf</message>
+</record>
+<record>
+  <date>2020-12-12T22:05:34.118202700Z</date>
+  <millis>1607810734118</millis>
+  <nanos>202700</nanos>
+  <sequence>1</sequence>
+  <logger>com.coen445.FinalProject</logger>
+  <level>INFO</level>
+  <class>com.coen445.FinalProject.LogHelper</class>
+  <method>writeInfo</method>
+  <thread>14</thread>
+  <message>com.coen445.FinalProject.RQ@4df9f56d</message>
+</record>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE log SYSTEM "logger.dtd">
+<log>
+<record>
+  <date>2020-12-12T23:49:27.358265300Z</date>
+  <millis>1607816967358</millis>
+  <nanos>265300</nanos>
+  <sequence>0</sequence>
+  <logger>com.coen445.FinalProject</logger>
+  <level>INFO</level>
+  <class>com.coen445.FinalProject.LogHelper</class>
+  <method>writeInfo</method>
+  <thread>14</thread>
+  <message>com.coen445.FinalProject.RQ@7b48d456</message>
+</record>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE log SYSTEM "logger.dtd">
+<log>
+<record>
+  <date>2020-12-13T00:08:28.992496200Z</date>
+  <millis>1607818108992</millis>
+  <nanos>496200</nanos>
+  <sequence>0</sequence>
+  <logger>com.coen445.FinalProject</logger>
+  <level>INFO</level>
+  <class>com.coen445.FinalProject.LogHelper</class>
+  <method>writeInfo</method>
+  <thread>16</thread>
+  <message>com.coen445.FinalProject.RQ@59d2c3cc</message>
+</record>
+</log>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE log SYSTEM "logger.dtd">
+<log>
+<record>
+  <date>2020-12-13T00:10:29.922973300Z</date>
+  <millis>1607818229922</millis>
+  <nanos>973300</nanos>
+  <sequence>0</sequence>
+  <logger>com.coen445.FinalProject</logger>
+  <level>INFO</level>
+  <class>com.coen445.FinalProject.LogHelper</class>
+  <method>writeInfo</method>
+  <thread>14</thread>
+  <message>com.coen445.FinalProject.RQ@17ba387c</message>
+</record>
+<record>
+  <date>2020-12-13T00:10:44.524029600Z</date>
+  <millis>1607818244524</millis>
+  <nanos>29600</nanos>
+  <sequence>1</sequence>
+  <logger>com.coen445.FinalProject</logger>
+  <level>INFO</level>
+  <class>com.coen445.FinalProject.LogHelper</class>
+  <method>writeInfo</method>
+  <thread>14</thread>
+  <message>com.coen445.FinalProject.RQ@6798cb79</message>
+</record>
+<record>
+  <date>2020-12-13T00:10:44.525028300Z</date>
+  <millis>1607818244525</millis>
+  <nanos>28300</nanos>
+  <sequence>2</sequence>
+  <logger>com.coen445.FinalProject</logger>
+  <level>INFO</level>
+  <class>com.coen445.FinalProject.LogHelper</class>
+  <method>writeInfo</method>
+  <thread>14</thread>
+  <message>Registering new user john 10.0.0.96 58198</message>
+</record>
+<record>
+  <date>2020-12-13T00:10:44.565982700Z</date>
+  <millis>1607818244565</millis>
+  <nanos>982700</nanos>
+  <sequence>3</sequence>
+  <logger>com.coen445.FinalProject</logger>
+  <level>INFO</level>
+  <class>com.coen445.FinalProject.LogHelper</class>
+  <method>writeInfo</method>
+  <thread>14</thread>
+  <message>Added user: john to database.</message>
+</record>
+<record>
+  <date>2020-12-13T00:10:44.566949200Z</date>
+  <millis>1607818244566</millis>
+  <nanos>949200</nanos>
+  <sequence>4</sequence>
+  <logger>com.coen445.FinalProject</logger>
+  <level>INFO</level>
+  <class>com.coen445.FinalProject.LogHelper</class>
+  <method>writeInfo</method>
+  <thread>14</thread>
+  <message>Informing server that john is registered.</message>
+</record>
+<record>
+  <date>2020-12-13T00:13:44.057685200Z</date>
+  <millis>1607818424057</millis>
+  <nanos>685200</nanos>
+  <sequence>5</sequence>
+  <logger>com.coen445.FinalProject</logger>
+  <level>INFO</level>
+  <class>com.coen445.FinalProject.LogHelper</class>
+  <method>writeInfo</method>
+  <thread>14</thread>
+  <message>com.coen445.FinalProject.RQ@6e06509d</message>
+</record>
+<record>
+  <date>2020-12-13T00:14:20.499699100Z</date>
+  <millis>1607818460499</millis>
+  <nanos>699100</nanos>
+  <sequence>6</sequence>
+  <logger>com.coen445.FinalProject</logger>
+  <level>INFO</level>
+  <class>com.coen445.FinalProject.LogHelper</class>
+  <method>writeInfo</method>
+  <thread>14</thread>
+  <message>com.coen445.FinalProject.RQ@3e82bad</message>
+</record>
+<record>
+  <date>2020-12-13T00:14:20.516652100Z</date>
+  <millis>1607818460516</millis>
+  <nanos>652100</nanos>
+  <sequence>7</sequence>
+  <logger>com.coen445.FinalProject</logger>
+  <level>INFO</level>
+  <class>com.coen445.FinalProject.LogHelper</class>
+  <method>writeInfo</method>
+  <thread>14</thread>
+  <message>com.coen445.FinalProject.RQ@2be05ca3</message>
+</record>
+<record>
+  <date>2020-12-13T00:14:20.517649900Z</date>
+  <millis>1607818460517</millis>
+  <nanos>649900</nanos>
+  <sequence>8</sequence>
+  <logger>com.coen445.FinalProject</logger>
+  <level>INFO</level>
+  <class>com.coen445.FinalProject.LogHelper</class>
+  <method>writeInfo</method>
+  <thread>14</thread>
+  <message>john will not be saved.</message>
+</record>
+<record>
+  <date>2020-12-13T00:14:39.483535600Z</date>
+  <millis>1607818479483</millis>
+  <nanos>535600</nanos>
+  <sequence>9</sequence>
+  <logger>com.coen445.FinalProject</logger>
+  <level>INFO</level>
+  <class>com.coen445.FinalProject.LogHelper</class>
+  <method>writeInfo</method>
+  <thread>14</thread>
+  <message>com.coen445.FinalProject.RQ@f63749</message>
+</record>
+<record>
+  <date>2020-12-13T00:14:39.491513500Z</date>
+  <millis>1607818479491</millis>
+  <nanos>513500</nanos>
+  <sequence>10</sequence>
+  <logger>com.coen445.FinalProject</logger>
+  <level>INFO</level>
+  <class>com.coen445.FinalProject.LogHelper</class>
+  <method>writeInfo</method>
+  <thread>14</thread>
+  <message>com.coen445.FinalProject.RQ@5c281d72</message>
+</record>
+<record>
+  <date>2020-12-13T00:14:39.492510500Z</date>
+  <millis>1607818479492</millis>
+  <nanos>510500</nanos>
+  <sequence>11</sequence>
+  <logger>com.coen445.FinalProject</logger>
+  <level>INFO</level>
+  <class>com.coen445.FinalProject.LogHelper</class>
+  <method>writeInfo</method>
+  <thread>14</thread>
+  <message>REGISTERED from other server</message>
+</record>
+<record>
+  <date>2020-12-13T00:14:52.624320200Z</date>
+  <millis>1607818492624</millis>
+  <nanos>320200</nanos>
+  <sequence>12</sequence>
+  <logger>com.coen445.FinalProject</logger>
+  <level>INFO</level>
+  <class>com.coen445.FinalProject.LogHelper</class>
+  <method>writeInfo</method>
+  <thread>14</thread>
+  <message>com.coen445.FinalProject.RQ@2bc76989</message>
+</record>
+<record>
+  <date>2020-12-13T00:14:58.791241400Z</date>
+  <millis>1607818498791</millis>
+  <nanos>241400</nanos>
+  <sequence>13</sequence>
+  <logger>com.coen445.FinalProject</logger>
+  <level>INFO</level>
+  <class>com.coen445.FinalProject.LogHelper</class>
+  <method>writeInfo</method>
+  <thread>14</thread>
+  <message>com.coen445.FinalProject.RQ@53f93ada</message>
+</record>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE log SYSTEM "logger.dtd">
+<log>
+<record>
+  <date>2020-12-13T02:24:31.763237800Z</date>
+  <millis>1607826271763</millis>
+  <nanos>237800</nanos>
+  <sequence>0</sequence>
+  <logger>com.coen445.FinalProject</logger>
+  <level>INFO</level>
+  <class>com.coen445.FinalProject.LogHelper</class>
+  <method>writeInfo</method>
+  <thread>14</thread>
+  <message>com.coen445.FinalProject.RQ@7d5ae6d1</message>
+</record>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE log SYSTEM "logger.dtd">
+<log>
+<record>
+  <date>2020-12-13T02:49:59.191464200Z</date>
+  <millis>1607827799191</millis>
+  <nanos>464200</nanos>
+  <sequence>0</sequence>
+  <logger>com.coen445.FinalProject</logger>
+  <level>INFO</level>
+  <class>com.coen445.FinalProject.LogHelper</class>
+  <method>writeInfo</method>
+  <thread>14</thread>
+  <message>com.coen445.FinalProject.RQ@52dd9957</message>
+</record>
+<record>
+  <date>2020-12-13T02:50:17.215693900Z</date>
+  <millis>1607827817215</millis>
+  <nanos>693900</nanos>
+  <sequence>1</sequence>
+  <logger>com.coen445.FinalProject</logger>
+  <level>INFO</level>
+  <class>com.coen445.FinalProject.LogHelper</class>
+  <method>writeInfo</method>
+  <thread>14</thread>
+  <message>com.coen445.FinalProject.RQ@4840ed13</message>
+</record>
+<record>
+  <date>2020-12-13T02:50:17.216691100Z</date>
+  <millis>1607827817216</millis>
+  <nanos>691100</nanos>
+  <sequence>2</sequence>
+  <logger>com.coen445.FinalProject</logger>
+  <level>INFO</level>
+  <class>com.coen445.FinalProject.LogHelper</class>
+  <method>writeInfo</method>
+  <thread>14</thread>
+  <message>Registering new user johnny 10.0.0.96 65161</message>
+</record>
+<record>
+  <date>2020-12-13T02:50:17.269577700Z</date>
+  <millis>1607827817269</millis>
+  <nanos>577700</nanos>
+  <sequence>3</sequence>
+  <logger>com.coen445.FinalProject</logger>
+  <level>INFO</level>
+  <class>com.coen445.FinalProject.LogHelper</class>
+  <method>writeInfo</method>
+  <thread>14</thread>
+  <message>Added user: johnny to database.</message>
+</record>
+<record>
+  <date>2020-12-13T02:50:17.271544500Z</date>
+  <millis>1607827817271</millis>
+  <nanos>544500</nanos>
+  <sequence>4</sequence>
+  <logger>com.coen445.FinalProject</logger>
+  <level>INFO</level>
+  <class>com.coen445.FinalProject.LogHelper</class>
+  <method>writeInfo</method>
+  <thread>14</thread>
+  <message>Informing server that johnny is registered.</message>
+</record>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE log SYSTEM "logger.dtd">
+<log>
+<record>
+  <date>2020-12-13T02:53:07.904788400Z</date>
+  <millis>1607827987904</millis>
+  <nanos>788400</nanos>
+  <sequence>0</sequence>
+  <logger>com.coen445.FinalProject</logger>
+  <level>INFO</level>
+  <class>com.coen445.FinalProject.LogHelper</class>
+  <method>writeInfo</method>
+  <thread>14</thread>
+  <message>com.coen445.FinalProject.RQ@6cf48684</message>
+</record>
+<record>
+  <date>2020-12-13T02:53:38.881224Z</date>
+  <millis>1607828018881</millis>
+  <nanos>224000</nanos>
+  <sequence>1</sequence>
+  <logger>com.coen445.FinalProject</logger>
+  <level>INFO</level>
+  <class>com.coen445.FinalProject.LogHelper</class>
+  <method>writeInfo</method>
+  <thread>14</thread>
+  <message>com.coen445.FinalProject.RQ@dff39ef</message>
+</record>
+<record>
+  <date>2020-12-13T02:54:09.899670200Z</date>
+  <millis>1607828049899</millis>
+  <nanos>670200</nanos>
+  <sequence>2</sequence>
+  <logger>com.coen445.FinalProject</logger>
+  <level>INFO</level>
+  <class>com.coen445.FinalProject.LogHelper</class>
+  <method>writeInfo</method>
+  <thread>14</thread>
+  <message>com.coen445.FinalProject.RQ@319c04db</message>
+</record>
+<record>
+  <date>2020-12-13T02:54:40.908863900Z</date>
+  <millis>1607828080908</millis>
+  <nanos>863900</nanos>
+  <sequence>3</sequence>
+  <logger>com.coen445.FinalProject</logger>
+  <level>INFO</level>
+  <class>com.coen445.FinalProject.LogHelper</class>
+  <method>writeInfo</method>
+  <thread>14</thread>
+  <message>com.coen445.FinalProject.RQ@dc4de0c</message>
+</record>

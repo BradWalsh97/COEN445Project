@@ -137,6 +137,9 @@ public class Main {
             System.out.println("Server will stop serving in " + delay + " minutes.");
             servingTimer.schedule(Main::toggleIsServer, delay, TimeUnit.MINUTES); //choose a random number between 2 & 5 minutes.
 //            servingTimer.schedule(Main::toggleIsServer, 30, TimeUnit.SECONDS);
+        }else{
+            System.out.println("In 6 minutes, i will check if serving server shut down so i can serve");
+            servingTimer.schedule(Main::checkIfOtherServerIsOff, 6, TimeUnit.MINUTES);
         }
 
         //Thread.sleep(5000);
@@ -239,13 +242,29 @@ public class Main {
         }
     }
 
-    public static void toggleIsServer(){
+    public static void checkIfOtherServerIsOff(){
+        if(!isServing){
 
-        JSONHelper helper = new JSONHelper(whichServer);
-        ArrayList<User> users = new ArrayList<>(helper.getLoggedInUsers());
+            JSONHelper helper = new JSONHelper(whichServer);
+            ArrayList<User> users = new ArrayList<>(helper.getLoggedInUsers());
 
-        //CHANGE SERVER to clients
-        for(User user : users) {
+            //CHANGE SERVER to clients
+            for(User user : users) {
+                try {
+                    RQ returnRQ = new RQ(16, altServerIP, altServerPort);
+                    Request.Register message = returnRQ.getRequestOut();
+                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                    ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
+                    outputStream.writeObject(message);
+                    byte[] dataSent = byteArrayOutputStream.toByteArray();
+                    DatagramPacket dp = new DatagramPacket(dataSent, dataSent.length, InetAddress.getByName(user.getIPAddress()), Integer.parseInt(user.getSocketNumber()));
+                    clientHandler.getSocket().send(dp);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            //CHANGE SERVER to other server
             try {
                 RQ returnRQ = new RQ(16, altServerIP, altServerPort);
                 Request.Register message = returnRQ.getRequestOut();
@@ -253,28 +272,62 @@ public class Main {
                 ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
                 outputStream.writeObject(message);
                 byte[] dataSent = byteArrayOutputStream.toByteArray();
-                DatagramPacket dp = new DatagramPacket(dataSent, dataSent.length, InetAddress.getByName(user.getIPAddress()), Integer.parseInt(user.getSocketNumber()));
+                DatagramPacket dp = new DatagramPacket(dataSent, dataSent.length, InetAddress.getByName(altServerIP), altServerPort);
                 clientHandler.getSocket().send(dp);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
 
-        //CHANGE SERVER to other server
-        try {
-            RQ returnRQ = new RQ(16, altServerIP, altServerPort);
-            Request.Register message = returnRQ.getRequestOut();
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
-            outputStream.writeObject(message);
-            byte[] dataSent = byteArrayOutputStream.toByteArray();
-            DatagramPacket dp = new DatagramPacket(dataSent, dataSent.length, InetAddress.getByName(altServerIP), altServerPort);
-            clientHandler.getSocket().send(dp);
-        } catch (Exception e) {
-            e.printStackTrace();
+            isServing = true;
         }
+    }
 
-        isServing = !isServing;
+    public static void toggleIsServer(){
+        if(!available(altServerPort)) {
+
+            JSONHelper helper = new JSONHelper(whichServer);
+            ArrayList<User> users = new ArrayList<>(helper.getLoggedInUsers());
+
+            //CHANGE SERVER to clients
+            for (User user : users) {
+                try {
+                    RQ returnRQ = new RQ(16, altServerIP, altServerPort);
+                    Request.Register message = returnRQ.getRequestOut();
+                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                    ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
+                    outputStream.writeObject(message);
+                    byte[] dataSent = byteArrayOutputStream.toByteArray();
+                    DatagramPacket dp = new DatagramPacket(dataSent, dataSent.length, InetAddress.getByName(user.getIPAddress()), Integer.parseInt(user.getSocketNumber()));
+                    clientHandler.getSocket().send(dp);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            //CHANGE SERVER to other server
+            try {
+                RQ returnRQ = new RQ(16, altServerIP, altServerPort);
+                Request.Register message = returnRQ.getRequestOut();
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
+                outputStream.writeObject(message);
+                byte[] dataSent = byteArrayOutputStream.toByteArray();
+                DatagramPacket dp = new DatagramPacket(dataSent, dataSent.length, InetAddress.getByName(altServerIP), altServerPort);
+                clientHandler.getSocket().send(dp);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            isServing = !isServing;
+            System.out.println("In 6 minutes, i will check if serving server shut down so i can serve");
+            servingTimer.schedule(Main::checkIfOtherServerIsOff, 6, TimeUnit.MINUTES);
+        }else{
+            System.out.print("Other server is off so i will keep serving.");
+            Random randTimerValue = new Random();
+            int delay = randTimerValue.nextInt(2) + 3;
+            System.out.println("Server will stop serving in " + delay + " minutes.");
+            servingTimer.schedule(Main::toggleIsServer, delay, TimeUnit.MINUTES); //choose a random number between 2 & 5 minutes.
+        }
     }
 }
 

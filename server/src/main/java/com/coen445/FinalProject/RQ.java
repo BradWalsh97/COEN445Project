@@ -1,9 +1,5 @@
 package com.coen445.FinalProject;
 
-import com.coen445.FinalProject.Request;
-import com.google.protobuf.InvalidProtocolBufferException;
-import sun.rmi.runtime.Log;
-
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -77,6 +73,8 @@ public class RQ {
             case 18:
 
             case 19:
+
+            case 20:
                 this.name = requestIn.getName();
                 break;
 

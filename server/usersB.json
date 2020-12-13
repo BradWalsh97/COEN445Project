@@ -1,0 +1,29 @@
+[
+ {
+  "userID": 0,
+  "userName": "john",
+  "interests": [],
+  "IPAddress": "10.0.0.96",
+  "socketNumber": "58198",
+  "isDeleted": false,
+  "loggedIn": false
+ },
+ {
+  "userID": 2,
+  "userName": "brad",
+  "interests": [],
+  "IPAddress": "10.0.0.96",
+  "socketNumber": "56748",
+  "isDeleted": false,
+  "loggedIn": false
+ },
+ {
+  "userID": 0,
+  "userName": "johnny",
+  "interests": [],
+  "IPAddress": "10.0.0.96",
+  "socketNumber": "65161",
+  "isDeleted": false,
+  "loggedIn": true
+ }
+]
