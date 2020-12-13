@@ -222,7 +222,7 @@ public class ClientHandler extends Thread {
                                 } else {
                                     try {
                                         //UPDATE DENIED to client
-                                        RQ returnRQ = new RQ(9, "Username or password did not match an existing user");
+                                        RQ returnRQ = new RQ(9, receivedRQ.getRqNum(),"Username or password did not match an existing user");
                                         Request.Register message = returnRQ.getRequestOut();
                                         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                                         ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
@@ -284,7 +284,7 @@ public class ClientHandler extends Thread {
 //                                clientOutputStream.writeObject(new RQ(12, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getSubjects()).getMessage());//send to client
                                     try {
                                         //SUBJECTS DENIED to client
-                                        RQ returnRQ = new RQ(12, receivedRQ.getRqNum());
+                                        RQ returnRQ = new RQ(12, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getSubjects());
                                         Request.Register message = returnRQ.getRequestOut();
                                         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                                         ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
@@ -367,7 +367,7 @@ public class ClientHandler extends Thread {
                         Main.altServerPort = receivedRQ.getSocketNum();
                         break;
 
-                    case 18:
+                    case 18: //LOG OUT from client
                         System.out.println("LOGGING OUT, " + receivedRQ.getName() + " will be logged out.");
                         helper.userLogOnLogOff(receivedRQ.getName());
 
@@ -391,7 +391,7 @@ public class ClientHandler extends Thread {
                         helper.userLogOnLogOff(receivedRQ.getName());
                         break;
 
-                    case 20:
+                    case 20: //client asking who is serving
                         if(Main.isServing){
                             try{
                                 System.out.println("I am serving!!!!");

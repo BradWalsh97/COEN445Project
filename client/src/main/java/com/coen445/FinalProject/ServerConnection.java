@@ -38,36 +38,36 @@ public class ServerConnection extends Thread {
                 if(receivedRQ == null) break;
 
                 switch(receivedRQ.getRegisterCode()){
-                    case 1:
+                    case 1: //REGISTERED from server
                         System.out.println(Main.username + " has been registered!");
                         Main.registerSuccess = true;
                         break;
 
-                    case 2:
+                    case 2: //REGISTER DENIED
                         System.out.println(receivedRQ.getText());
                         break;
 
-                    case 14:
+                    case 14: //MESSAGE
                         System.out.println(receivedRQ.getSubjects().get(0) + ": " + receivedRQ.getText() + " from " + receivedRQ.getName());
                         break;
 
-                    case 8:
+                    case 8: //UPDATE CONFIRMED
                         System.out.println("Successfully logged in");
                         Main.registerSuccess = true;
                         break;
 
-                    case 9:
+                    case 9: //UPDATE DENIED
                         System.out.println(receivedRQ.getText());
                         break;
 
-                    case 13:
+                    case 13: //PUBLISH
                         System.out.println("Message from");
 
-                    case 15:
+                    case 15: //PUBLISH DENIED
                         System.out.println("Message could not be published.. " + receivedRQ.getText());
                         break;
 
-                    case 16:
+                    case 16: //CHANGE SERVER
                         System.out.println("Serving server is changing");
                         Main.altIP = Main.servingIP;
                         Main.servingIP = receivedRQ.getIp();
@@ -75,7 +75,7 @@ public class ServerConnection extends Thread {
                         Main.servingPort = receivedRQ.getSocketNum();
                         break;
 
-                    case 21:
+                    case 21: //who is serving
                         System.out.println("Serving server is " + receivedRQ.getName());
                         if(receivedRQ.getName().equalsIgnoreCase("ServerA")){
                             Main.servingPort = Main.serverAPort;
