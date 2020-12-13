@@ -17,7 +17,7 @@ public class Main {
     public static ExecutorService pool = Executors.newFixedThreadPool(4);
 
     public static boolean isServing = true;
-    public static ScheduledExecutorService servingTimer = Executors.newScheduledThreadPool(1);
+    public static ScheduledExecutorService servingTimer = Executors.newScheduledThreadPool(2);
     public static int serverPort;
     public static int altServerPort;
     public static String altServerIP;

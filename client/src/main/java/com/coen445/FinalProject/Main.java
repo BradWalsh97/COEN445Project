@@ -16,8 +16,8 @@ public class Main {
     public static String serverBip = "";
     public static int serverAPort;
     public static int serverBPort;
-    public static int servingPort = 5001;
-    public static int altServingPort = 5002;
+    public static int servingPort;
+    public static int altServingPort;
     public static String servingIP = "";
     public static String altIP = "";
     public static boolean whoServing = false;

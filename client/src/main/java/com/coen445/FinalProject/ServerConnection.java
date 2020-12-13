@@ -10,11 +10,11 @@ import java.net.Socket;
 import java.net.SocketException;
 
 public class ServerConnection extends Thread {
-    private DatagramSocket server;
+    private DatagramSocket client;
     //private ObjectInputStream inputStream;
 
     public ServerConnection(DatagramSocket socket) throws IOException {
-        this.server = socket;
+        this.client = socket;
         //inputStream = new ObjectInputStream(server.getInputStream());
     }
 
@@ -25,7 +25,7 @@ public class ServerConnection extends Thread {
                 //Object serverResponse = inputStream.readObject();
                 byte[] receive = new byte[65535];
                 DatagramPacket dp = new DatagramPacket(receive, receive.length);
-                server.receive(dp);
+                client.receive(dp);
                 byte[] data = dp.getData();
                 ByteArrayInputStream in = new ByteArrayInputStream(data);
                 ObjectInputStream inputStream = new ObjectInputStream(in);
@@ -101,7 +101,7 @@ public class ServerConnection extends Thread {
             }else
                 e.printStackTrace();
         }finally {
-            server.close();
+            client.close();
             //inputStream.close();
         }
     }
