@@ -1,7 +1,6 @@
 package com.coen445.FinalProject;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-
 import java.util.ArrayList;
 
 public class RQ {
@@ -58,8 +57,6 @@ public class RQ {
                 this.text = requestIn.getName();
                 break;
             case 2:
-
-            //case 9:
 
             case 15:
                 this.rqNum = requestIn.getRqNum();
