@@ -13,8 +13,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class Main {
-    //public static ArrayList<ClientHandlerClass> clients = new ArrayList<>();
-    public static ExecutorService pool = Executors.newFixedThreadPool(4);
 
     public static boolean isServing = true;
     public static ScheduledExecutorService servingTimer = Executors.newScheduledThreadPool(2);
@@ -22,13 +20,10 @@ public class Main {
     public static int altServerPort;
     public static String altServerIP;
     public static String whichServer;
-    public static boolean otherServerConnected = false;
-    public static boolean backupRegistered = false;
     public static ClientHandler clientHandler = null;
     public static boolean wantToUpdate = false;
 
-    public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
-        boolean servingDone = false;
+    public static void main(String[] args) throws IOException {
         boolean correctInput = false;
         boolean correctPortInput = false;
         boolean correctUpdateInput = false;
@@ -38,17 +33,16 @@ public class Main {
         DatagramSocket socket = null;
 
         //Start by getting some initial info
-        while(!correctInput) {
+        while (!correctInput) {
             //get user inputs
             System.out.println("Hello Systems Administrator. Is this server A or B? (A/B)"); //used for database recognition
             whichServer = scanner.nextLine().toUpperCase();
             System.out.println("Is this server the primary server? (Y/N)");
             isPrimaryString = scanner.nextLine();
-            int serverSwitchTime = 5; //stored in minutes
 
             //check for correct inputs:
             if ((whichServer.equalsIgnoreCase("a") || whichServer.equalsIgnoreCase("b"))
-            && (isPrimaryString.equalsIgnoreCase("Y") || isPrimaryString.equalsIgnoreCase("N"))){
+                    && (isPrimaryString.equalsIgnoreCase("Y") || isPrimaryString.equalsIgnoreCase("N"))) {
                 correctInput = true;
             } else {
                 System.out.println("Invalid inputs, please try again :)");
@@ -57,7 +51,7 @@ public class Main {
 
         //get which port the server will listen on and then print it to the terminal.
         serverPort = 5001;
-        while(!available(serverPort)) //get the server to run on a available port
+        while (!available(serverPort)) //get the server to run on a available port
             serverPort++;
         socket = new DatagramSocket(serverPort);
         System.out.println("This server is listening on port: " + serverPort);
@@ -65,37 +59,34 @@ public class Main {
         System.out.println("This server is running on port: " + InetAddress.getLocalHost().getHostAddress());
 
         //get info about the other server
-        while(!correctPortInput){
+        while (!correctPortInput) {
             System.out.println("Please enter the ip which the other server is running on: ");
             altServerIP = scanner.nextLine();
 
             //Pattern sourced from: https://stackoverflow.com/questions/5667371/validate-ipv4-address-in-java
             String ipv4Pattern = "^((0|1\\d?\\d?|2[0-4]?\\d?|25[0-5]?|[3-9]\\d?)\\.){3}(0|1\\d?\\d?|2[0-4]?\\d?|25[0-5]?|[3-9]\\d?)$";
-            if(altServerIP.matches(ipv4Pattern)){
-                correctInput = true;
-            } else{
+            if (!altServerIP.matches(ipv4Pattern)) {
                 System.out.println("Hmm, that IP address doesn't look right. Please try again");
                 continue;
             }
             System.out.println("Please enter the port which the other server is listening on: ");
             altServerPort = Integer.parseInt(scanner.nextLine());
-            if(altServerPort >= 5001 && altServerPort <= 65535)
+            if (altServerPort >= 5001 && altServerPort <= 65535)
                 correctPortInput = true;
             else System.out.println("Invalid port number, please try again. \n\n");
-
         }
 
         //now, in the event of a server reset, give the systems administrator the option to update the other server.
-        while(!correctUpdateInput){
+        while (!correctUpdateInput) {
             System.out.println("Do you want to update the other server with your current into? (Y/N)");
             String input = scanner.nextLine();
-            if(input.equalsIgnoreCase("Y")) {
+            if (input.equalsIgnoreCase("Y")) {
                 wantToUpdate = true;
                 correctUpdateInput = true;
-            } else if(input.equalsIgnoreCase("N")){
+            } else if (input.equalsIgnoreCase("N")) {
                 wantToUpdate = false;
                 correctUpdateInput = true;
-            }else{
+            } else {
                 System.out.println("Incorrect input, please try again.");
                 correctUpdateInput = false;
             }
@@ -103,51 +94,28 @@ public class Main {
         }
 
         boolean isPrimary;
-        if(isPrimaryString.equalsIgnoreCase("Y")) {
+        if (isPrimaryString.equalsIgnoreCase("Y")) {
             isPrimary = true;
             isServing = true;
-        }
-        else {
+        } else {
             isPrimary = false;
             isServing = false;
         }
 
-
-
-
-        //todo do server socket between server A and B
-
-        //ServerSocket listener = null;
-        //Socket otherServerSocket = null;
-        //if(available(serverPort))
-//        if(whichServer.equalsIgnoreCase("a")) {
-//            serverPort = ServerInfo.SERVER_A_PORT;
-//            //listener = new ServerSocket(serverPort);
-//            altServerPort = ServerInfo.SERVER_B_PORT;
-//        }else if(whichServer.equalsIgnoreCase("b")){
-//            serverPort = ServerInfo.SERVER_B_PORT;
-//            //listener = new ServerSocket(serverPort);
-//            altServerPort = ServerInfo.SERVER_A_PORT;
-//        }
-
         //now that the server has been created, start a timer between 3 & 5 minutes
         Random randTimerValue = new Random();
-        if(isPrimary) { //start n minute timer
+        if (isPrimary) { //start n minute timer
             int delay = randTimerValue.nextInt(2) + 5;
             System.out.println("Server will stop serving in " + delay + " minutes.");
             servingTimer.schedule(Main::toggleIsServer, delay, TimeUnit.MINUTES); //choose a random number between 5 & 7 minutes.
-            //servingTimer.schedule(Main::toggleIsServer, 30, TimeUnit.SECONDS); //use for debuggin
-        }else{
+            //servingTimer.schedule(Main::toggleIsServer, 30, TimeUnit.SECONDS); //use for debugging
+        } else {
             System.out.println("In 1 minute, I will check if serving server shut down so I can serve");
             servingTimer.schedule(Main::checkIfOtherServerIsOff, 1, TimeUnit.MINUTES);
         }
 
-        //Thread.sleep(5000);
-        //ServerConnection serverConnection = new ServerConnection(serverPort);
-        //new Thread(serverConnection).start();
-
         clientHandler = new ClientHandler(socket);
-        if(wantToUpdate){
+        if (wantToUpdate) {
             updateServer(serverIP, altServerPort);
             wantToUpdate = false;
         }
@@ -189,7 +157,7 @@ public class Main {
         return false;
     }
 
-    public static void updateServer(String serverIP, int otherServerPort){
+    public static void updateServer(String serverIP, int otherServerPort) {
         try {
             RQ returnRQ = new RQ(17, serverIP, serverPort);
             Request.Register message = returnRQ.getRequestOut();
@@ -204,14 +172,14 @@ public class Main {
         }
     }
 
-    public static void checkIfOtherServerIsOff(){
-        if(!isServing && available(altServerPort)){ //if I am not the serving server but the other server is offline
+    public static void checkIfOtherServerIsOff() {
+        if (!isServing && available(altServerPort)) { //if I am not the serving server but the other server is offline
             System.out.println("Other server seems to be offline, this server will begin serving.");
             JSONHelper helper = new JSONHelper(whichServer);
             ArrayList<User> users = new ArrayList<>(helper.getLoggedInUsers());
 
             //CHANGE SERVER to clients
-            for(User user : users) {
+            for (User user : users) {
                 try {
                     RQ returnRQ = new RQ(16, altServerIP, altServerPort);
                     Request.Register message = returnRQ.getRequestOut();
@@ -241,14 +209,14 @@ public class Main {
             }
 
             isServing = true;
-        } else if(!isServing && !available(altServerPort)){ //if I am not the serving server and the other server is still online
+        } else if (!isServing && !available(altServerPort)) { //if I am not the serving server and the other server is still online
             System.out.println("Server check complete, serving server is still active. ");
             servingTimer.schedule(Main::checkIfOtherServerIsOff, 1, TimeUnit.MINUTES);
         }
     }
 
-    public static void toggleIsServer(){
-        if(!available(altServerPort)) {
+    public static void toggleIsServer() {
+        if (!available(altServerPort)) {
             JSONHelper helper = new JSONHelper(whichServer);
             ArrayList<User> users = new ArrayList<>(helper.getLoggedInUsers());
 
@@ -285,7 +253,7 @@ public class Main {
             isServing = !isServing;
             System.out.println("In 1 minute, I will check if serving server shut down so I can serve");
             servingTimer.schedule(Main::checkIfOtherServerIsOff, 1, TimeUnit.MINUTES);
-        }else{
+        } else {
             System.out.print("Other server is off so i will keep serving.");
             Random randTimerValue = new Random();
             int delay = randTimerValue.nextInt(2) + 5;
