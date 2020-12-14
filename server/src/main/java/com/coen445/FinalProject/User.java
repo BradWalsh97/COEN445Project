@@ -20,9 +20,9 @@ public class User implements Serializable {
         this.userID = User.nextID;
         User.nextID++;
         this.userName = Name;
-        this.password = Password;
+        this.password = Password; //keeping this even though its not implemented. Allows addition of authentication.
         this.interests = new ArrayList<String>();
-        this.isDeleted = false;
+        this.isDeleted = false; //keeping this even though its not implemented. Allows a soft delete feature to be added.
         this.IPAddress = IPAddress;
         this.socketNumber = socket;
         this.loggedIn = true; //since user is logging in my registering
