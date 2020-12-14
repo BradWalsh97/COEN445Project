@@ -10,11 +10,11 @@ import java.net.Socket;
 import java.net.SocketException;
 
 public class ServerConnection extends Thread {
-    private DatagramSocket server;
+    private DatagramSocket client;
     //private ObjectInputStream inputStream;
 
     public ServerConnection(DatagramSocket socket) throws IOException {
-        this.server = socket;
+        this.client = socket;
         //inputStream = new ObjectInputStream(server.getInputStream());
     }
 
@@ -25,7 +25,7 @@ public class ServerConnection extends Thread {
                 //Object serverResponse = inputStream.readObject();
                 byte[] receive = new byte[65535];
                 DatagramPacket dp = new DatagramPacket(receive, receive.length);
-                server.receive(dp);
+                client.receive(dp);
                 byte[] data = dp.getData();
                 ByteArrayInputStream in = new ByteArrayInputStream(data);
                 ObjectInputStream inputStream = new ObjectInputStream(in);
@@ -38,41 +38,60 @@ public class ServerConnection extends Thread {
                 if(receivedRQ == null) break;
 
                 switch(receivedRQ.getRegisterCode()){
-                    case 1:
+                    case 1: //REGISTERED from server
                         System.out.println(Main.username + " has been registered!");
                         Main.registerSuccess = true;
                         break;
 
-                    case 2:
+                    case 2: //REGISTER DENIED
                         System.out.println(receivedRQ.getText());
                         break;
 
-                    case 14:
+                    case 14: //MESSAGE
                         System.out.println(receivedRQ.getSubjects().get(0) + ": " + receivedRQ.getText() + " from " + receivedRQ.getName());
                         break;
 
-                    case 8:
+                    case 8: //UPDATE CONFIRMED
                         System.out.println("Successfully logged in");
                         Main.registerSuccess = true;
                         break;
 
-                    case 9:
+                    case 9: //UPDATE DENIED
                         System.out.println(receivedRQ.getText());
                         break;
 
-                    case 13:
+                    case 12: //SUBJECTS DENIED
+                        System.out.println("Provided subjects were denied by the server");
+
+                    case 13: //PUBLISH
                         System.out.println("Message from");
 
-                    case 15:
+                    case 15: //PUBLISH DENIED
                         System.out.println("Message could not be published.. " + receivedRQ.getText());
                         break;
 
-                    case 16:
+                    case 16: //CHANGE SERVER
                         System.out.println("Serving server is changing");
                         Main.altIP = Main.servingIP;
                         Main.servingIP = receivedRQ.getIp();
                         Main.altServingPort = Main.servingPort;
                         Main.servingPort = receivedRQ.getSocketNum();
+                        break;
+
+                    case 21: //who is serving
+                        System.out.println("Serving server is " + receivedRQ.getName());
+                        if(receivedRQ.getName().equalsIgnoreCase("ServerA")){
+                            Main.servingPort = Main.serverAPort;
+                            Main.altServingPort = Main.serverBPort;
+                            Main.servingIP = Main.serverAip;
+                            Main.altIP = Main.serverBip;
+                        }else{
+                            Main.servingPort = Main.serverBPort;
+                            Main.altServingPort = Main.serverAPort;
+                            Main.servingIP = Main.serverBip;
+                            Main.altIP = Main.serverAip;
+                        }
+                        Main.whoServing = true;
                         break;
                 }
 
@@ -85,7 +104,7 @@ public class ServerConnection extends Thread {
             }else
                 e.printStackTrace();
         }finally {
-            server.close();
+            client.close();
             //inputStream.close();
         }
     }

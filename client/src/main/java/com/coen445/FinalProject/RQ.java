@@ -74,6 +74,8 @@ public class RQ {
             case 6:
 
             case 18:
+
+            case 21:
                 this.name = requestIn.getName();
                 break;
 
@@ -135,7 +137,7 @@ public class RQ {
         requestOut.setIp(ip);
         requestOut.setSocketNum(socketNum);
 
-        System.out.println(requestOut);
+        //System.out.println(requestOut); //uncomment for debugging
 
         message = requestOut.build().toByteArray();
     }
@@ -148,7 +150,7 @@ public class RQ {
         requestOut.setRegisterCode(registerCode);
         requestOut.setRqNum(rqNum);
 
-        System.out.println(requestOut);
+        //System.out.println(requestOut); //uncomment for debugging
 
         message = requestOut.build().toByteArray();
     }
@@ -169,7 +171,7 @@ public class RQ {
           requestOut.setText(text);
         }
 
-        System.out.println(requestOut);
+        //System.out.println(requestOut); //uncomment for debugging
 
         message = requestOut.build().toByteArray();
     }
@@ -188,12 +190,12 @@ public class RQ {
         requestOut.setIp(ip);
         requestOut.setSocketNum(socketNum);
 
-        System.out.println(requestOut);
+        //System.out.println(requestOut); //uncomment for debugging
 
         message = requestOut.build().toByteArray();
     }
 
-    //For de-register info pass to back-up server & logging out (6/18)
+    //For de-register info pass to back-up server & logging out & who is serving (6/18/20)
     public RQ(int registerCode, String name) {
         this.registerCode = registerCode;
         this.name = name;
@@ -201,7 +203,7 @@ public class RQ {
         requestOut.setRegisterCode(registerCode);
         requestOut.setName(name);
 
-        System.out.println(requestOut);
+        //System.out.println(requestOut); //uncomment for debugging
 
         message = requestOut.build().toByteArray();
     }
@@ -218,7 +220,7 @@ public class RQ {
         requestOut.setName(name);
         requestOut.setSubjects(generateSubjectList(subjects));
 
-        System.out.println(requestOut);
+        //System.out.println(requestOut); //uncomment for debugging
 
         message = requestOut.build().toByteArray();
     }
@@ -236,7 +238,7 @@ public class RQ {
         requestOut.setSubjects(generateSubjectList(subjects));
         requestOut.setText(text);
 
-        System.out.println(requestOut);
+        //System.out.println(requestOut); //uncomment for debugging
 
         message = requestOut.build().toByteArray();
 
@@ -253,7 +255,7 @@ public class RQ {
         requestOut.setSubjects(generateSubjectList(subjects));
         requestOut.setText(text);
 
-        System.out.println(requestOut);
+        //System.out.println(requestOut); //uncomment for debugging
 
         message = requestOut.build().toByteArray();
     }

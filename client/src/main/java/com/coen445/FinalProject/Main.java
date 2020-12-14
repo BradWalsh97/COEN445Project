@@ -12,10 +12,15 @@ import java.util.Scanner;
 public class Main {
     public static boolean registerSuccess = false;
     public static String username = "";
-    public static int servingPort = 5001;
-    public static int altServingPort = 5002;
+    public static String serverAip = "";
+    public static String serverBip = "";
+    public static int serverAPort;
+    public static int serverBPort;
+    public static int servingPort;
+    public static int altServingPort;
     public static String servingIP = "";
     public static String altIP = "";
+    public static boolean whoServing = false;
 
     //todo about updating if logging in from new computer
     //khendek said that the update can server as a login (since you're updating the ip address). If you update from a
@@ -26,14 +31,14 @@ public class Main {
         int rq = 1;
         Scanner scanner = new Scanner(System.in);
         InetAddress clientAddress = InetAddress.getLocalHost();
-        System.out.println("Hello, lets get some info about the servers you want to connect to. \nWhat is the ip of the serving server?");
-        servingIP = scanner.nextLine();
-        System.out.println("What about the alternate server's ip?");
-        altIP = scanner.nextLine();
-        System.out.println("What is the serving server's port?");
-        servingPort = Integer.parseInt(scanner.nextLine());
-        System.out.println("What is the alternate server's port?");
-        altServingPort = Integer.parseInt(scanner.nextLine());
+        System.out.println("Hello, lets get some info about the servers you want to connect to. \nWhat is the ip of server A?");
+        serverAip = scanner.nextLine();
+        System.out.println("What about server B ip?");
+        serverBip = scanner.nextLine();
+        System.out.println("What is the port of server A?");
+        serverAPort = Integer.parseInt(scanner.nextLine());
+        System.out.println("What is server B port?");
+        serverBPort = Integer.parseInt(scanner.nextLine());
         boolean validChoice = false;
         boolean loop = true;
         DatagramSocket socket = null;
@@ -42,11 +47,35 @@ public class Main {
         try {
             socket = new DatagramSocket();
             serverConnection = new ServerConnection(socket); //todo get port from user
-            System.out.println("Connected to server A");
+            System.out.println("Client bound to port " + socket.getLocalPort());
             new Thread(serverConnection).start();
         } catch (ConnectException e) {
-            System.out.println("Socket unnable to connect");
+            System.out.println("Socket unable to connect");
         }
+        //todo add code for user asking whos serving
+        do{
+            System.out.println("Asking both servers who is serving");
+            try {
+                RQ servingRQ = new RQ(20, "who is serving?");
+                Request.Register message = servingRQ.getRequestOut();
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
+                outputStream.writeObject(message);
+                byte[] data = byteArrayOutputStream.toByteArray();
+                DatagramPacket dpA = new DatagramPacket(data, data.length, InetAddress.getByName(serverAip), serverAPort);
+                socket.send(dpA);
+                DatagramPacket dpB = new DatagramPacket(data, data.length, InetAddress.getByName(serverBip), serverBPort);
+                socket.send(dpB);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
+            Thread.sleep(1000);
+            if(!whoServing){
+                System.out.println("No response waiting 30 seconds.");
+                Thread.sleep(30000);
+            }
+        }while (!whoServing);
         /*try {
             socketB = new DatagramSocket();
             while(!available(clientPortB)){
@@ -70,12 +99,14 @@ public class Main {
 
         while (true) {
             do {
+                loop = true;
                 do {
                     System.out.println("\n\nWould you like to login or register? LOGIN/REGISTER");
                     String loginOrRegister = scanner.nextLine();
 
                     if (loginOrRegister.equalsIgnoreCase("login")) {
                         validChoice = true;
+                        loop = true;
                         System.out.println("Please enter your username");
                         username = scanner.nextLine();
                         System.out.println("Please enter your password");
@@ -134,7 +165,7 @@ public class Main {
             } while (!validChoice);
 
             while (loop) {
-                System.out.println("Command list: +" +
+                System.out.println("Command list: " +
                         //"\nTo update your user: UPDATE" +
                         "\nTo delete a user: DE-REGISTER" +
                         "\nTo update your subjects: SUBJECTS " +
@@ -165,9 +196,12 @@ public class Main {
                     case "DE-REGISTER":
                         System.out.println("Are you sure you want to de-register? You will need to recreate an account to " +
                                 "continue using this service! (Y/N)");
-                        String areYouSureOrNAWH = scanner.nextLine();
-                        if (areYouSureOrNAWH.equalsIgnoreCase("y")) {
+                        String confirmDeRegister = scanner.nextLine();
 
+
+                        if (confirmDeRegister.equalsIgnoreCase("y")) {
+                            validChoice = false;
+                            registerSuccess = false;
                             //DE-REGISTER to serving server
                             try {
                                 RQ deRegisterRQ = new RQ(5, rq++, username);
@@ -291,6 +325,8 @@ public class Main {
 
                     case "LOG OUT":
                         //client.closeConnections();
+                        validChoice = false;
+                        registerSuccess = false;
                         try {
                             RQ logOutRQ = new RQ(18, username);
                             Request.Register message = logOutRQ.getRequestOut();
@@ -311,6 +347,7 @@ public class Main {
                         break;
 
                     case "JOKE":
+                        System.out.println("I'd tell you a joke about UDP, but you probably won't get it :D HAHAHAHAHAHAHA");
                         break;
                 }
             }

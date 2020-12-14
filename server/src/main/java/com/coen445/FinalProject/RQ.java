@@ -1,8 +1,6 @@
 package com.coen445.FinalProject;
 
-import com.coen445.FinalProject.Request;
-import com.google.protobuf.InvalidProtocolBufferException;
-
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class RQ {
@@ -22,7 +20,7 @@ public class RQ {
     private Request.Register requestIn = Request.Register.newBuilder().build();
 
     //For deserializing a request
-    public RQ(Request.Register RQIn) throws InvalidProtocolBufferException {
+    public RQ(Request.Register RQIn){
         this.requestIn = RQIn;
 
         System.out.println(requestIn);
@@ -75,6 +73,8 @@ public class RQ {
             case 18:
 
             case 19:
+
+            case 20:
                 this.name = requestIn.getName();
                 break;
 
@@ -125,7 +125,7 @@ public class RQ {
     }
 
     //For Server Change/Update (16/17)
-    public RQ(int registerCode, String ip, int socketNum) {
+    public RQ(int registerCode, String ip, int socketNum) throws IOException {
         this.registerCode = registerCode;
         this.ip = ip;
         this.socketNum = socketNum;
@@ -134,27 +134,27 @@ public class RQ {
         requestOut.setIp(ip);
         requestOut.setSocketNum(socketNum);
 
-        System.out.println(requestOut);
+        //System.out.println(requestOut); //uncomment for debugging
 
         message = requestOut.build().toByteArray();
     }
 
     //For user registration confirmation from Server (1)
-    public RQ(int registerCode, int rqNum) {
+    public RQ(int registerCode, int rqNum) throws IOException {
         this.registerCode = registerCode;
         this.rqNum = rqNum;
 
         requestOut.setRegisterCode(registerCode);
         requestOut.setRqNum(rqNum);
 
-        System.out.println(requestOut);
+        //System.out.println(requestOut); //uncomment for debugging
 
         message = requestOut.build().toByteArray();
     }
 
     //For Reqister-Denied/Update-Denied/Publish-Denied response to user and client de-Register (2/5/9/15)
     //TODO conditions for whether the input is a message (like reason) or a NAME
-    public RQ(int registerCode, int rqNum, String text) {
+    public RQ(int registerCode, int rqNum, String text) throws IOException {
         this.registerCode = registerCode;
         this.rqNum = rqNum;
         this.text = text;
@@ -168,13 +168,13 @@ public class RQ {
           requestOut.setText(text);
         }
 
-        System.out.println(requestOut);
+        //System.out.println(requestOut); //uncomment for debugging
 
         message = requestOut.build().toByteArray();
     }
 
     //For Register, Registered/Register-Denied(server to server), Update, Update-Confirmed(sent to user and b-server) (0/3/4/7/8)
-    public RQ(int registerCode, int rqNum, String name, String ip, int socketNum) {
+    public RQ(int registerCode, int rqNum, String name, String ip, int socketNum) throws IOException {
         this.registerCode = registerCode;
         this.rqNum = rqNum;
         this.name = name;
@@ -187,26 +187,26 @@ public class RQ {
         requestOut.setIp(ip);
         requestOut.setSocketNum(socketNum);
 
-        System.out.println(requestOut);
+        //System.out.println(requestOut); //uncomment for debugging
 
         message = requestOut.build().toByteArray();
     }
 
     //For de-register info pass to back-up server & logging out & server to server log out (6/18/19)
-    public RQ(int registerCode, String name) {
+    public RQ(int registerCode, String name) throws IOException {
         this.registerCode = registerCode;
         this.name = name;
 
         requestOut.setRegisterCode(registerCode);
         requestOut.setName(name);
 
-        System.out.println(requestOut);
+        //System.out.println(requestOut); //uncomment for debugging
 
         message = requestOut.build().toByteArray();
     }
 
     //For user adding subjects, subject-update info pass to back-up server & Subjects rejected (10/11/12)
-    public RQ(int registerCode, int rqNum, String name, ArrayList <String> subjects) {
+    public RQ(int registerCode, int rqNum, String name, ArrayList <String> subjects) throws IOException {
         this.registerCode = registerCode;
         this.rqNum = rqNum;
         this.name = name;
@@ -217,13 +217,13 @@ public class RQ {
         requestOut.setName(name);
         requestOut.setSubjects(generateSubjectList(subjects));
 
-        System.out.println(requestOut);
+        //System.out.println(requestOut); //uncomment for debugging
 
         message = requestOut.build().toByteArray();
     }
 
     //For Publish a message (13)
-    public RQ(int registerCode, int rqNum, String name, ArrayList <String> subjects, String text) {
+    public RQ(int registerCode, int rqNum, String name, ArrayList <String> subjects, String text) throws IOException {
         this.registerCode = registerCode;
         this.rqNum = rqNum;
         this.name = name;
@@ -235,14 +235,14 @@ public class RQ {
         requestOut.setSubjects(generateSubjectList(subjects));
         requestOut.setText(text);
 
-        System.out.println(requestOut);
+        //System.out.println(requestOut); //uncomment for debugging
 
         message = requestOut.build().toByteArray();
 
     }
 
     //For Sharing a message (14)
-    public RQ(int registerCode, String name, ArrayList <String> subjects, String text) {
+    public RQ(int registerCode, String name, ArrayList <String> subjects, String text) throws IOException {
         this.registerCode = registerCode;
         this.name = name;
         this.text = text;
@@ -252,7 +252,7 @@ public class RQ {
         requestOut.setSubjects(generateSubjectList(subjects));
         requestOut.setText(text);
 
-        System.out.println(requestOut);
+        //System.out.println(requestOut); //uncomment for debugging
 
 
         message = requestOut.build().toByteArray();

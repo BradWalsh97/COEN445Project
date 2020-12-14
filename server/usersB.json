@@ -1,25 +1,55 @@
 [
  {
-  "userID": 2,
+  "userID": 0,
   "userName": "brad",
-  "interests": [
-   "Politics",
-   "Sports",
-   "Weather"
-  ],
-  "IPAddress": "127.0.0.1",
-  "socketNumber": "51275",
+  "interests": [],
+  "IPAddress": "127.0.1.1",
+  "socketNumber": "44061",
+  "isDeleted": false,
+  "loggedIn": false
+ },
+ {
+  "userID": 2,
+  "userName": "brad2",
+  "interests": [],
+  "IPAddress": "127.0.1.1",
+  "socketNumber": "44061",
+  "isDeleted": false,
+  "loggedIn": false
+ },
+ {
+  "userID": 0,
+  "userName": "brad3",
+  "interests": [],
+  "IPAddress": "127.0.1.1",
+  "socketNumber": "44061",
+  "isDeleted": false,
+  "loggedIn": false
+ },
+ {
+  "userID": 1,
+  "userName": "brad4",
+  "interests": [],
+  "IPAddress": "127.0.1.1",
+  "socketNumber": "44061",
+  "isDeleted": false,
+  "loggedIn": false
+ },
+ {
+  "userID": 0,
+  "userName": "brad5",
+  "interests": [],
+  "IPAddress": "127.0.1.1",
+  "socketNumber": "44061",
   "isDeleted": false,
   "loggedIn": true
  },
  {
-  "userID": 3,
-  "userName": "joe",
-  "interests": [
-   "Politics"
-  ],
-  "IPAddress": "127.0.0.1",
-  "socketNumber": "56999",
+  "userID": 0,
+  "userName": "brad6",
+  "interests": [],
+  "IPAddress": "127.0.1.1",
+  "socketNumber": "56965",
   "isDeleted": false,
   "loggedIn": true
  }

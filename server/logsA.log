@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE log SYSTEM "logger.dtd">
+<log>
+</log>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE log SYSTEM "logger.dtd">
+<log>
+<record>
+  <date>2020-12-14T01:24:11.468543570Z</date>
+  <millis>1607909051468</millis>
+  <nanos>543570</nanos>
+  <sequence>0</sequence>
+  <logger>com.coen445.FinalProject</logger>
+  <level>INFO</level>
+  <class>com.coen445.FinalProject.LogHelper</class>
+  <method>writeInfo</method>
+  <thread>15</thread>
+  <message>Registering new user brad 127.0.1.1 34359</message>
+</record>
+<record>
+  <date>2020-12-14T01:26:59.556743970Z</date>
+  <millis>1607909219556</millis>
+  <nanos>743970</nanos>
+  <sequence>1</sequence>
+  <logger>com.coen445.FinalProject</logger>
+  <level>INFO</level>
+  <class>com.coen445.FinalProject.LogHelper</class>
+  <method>writeInfo</method>
+  <thread>15</thread>
+  <message>Registering new user brad2 127.0.1.1 44061</message>
+</record>
+</log>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE log SYSTEM "logger.dtd">
+<log>
+<record>
+  <date>2020-12-14T01:28:07.004523296Z</date>
+  <millis>1607909287004</millis>
+  <nanos>523296</nanos>
+  <sequence>0</sequence>
+  <logger>com.coen445.FinalProject</logger>
+  <level>INFO</level>
+  <class>com.coen445.FinalProject.LogHelper</class>
+  <method>writeInfo</method>
+  <thread>15</thread>
+  <message>Registering new user brad3 127.0.1.1 44061</message>
+</record>
+<record>
+  <date>2020-12-14T01:29:03.432271013Z</date>
+  <millis>1607909343432</millis>
+  <nanos>271013</nanos>
+  <sequence>1</sequence>
+  <logger>com.coen445.FinalProject</logger>
+  <level>INFO</level>
+  <class>com.coen445.FinalProject.LogHelper</class>
+  <method>writeInfo</method>
+  <thread>15</thread>
+  <message>Registering new user brad4 127.0.1.1 44061</message>
+</record>
+</log>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE log SYSTEM "logger.dtd">
+<log>
+<record>
+  <date>2020-12-14T01:31:51.037147897Z</date>
+  <millis>1607909511037</millis>
+  <nanos>147897</nanos>
+  <sequence>0</sequence>
+  <logger>com.coen445.FinalProject</logger>
+  <level>INFO</level>
+  <class>com.coen445.FinalProject.LogHelper</class>
+  <method>writeInfo</method>
+  <thread>15</thread>
+  <message>Registering new user brad5 127.0.1.1 44061</message>
+</record>
+</log>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE log SYSTEM "logger.dtd">
+<log>
+<record>
+  <date>2020-12-14T01:37:29.354791761Z</date>
+  <millis>1607909849354</millis>
+  <nanos>791761</nanos>
+  <sequence>0</sequence>
+  <logger>com.coen445.FinalProject</logger>
+  <level>INFO</level>
+  <class>com.coen445.FinalProject.LogHelper</class>
+  <method>writeInfo</method>
+  <thread>15</thread>
+  <message>Registering new user brad6 127.0.1.1 56965</message>
+</record>
