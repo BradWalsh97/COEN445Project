@@ -1,8 +1,5 @@
 package com.coen445.FinalProject;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-
-import javax.xml.crypto.Data;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
@@ -11,26 +8,15 @@ import java.util.concurrent.TimeUnit;
 
 public class ClientHandler extends Thread {
     private DatagramSocket socket = null;
-    private LogHelper logger = new LogHelper("logs" + Main.whichServer + ".log");
+    //private LogHelper logger = new LogHelper("logs" + Main.whichServer + ".log");
 
     public ClientHandler(DatagramSocket socket) throws IOException {
         this.socket = socket;
     }
 
-    public DatagramSocket getSocket(){return socket;}
-
-    public StringBuilder data(byte[] a) {
-        if (a == null)
-            return null;
-        StringBuilder ret = new StringBuilder();
-        int i = 0;
-        while (a[i] != 0) {
-            ret.append((char) a[i]);
-            i++;
-        }
-        return ret;
+    public DatagramSocket getSocket() {
+        return socket;
     }
-
 
     @Override
     public void run() {
@@ -49,12 +35,12 @@ public class ClientHandler extends Thread {
                 JSONHelper helper = new JSONHelper(Main.whichServer);
 
                 switch (receivedRQ.getRegisterCode()) {
-                    case 0: //REGISTER  //todo: make an exception for an empty username
-                        if(Main.isServing) {
+                    case 0: //REGISTER
+                        if (Main.isServing) {
                             try {
                                 //start by receiving the message and logging its info
                                 System.out.println("Registering new user " + receivedRQ.getName() + " " + receivedRQ.getIp() + " " + receivedRQ.getSocketNum());
-                                logger.writeInfo("Registering new user " + receivedRQ.getName() + " " + receivedRQ.getIp() + " " + receivedRQ.getSocketNum());
+                                //logger.writeInfo("Registering new user " + receivedRQ.getName() + " " + receivedRQ.getIp() + " " + receivedRQ.getSocketNum());
                                 //check validity of new user, start by making sure that their username is unique.
                                 //This is done with the json helper's return value.
                                 User newUser = new User(receivedRQ.getName(), receivedRQ.getPassword(),
@@ -141,23 +127,12 @@ public class ClientHandler extends Thread {
                         break;
 
                     case 5://DE-REGISTER
-                        //todo check if user exists and delete
-                        if(Main.isServing) {
+                        if (Main.isServing) {
                             try {
                                 if (helper.deleteUserWithCheck(receivedRQ.getName())) {//if true: user deleted
                                     System.out.println("User " + receivedRQ.getName() + " has been deleted");
                                     //server.sendObject(new RQ(6, receivedRQ.getName()).getMessage()); //send DE-REGISTER response to other server
                                     try {
-                                        //server sends DE-REGISTERED to client
-//                                        RQ returnRQ = new RQ(6, receivedRQ.getName());
-//                                        Request.Register message = returnRQ.getRequestOut();
-//                                        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-//                                        ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
-//                                        outputStream.writeObject(message);
-//                                        byte[] dataSent = byteArrayOutputStream.toByteArray();
-//                                        DatagramPacket dp = new DatagramPacket(dataSent, dataSent.length, packet.getAddress(), packet.getPort());
-//                                        socket.send(dp);
-
                                         //server sends DE-REGISTERED to other server
                                         RQ toServerRQ = new RQ(6, receivedRQ.getName());
                                         Request.Register messageToServer = toServerRQ.getRequestOut();
@@ -188,10 +163,8 @@ public class ClientHandler extends Thread {
                         break;
 
                     case 7://UPDATE
-                        //todo: open a connection here if its a login scenario
-                        //todo check if user exists and update ip and port upon login, else send user does not exit
                         //start by checking to see if the user exists
-                        if(Main.isServing) {
+                        if (Main.isServing) {
                             try {
                                 if (helper.checkIfUserExists(receivedRQ.getName())) {
                                     //if the user exists, update their info
@@ -222,7 +195,7 @@ public class ClientHandler extends Thread {
                                 } else {
                                     try {
                                         //UPDATE DENIED to client
-                                        RQ returnRQ = new RQ(9, receivedRQ.getRqNum(),"Username or password did not match an existing user");
+                                        RQ returnRQ = new RQ(9, receivedRQ.getRqNum(), "Username or password did not match an existing user");
                                         Request.Register message = returnRQ.getRequestOut();
                                         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                                         ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
@@ -248,11 +221,10 @@ public class ClientHandler extends Thread {
                         break;
 
                     case 10://SUBJECTS (Client to Server -> we receive the new subjects)
-                        if(Main.isServing) {
+                        if (Main.isServing) {
                             try {
                                 if (helper.updateUserSubjects(receivedRQ.getName(), receivedRQ.getSubjects())) {
                                     //send to client and other server update confirmed.
-                                    //server.sendObject(new RQ(11, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getSubjects()).getMessage()); //send to client
                                     try {
                                         //SUBJECTS UPDATED to client
                                         RQ returnRQ = new RQ(11, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getSubjects());
@@ -277,11 +249,7 @@ public class ClientHandler extends Thread {
                                         e.printStackTrace();
                                     }
 
-//                                clientOutputStream.writeObject(new RQ(11, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getSubjects()).getMessage());
-                                    //server.sendObject(new RQ(11, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getSubjects()).getMessage()); //send to other server //todo: update to send to server (using objectOutputStream)
                                 } else {
-                                    //send subjects-rejected to client
-//                                clientOutputStream.writeObject(new RQ(12, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getSubjects()).getMessage());//send to client
                                     try {
                                         //SUBJECTS DENIED to client
                                         RQ returnRQ = new RQ(12, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getSubjects());
@@ -340,7 +308,7 @@ public class ClientHandler extends Thread {
                                         byte[] dataSent = byteArrayOutputStream.toByteArray();
                                         DatagramPacket dp = new DatagramPacket(dataSent, dataSent.length, packet.getAddress(), packet.getPort());
                                         socket.send(dp);
-                                    }catch (Exception e){
+                                    } catch (Exception e) {
                                         e.printStackTrace();
                                     }
                                 }
@@ -372,7 +340,7 @@ public class ClientHandler extends Thread {
                         helper.userLogOnLogOff(receivedRQ.getName());
 
                         //LOGGING OUT to other server
-                        try{
+                        try {
                             RQ toServerRQ = new RQ(19, receivedRQ.getName());
                             Request.Register messageToServer = toServerRQ.getRequestOut();
                             ByteArrayOutputStream byteArrayOutputStreamToServer = new ByteArrayOutputStream();
@@ -381,7 +349,7 @@ public class ClientHandler extends Thread {
                             byte[] dataSentToServer = byteArrayOutputStreamToServer.toByteArray();
                             DatagramPacket dpToServer = new DatagramPacket(dataSentToServer, dataSentToServer.length, InetAddress.getByName(Main.altServerIP), Main.altServerPort);
                             socket.send(dpToServer);
-                        }catch (Exception e){
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
                         break;
@@ -392,8 +360,8 @@ public class ClientHandler extends Thread {
                         break;
 
                     case 20: //client asking who is serving
-                        if(Main.isServing){
-                            try{
+                        if (Main.isServing) {
+                            try {
                                 System.out.println("I am serving!!!!");
                                 RQ returnRQ = new RQ(21, "Server" + Main.whichServer);
                                 Request.Register message = returnRQ.getRequestOut();
@@ -403,7 +371,7 @@ public class ClientHandler extends Thread {
                                 byte[] dataSent = byteArrayOutputStreamToServer.toByteArray();
                                 DatagramPacket dp = new DatagramPacket(dataSent, dataSent.length, packet.getAddress(), packet.getPort());
                                 socket.send(dp);
-                            }catch (Exception e){
+                            } catch (Exception e) {
                                 e.printStackTrace();
                             }
                         }
