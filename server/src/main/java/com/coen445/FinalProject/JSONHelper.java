@@ -18,7 +18,7 @@ public class JSONHelper {
     private Lock lock = new ReentrantLock();
     private String serverName;
 
-    public JSONHelper(String serverName){
+    public JSONHelper(String serverName) {
         this.serverName = serverName;
     }
 
@@ -59,7 +59,7 @@ public class JSONHelper {
                     if (updatedUser.getSocketNumber() != users.get(i).getSocketNumber()) { //update socket number
                         users.get(i).setSocketNumber(updatedUser.getSocketNumber());
                     }
-                    if(updatedUser.getLoggedIn() != users.get(i).getLoggedIn()){
+                    if (updatedUser.getLoggedIn() != users.get(i).getLoggedIn()) {
                         users.get(i).setLoggedIn(updatedUser.getLoggedIn());
                     }
 //                    if (!updatedUser.getUserName().equals(users.get(i).getUserName())) { //todo: this should probably be deprecated
@@ -77,13 +77,9 @@ public class JSONHelper {
         }
     }
 
-    //todo: add a lock when threaded since this writes to a file
     private boolean writeNewUserToFile(User newUser) throws IOException {
 
         System.out.println("Currently saving user: " + newUser.getUserName());
-        /* TODO: 2020-10-17 Change the check to also see if the file is empty instead of the user,
-            this is because the person might try to add a new user zero. */
-
 
         File newFile = new File("users" + serverName + ".json"); //use this to check if the file is empty
 
@@ -91,7 +87,8 @@ public class JSONHelper {
 
             //Create objects we will need
             Gson gson = new Gson();
-            final Type USER_TYPE = new TypeToken<List<User>>() {}.getType();
+            final Type USER_TYPE = new TypeToken<List<User>>() {
+            }.getType();
             JsonReader jsonReader = new JsonReader(new FileReader("users" + serverName + ".json"));
             List<User> users = gson.fromJson(jsonReader, USER_TYPE); //get all current users
             JsonArray jsonArray = new JsonArray();
@@ -133,7 +130,6 @@ public class JSONHelper {
         return true;
     }
 
-    //todo: add a lock when threaded since this writes to a file
     private void writeUpdatedUserToFile(List<User> users) throws IOException {
         Gson gson = new Gson();
         JsonArray jsonArray = new Gson().toJsonTree(users).getAsJsonArray();
@@ -181,7 +177,7 @@ public class JSONHelper {
 
     // delete user without verifying that is exists. This is essentially done regardless but we're just not returning
     // anything because this will only be called if we know the user does not exists
-    public void deleteUserWithoutCheck(String username) throws IOException{
+    public void deleteUserWithoutCheck(String username) throws IOException {
         lock.lock();
         try {
             Gson gson = new Gson();
@@ -234,7 +230,7 @@ public class JSONHelper {
         }
     }
 
-    public ArrayList<User> getAllUsersWithInterest(String interest, String userName){
+    public ArrayList<User> getAllUsersWithInterest(String interest, String userName) {
         lock.lock();
         ArrayList<User> allUsers = new ArrayList<>();
         ArrayList<User> users = new ArrayList<>();
@@ -245,7 +241,7 @@ public class JSONHelper {
             JsonReader jsonReader = new JsonReader(new FileReader("users" + serverName + ".json"));
             allUsers = gson.fromJson(jsonReader, USER_TYPE);
             for (User user : allUsers) {//for every user
-                if(user.getUserName().equalsIgnoreCase(userName))
+                if (user.getUserName().equalsIgnoreCase(userName))
                     continue;
                 for (String userInterest : user.getInterests()) {//and every interest of that user
                     //check to see if they have that interest.
@@ -269,7 +265,8 @@ public class JSONHelper {
         //assume we don't need a lock because if a user is checking to see if their username exists, they should not
         //at the same time, be adding that user into the database.
         Gson gson = new Gson();
-        final Type USER_TYPE = new TypeToken<List<User>>() {}.getType();
+        final Type USER_TYPE = new TypeToken<List<User>>() {
+        }.getType();
         JsonReader jsonReader = new JsonReader(new FileReader("users" + serverName + ".json"));
         List<User> users = gson.fromJson(jsonReader, USER_TYPE); //get all current users
         for (User user : users) { //check duplicates
@@ -282,8 +279,8 @@ public class JSONHelper {
 
     public boolean checkIfUserHasInterest(String username, String interest) throws FileNotFoundException {
         Optional<User> user = getUser(username);
-        if(user.isPresent()){
-            for(String userInterest: user.get().getInterests()){
+        if (user.isPresent()) {
+            for (String userInterest : user.get().getInterests()) {
                 if (userInterest.equalsIgnoreCase(interest))
                     return true;
             }
@@ -291,8 +288,8 @@ public class JSONHelper {
         return false;
     }
 
-    public boolean updateUserSubjects(String username, ArrayList<String> newInterests ) throws FileNotFoundException {
-        if(checkIfUserExists(username)) { //if user exists, make the change. else, return false
+    public boolean updateUserSubjects(String username, ArrayList<String> newInterests) throws FileNotFoundException {
+        if (checkIfUserExists(username)) { //if user exists, make the change. else, return false
             lock.lock();
             try {
                 Gson gson = new Gson();
@@ -306,8 +303,7 @@ public class JSONHelper {
                 for (User user : users) {
                     if (!username.equalsIgnoreCase(user.getUserName())) {//only add the users we want to keep to the list to store again
                         jsonArray.add(gson.toJsonTree(user, User.class));
-                    }
-                    else{ //add the new interests to the user and save them again
+                    } else { //add the new interests to the user and save them again
                         user.setInterests(newInterests);
                         jsonArray.add(gson.toJsonTree(user, User.class));
                     }
@@ -324,8 +320,7 @@ public class JSONHelper {
             } finally {
                 lock.unlock();
             }
-        }
-        else
+        } else
             return false;
 
         return true;
@@ -345,8 +340,7 @@ public class JSONHelper {
             for (User user : users) {
                 if (!username.equalsIgnoreCase(user.getUserName())) {
                     jsonArray.add(gson.toJsonTree(user, User.class));
-                }
-                else{ //toggle login status and save the user again
+                } else { //toggle login status and save the user again
                     user.setLoggedIn(!user.getLoggedIn());
                     jsonArray.add(gson.toJsonTree(user, User.class));
                 }
@@ -365,7 +359,7 @@ public class JSONHelper {
         }
     }
 
-    public ArrayList<User> getLoggedInUsers(){
+    public ArrayList<User> getLoggedInUsers() {
         lock.lock();
         ArrayList<User> loggedInUsers = new ArrayList<>();
         try {
@@ -377,8 +371,8 @@ public class JSONHelper {
 
             //check every user to see if they match. If they don't, add them to the list of users to keep. If they do, update their interest
             for (User user : users) {
-               if(user.getLoggedIn() == true)
-                   loggedInUsers.add(user);
+                if (user.getLoggedIn() == true)
+                    loggedInUsers.add(user);
             }
             return loggedInUsers;
         } catch (IOException e) {
@@ -388,7 +382,6 @@ public class JSONHelper {
         }
         return loggedInUsers;
     }
-
 
 
 }
