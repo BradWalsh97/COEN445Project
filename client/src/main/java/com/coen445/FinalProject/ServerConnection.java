@@ -3,26 +3,21 @@ package com.coen445.FinalProject;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.Socket;
 import java.net.SocketException;
 
 public class ServerConnection extends Thread {
     private DatagramSocket client;
-    //private ObjectInputStream inputStream;
 
     public ServerConnection(DatagramSocket socket) throws IOException {
         this.client = socket;
-        //inputStream = new ObjectInputStream(server.getInputStream());
     }
 
     @Override
     public void run() {
         try{
             while(true){
-                //Object serverResponse = inputStream.readObject();
                 byte[] receive = new byte[65535];
                 DatagramPacket dp = new DatagramPacket(receive, receive.length);
                 client.receive(dp);
@@ -95,7 +90,6 @@ public class ServerConnection extends Thread {
                         break;
                 }
 
-                //System.out.println(receivedRq);
             }
         }catch (IOException | ClassNotFoundException e){
             if(e instanceof SocketException){
@@ -105,7 +99,6 @@ public class ServerConnection extends Thread {
                 e.printStackTrace();
         }finally {
             client.close();
-            //inputStream.close();
         }
     }
 }
