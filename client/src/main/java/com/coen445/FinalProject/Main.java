@@ -99,12 +99,14 @@ public class Main {
 
         while (true) {
             do {
+                loop = true;
                 do {
                     System.out.println("\n\nWould you like to login or register? LOGIN/REGISTER");
                     String loginOrRegister = scanner.nextLine();
 
                     if (loginOrRegister.equalsIgnoreCase("login")) {
                         validChoice = true;
+                        loop = true;
                         System.out.println("Please enter your username");
                         username = scanner.nextLine();
                         System.out.println("Please enter your password");
@@ -163,7 +165,7 @@ public class Main {
             } while (!validChoice);
 
             while (loop) {
-                System.out.println("Command list: +" +
+                System.out.println("Command list: " +
                         //"\nTo update your user: UPDATE" +
                         "\nTo delete a user: DE-REGISTER" +
                         "\nTo update your subjects: SUBJECTS " +
@@ -194,9 +196,12 @@ public class Main {
                     case "DE-REGISTER":
                         System.out.println("Are you sure you want to de-register? You will need to recreate an account to " +
                                 "continue using this service! (Y/N)");
-                        String areYouSureOrNAWH = scanner.nextLine();
-                        if (areYouSureOrNAWH.equalsIgnoreCase("y")) {
+                        String confirmDeRegister = scanner.nextLine();
 
+
+                        if (confirmDeRegister.equalsIgnoreCase("y")) {
+                            validChoice = false;
+                            registerSuccess = false;
                             //DE-REGISTER to serving server
                             try {
                                 RQ deRegisterRQ = new RQ(5, rq++, username);
@@ -320,6 +325,8 @@ public class Main {
 
                     case "LOG OUT":
                         //client.closeConnections();
+                        validChoice = false;
+                        registerSuccess = false;
                         try {
                             RQ logOutRQ = new RQ(18, username);
                             Request.Register message = logOutRQ.getRequestOut();
@@ -340,6 +347,7 @@ public class Main {
                         break;
 
                     case "JOKE":
+                        System.out.println("I'd tell you a joke about UDP, but you probably won't get it :D HAHAHAHAHAHAHA");
                         break;
                 }
             }

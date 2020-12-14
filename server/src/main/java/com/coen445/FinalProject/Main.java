@@ -133,13 +133,13 @@ public class Main {
         //now that the server has been created, start a timer between 3 & 5 minutes
         Random randTimerValue = new Random();
         if(isPrimary) { //start n minute timer
-            int delay = randTimerValue.nextInt(2) + 3;
+            int delay = randTimerValue.nextInt(2) + 5;
             System.out.println("Server will stop serving in " + delay + " minutes.");
-            servingTimer.schedule(Main::toggleIsServer, delay, TimeUnit.MINUTES); //choose a random number between 2 & 5 minutes.
-//            servingTimer.schedule(Main::toggleIsServer, 30, TimeUnit.SECONDS);
+            servingTimer.schedule(Main::toggleIsServer, delay, TimeUnit.MINUTES); //choose a random number between 5 & 7 minutes.
+            //servingTimer.schedule(Main::toggleIsServer, 30, TimeUnit.SECONDS); //use for debuggin
         }else{
-            System.out.println("In 6 minutes, i will check if serving server shut down so i can serve");
-            servingTimer.schedule(Main::checkIfOtherServerIsOff, 6, TimeUnit.MINUTES);
+            System.out.println("In 1 minute, I will check if serving server shut down so I can serve");
+            servingTimer.schedule(Main::checkIfOtherServerIsOff, 1, TimeUnit.MINUTES);
         }
 
         //Thread.sleep(5000);
@@ -153,45 +153,7 @@ public class Main {
         }
         clientHandler.start();
 
-        //System.out.println("Stopping server");
-        //serverConnection.stopServer();
 
-
-        //server.startSever();
-        /*while (true) {
-            //server.acceptClient();
-            //Thread t = new ClientHandlerClass(server);
-            //t.start();
-
-            System.out.println("Waiting for client connection...");
-            Socket client = listener.accept();
-
-
-
-            System.out.println("socket is " + client.getLocalPort() + " and " + client.getPort());
-            System.out.println("Connected to client");
-            ClientHandlerClass clientThread = new ClientHandlerClass(client, clients);
-            clients.add(clientThread);
-
-            pool.execute(clientThread);
-
-
-            //server.checkMessage();
-            //server.endConnection();
-        }*/
-        /*User user = new User("Bob", "Password123");
-        user.addInterest("Soccer");
-        user.addInterest("Football");
-        user.addInterest("Hockey");
-        user.addInterest("Rugby");
-        User user1 = new User("Jim", "Password123");
-        user1.addInterest("Soccer");
-        user1.addInterest("Football");
-        user1.addInterest("Hockey");
-        user1.addInterest("Rugby");
-        JSONHelper helper = new JSONHelper();
-        helper.saveUserToJSON(user);
-        helper.saveUserToJSON(user1);*/
     }
 
     //function obtains from: https://stackoverflow.com/questions/434718/sockets-discover-port-availability-using-java
@@ -243,8 +205,8 @@ public class Main {
     }
 
     public static void checkIfOtherServerIsOff(){
-        if(!isServing){
-
+        if(!isServing && available(altServerPort)){ //if I am not the serving server but the other server is offline
+            System.out.println("Other server seems to be offline, this server will begin serving.");
             JSONHelper helper = new JSONHelper(whichServer);
             ArrayList<User> users = new ArrayList<>(helper.getLoggedInUsers());
 
@@ -279,12 +241,14 @@ public class Main {
             }
 
             isServing = true;
+        } else if(!isServing && !available(altServerPort)){ //if I am not the serving server and the other server is still online
+            System.out.println("Server check complete, serving server is still active. ");
+            servingTimer.schedule(Main::checkIfOtherServerIsOff, 1, TimeUnit.MINUTES);
         }
     }
 
     public static void toggleIsServer(){
         if(!available(altServerPort)) {
-
             JSONHelper helper = new JSONHelper(whichServer);
             ArrayList<User> users = new ArrayList<>(helper.getLoggedInUsers());
 
@@ -319,14 +283,15 @@ public class Main {
             }
 
             isServing = !isServing;
-            System.out.println("In 6 minutes, i will check if serving server shut down so i can serve");
-            servingTimer.schedule(Main::checkIfOtherServerIsOff, 6, TimeUnit.MINUTES);
+            System.out.println("In 1 minute, I will check if serving server shut down so I can serve");
+            servingTimer.schedule(Main::checkIfOtherServerIsOff, 1, TimeUnit.MINUTES);
         }else{
             System.out.print("Other server is off so i will keep serving.");
             Random randTimerValue = new Random();
-            int delay = randTimerValue.nextInt(2) + 3;
+            int delay = randTimerValue.nextInt(2) + 5;
             System.out.println("Server will stop serving in " + delay + " minutes.");
-            servingTimer.schedule(Main::toggleIsServer, delay, TimeUnit.MINUTES); //choose a random number between 2 & 5 minutes.
+            servingTimer.schedule(Main::toggleIsServer, delay, TimeUnit.MINUTES); //choose a random number between 5 & 7 minutes.
+            //servingTimer.schedule(Main::toggleIsServer, 30, TimeUnit.SECONDS); //use for debuggin
         }
     }
 }

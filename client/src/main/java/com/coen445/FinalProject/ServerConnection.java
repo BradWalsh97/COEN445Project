@@ -60,6 +60,9 @@ public class ServerConnection extends Thread {
                         System.out.println(receivedRQ.getText());
                         break;
 
+                    case 12: //SUBJECTS DENIED
+                        System.out.println("Provided subjects were denied by the server");
+
                     case 13: //PUBLISH
                         System.out.println("Message from");
 

@@ -54,7 +54,7 @@ public class ClientHandler extends Thread {
                             try {
                                 //start by receiving the message and logging its info
                                 System.out.println("Registering new user " + receivedRQ.getName() + " " + receivedRQ.getIp() + " " + receivedRQ.getSocketNum());
-                                //logger.writeInfo("Registering new user " + receivedRQ.getName() + " " + receivedRQ.getIp() + " " + receivedRQ.getSocketNum());
+                                logger.writeInfo("Registering new user " + receivedRQ.getName() + " " + receivedRQ.getIp() + " " + receivedRQ.getSocketNum());
                                 //check validity of new user, start by making sure that their username is unique.
                                 //This is done with the json helper's return value.
                                 User newUser = new User(receivedRQ.getName(), receivedRQ.getPassword(),
@@ -355,9 +355,9 @@ public class ClientHandler extends Thread {
                         System.out.println("CHANGE SERVER, it is my turn to serve!!!");
                         Main.isServing = true;
                         Random randTimerValue = new Random();
-                        int delay = randTimerValue.nextInt(2) + 3;
+                        int delay = randTimerValue.nextInt(2) + 5;
                         System.out.println("Server will stop serving in " + delay + " minutes.");
-                        Main.servingTimer.schedule(Main::toggleIsServer, delay, TimeUnit.MINUTES); //choose a random number between 2 & 5 minutes.
+                        Main.servingTimer.schedule(Main::toggleIsServer, delay, TimeUnit.MINUTES); //choose a random number between 5 & 7 minutes.
                         //Main.servingTimer.schedule(Main::toggleIsServer, 30, TimeUnit.SECONDS); //use for testing purposes
                         break;
 
