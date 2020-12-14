@@ -149,14 +149,14 @@ public class ClientHandler extends Thread {
                                     //server.sendObject(new RQ(6, receivedRQ.getName()).getMessage()); //send DE-REGISTER response to other server
                                     try {
                                         //server sends DE-REGISTERED to client
-                                        RQ returnRQ = new RQ(6, receivedRQ.getName());
-                                        Request.Register message = returnRQ.getRequestOut();
-                                        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                                        ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
-                                        outputStream.writeObject(message);
-                                        byte[] dataSent = byteArrayOutputStream.toByteArray();
-                                        DatagramPacket dp = new DatagramPacket(dataSent, dataSent.length, packet.getAddress(), packet.getPort());
-                                        socket.send(dp);
+//                                        RQ returnRQ = new RQ(6, receivedRQ.getName());
+//                                        Request.Register message = returnRQ.getRequestOut();
+//                                        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+//                                        ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
+//                                        outputStream.writeObject(message);
+//                                        byte[] dataSent = byteArrayOutputStream.toByteArray();
+//                                        DatagramPacket dp = new DatagramPacket(dataSent, dataSent.length, packet.getAddress(), packet.getPort());
+//                                        socket.send(dp);
 
                                         //server sends DE-REGISTERED to other server
                                         RQ toServerRQ = new RQ(6, receivedRQ.getName());
