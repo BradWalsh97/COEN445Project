@@ -1,4 +1,6 @@
-package com.coen445.FinalProject;
+package com.coen445.FinalProject.deprecatedClasses;
+
+import com.coen445.FinalProject.User;
 
 import java.io.*;
 import java.net.Socket;

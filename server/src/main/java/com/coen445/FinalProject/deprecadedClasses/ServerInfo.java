@@ -1,4 +1,4 @@
-package com.coen445.FinalProject;
+package com.coen445.FinalProject.deprecadedClasses;
 
 public abstract class ServerInfo{
     public static String SERVER_A_ADDRESS = "localhost";
