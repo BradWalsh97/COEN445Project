@@ -73,6 +73,7 @@ public class ServerConnection extends Thread {
                         Main.servingIP = receivedRQ.getIp();
                         Main.altServingPort = Main.servingPort;
                         Main.servingPort = receivedRQ.getSocketNum();
+                        System.out.println("IP:" + Main.servingIP + "port: " + receivedRQ.getSocketNum()); //uncomment for debug
                         break;
 
                     case 21: //who is serving

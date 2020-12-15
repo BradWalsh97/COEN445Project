@@ -181,7 +181,7 @@ public class Main {
             //CHANGE SERVER to clients
             for (User user : users) {
                 try {
-                    RQ returnRQ = new RQ(16, altServerIP, altServerPort);
+                    RQ returnRQ = new RQ(16, InetAddress.getLocalHost().getHostAddress(), serverPort);
                     Request.Register message = returnRQ.getRequestOut();
                     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                     ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
@@ -195,20 +195,25 @@ public class Main {
             }
 
             //CHANGE SERVER to other server
-            try {
-                RQ returnRQ = new RQ(16, altServerIP, altServerPort);
-                Request.Register message = returnRQ.getRequestOut();
-                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
-                outputStream.writeObject(message);
-                byte[] dataSent = byteArrayOutputStream.toByteArray();
-                DatagramPacket dp = new DatagramPacket(dataSent, dataSent.length, InetAddress.getByName(altServerIP), altServerPort);
-                clientHandler.getSocket().send(dp);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+//            try {
+//                RQ returnRQ = new RQ(16, altServerIP, altServerPort);
+//                Request.Register message = returnRQ.getRequestOut();
+//                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+//                ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
+//                outputStream.writeObject(message);
+//                byte[] dataSent = byteArrayOutputStream.toByteArray();
+//                DatagramPacket dp = new DatagramPacket(dataSent, dataSent.length, InetAddress.getByName(altServerIP), altServerPort);
+//                clientHandler.getSocket().send(dp);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
 
-            isServing = true;
+            //isServing = true;
+            Random randTimerValue = new Random();
+            isServing = !isServing;
+            int delay = randTimerValue.nextInt(2) + 5;
+            System.out.println("Server will stop serving in " + delay + " minutes.");
+            servingTimer.schedule(Main::toggleIsServer, delay, TimeUnit.MINUTES); //choose a random number between 5 & 7 minutes.
         } else if (!isServing && !available(altServerPort)) { //if I am not the serving server and the other server is still online
             System.out.println("Server check complete, serving server is still active. ");
             servingTimer.schedule(Main::checkIfOtherServerIsOff, 1, TimeUnit.MINUTES);

@@ -172,9 +172,9 @@ public class Main {
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
+                            loop = false;
                         }
                         Thread.sleep(1000);
-                        loop = false;
                         break;
                     case "SUBJECTS":
                         System.out.println("Changing the interests for user " + username);
