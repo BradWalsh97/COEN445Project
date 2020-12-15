@@ -23,7 +23,7 @@ public class RQ {
     public RQ(Request.Register RQIn) throws InvalidProtocolBufferException {
         this.requestIn = RQIn;
 
-        System.out.println(requestIn);
+        System.out.println("\n" + requestIn + "\n");
 
         this.registerCode = requestIn.getRegisterCode();
         generateRQ();

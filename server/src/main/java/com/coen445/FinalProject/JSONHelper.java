@@ -22,7 +22,6 @@ public class JSONHelper {
         this.serverName = serverName;
     }
 
-    //todo: update the return to return if the creation was successful or not. If not, why did it fail. Return this in the register-denied frame.
     public boolean saveNewUser(User user) throws IOException {
         lock.lock();
         try {
@@ -113,8 +112,6 @@ public class JSONHelper {
             jsonWriter.setIndent(" ");
             gson.toJson(jsonArray, jsonWriter);
             writer.close();
-
-            //todo: quicksort based on userID (is this even needed tho???)
 
         } else { //case of adding first user (where users.json is empty)
             Gson gson = new Gson();

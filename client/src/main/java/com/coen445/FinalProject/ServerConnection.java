@@ -34,39 +34,41 @@ public class ServerConnection extends Thread {
 
                 switch(receivedRQ.getRegisterCode()){
                     case 1: //REGISTERED from server
-                        System.out.println(Main.username + " has been registered!");
+                        System.out.println("\n" + Main.username + " has been registered!");
                         Main.registerSuccess = true;
                         break;
 
                     case 2: //REGISTER DENIED
-                        System.out.println(receivedRQ.getText());
+                        System.out.println("\n" + receivedRQ.getText() + "\n");
                         break;
 
                     case 14: //MESSAGE
-                        System.out.println(receivedRQ.getSubjects().get(0) + ": " + receivedRQ.getText() + " from " + receivedRQ.getName());
+                        System.out.println("\n" + receivedRQ.getSubjects().get(0) + ": " + receivedRQ.getText() + " from " + receivedRQ.getName() + "\n");
                         break;
 
                     case 8: //UPDATE CONFIRMED
-                        System.out.println("Successfully logged in");
+                        System.out.println("\nSuccessfully logged in\n");
                         Main.registerSuccess = true;
                         break;
 
                     case 9: //UPDATE DENIED
-                        System.out.println(receivedRQ.getText());
+                        System.out.println("\n" + receivedRQ.getText() + "\n");
+                        break;
+
+                    case 11:
+                        System.out.println("\nInterests have been updated!\n");
                         break;
 
                     case 12: //SUBJECTS DENIED
-                        System.out.println("Provided subjects were denied by the server");
-
-                    case 13: //PUBLISH
-                        System.out.println("Message from");
+                        System.out.println("\nProvided subjects were denied by the server\n");
+                        break;
 
                     case 15: //PUBLISH DENIED
-                        System.out.println("Message could not be published.. " + receivedRQ.getText());
+                        System.out.println("\nMessage could not be published.. " + receivedRQ.getText() + "\n");
                         break;
 
                     case 16: //CHANGE SERVER
-                        System.out.println("Serving server is changing");
+                        System.out.println("\nServing server is changing\n");
                         Main.altIP = Main.servingIP;
                         Main.servingIP = receivedRQ.getIp();
                         Main.altServingPort = Main.servingPort;
@@ -74,7 +76,7 @@ public class ServerConnection extends Thread {
                         break;
 
                     case 21: //who is serving
-                        System.out.println("Serving server is " + receivedRQ.getName());
+                        System.out.println("\nServing server is " + receivedRQ.getName() + "\n");
                         if(receivedRQ.getName().equalsIgnoreCase("ServerA")){
                             Main.servingPort = Main.serverAPort;
                             Main.altServingPort = Main.serverBPort;
@@ -93,8 +95,8 @@ public class ServerConnection extends Thread {
             }
         }catch (IOException | ClassNotFoundException e){
             if(e instanceof SocketException){
-                System.out.println("The RSS server is currently experiencing an outage. \n" +
-                        "Please try again in a few minutes while we work to restore the service! <3");
+                System.out.println("\nThe RSS server is currently experiencing an outage. \n" +
+                        "Please try again in a few minutes while we work to restore the service! <3\n");
             }else
                 e.printStackTrace();
         }finally {

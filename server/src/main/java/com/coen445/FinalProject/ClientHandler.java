@@ -3,7 +3,9 @@ package com.coen445.FinalProject;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class ClientHandler extends Thread {
@@ -74,7 +76,6 @@ public class ClientHandler extends Thread {
                                     }
 
                                 } else {
-                                    //server.sendObject("REGISTERED");
                                     System.out.println("New user added to database");
                                     //logger.writeInfo("Added user: " + receivedRQ.getName() + " to database.");
                                     try {
@@ -223,33 +224,10 @@ public class ClientHandler extends Thread {
                     case 10://SUBJECTS (Client to Server -> we receive the new subjects)
                         if (Main.isServing) {
                             try {
-                                if (helper.updateUserSubjects(receivedRQ.getName(), receivedRQ.getSubjects())) {
-                                    //send to client and other server update confirmed.
-                                    try {
-                                        //SUBJECTS UPDATED to client
-                                        RQ returnRQ = new RQ(11, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getSubjects());
-                                        Request.Register message = returnRQ.getRequestOut();
-                                        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                                        ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
-                                        outputStream.writeObject(message);
-                                        byte[] dataSent = byteArrayOutputStream.toByteArray();
-                                        DatagramPacket dp = new DatagramPacket(dataSent, dataSent.length, packet.getAddress(), packet.getPort());
-                                        socket.send(dp);
-
-                                        //SUBJECTS UPDATED to other server
-                                        RQ toServerRQ = new RQ(11, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getSubjects());
-                                        Request.Register messageToServer = toServerRQ.getRequestOut();
-                                        ByteArrayOutputStream byteArrayOutputStreamToServer = new ByteArrayOutputStream();
-                                        ObjectOutputStream outputStreamToServer = new ObjectOutputStream(byteArrayOutputStreamToServer);
-                                        outputStreamToServer.writeObject(messageToServer);
-                                        byte[] dataSentToServer = byteArrayOutputStreamToServer.toByteArray();
-                                        DatagramPacket dpToServer = new DatagramPacket(dataSentToServer, dataSentToServer.length, InetAddress.getByName(Main.altServerIP), Main.altServerPort);
-                                        socket.send(dpToServer);
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
-
-                                } else {
+                                //we want to determine if there are duplicates in the list. to do this, we add the list
+                                //to a set, and if they are the same size there are no duplicates (since a set cannot have duplicates)
+                                Set<String> set = new HashSet<>(receivedRQ.getSubjects());
+                                if(set.size() < receivedRQ.getSubjects().size()) { //if we have duplicates
                                     try {
                                         //SUBJECTS DENIED to client
                                         RQ returnRQ = new RQ(12, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getSubjects());
@@ -262,6 +240,48 @@ public class ClientHandler extends Thread {
                                         socket.send(dp);
                                     } catch (Exception e) {
                                         e.printStackTrace();
+                                    }
+                                } else {
+                                    if (helper.updateUserSubjects(receivedRQ.getName(), receivedRQ.getSubjects())) {
+                                        //send to client and other server update confirmed.
+                                        try {
+                                            //SUBJECTS UPDATED to client
+                                            RQ returnRQ = new RQ(11, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getSubjects());
+                                            Request.Register message = returnRQ.getRequestOut();
+                                            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                                            ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
+                                            outputStream.writeObject(message);
+                                            byte[] dataSent = byteArrayOutputStream.toByteArray();
+                                            DatagramPacket dp = new DatagramPacket(dataSent, dataSent.length, packet.getAddress(), packet.getPort());
+                                            socket.send(dp);
+
+                                            //SUBJECTS UPDATED to other server
+                                            RQ toServerRQ = new RQ(11, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getSubjects());
+                                            Request.Register messageToServer = toServerRQ.getRequestOut();
+                                            ByteArrayOutputStream byteArrayOutputStreamToServer = new ByteArrayOutputStream();
+                                            ObjectOutputStream outputStreamToServer = new ObjectOutputStream(byteArrayOutputStreamToServer);
+                                            outputStreamToServer.writeObject(messageToServer);
+                                            byte[] dataSentToServer = byteArrayOutputStreamToServer.toByteArray();
+                                            DatagramPacket dpToServer = new DatagramPacket(dataSentToServer, dataSentToServer.length, InetAddress.getByName(Main.altServerIP), Main.altServerPort);
+                                            socket.send(dpToServer);
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
+
+                                    } else {
+                                        try {
+                                            //SUBJECTS DENIED to client
+                                            RQ returnRQ = new RQ(12, receivedRQ.getRqNum(), receivedRQ.getName(), receivedRQ.getSubjects());
+                                            Request.Register message = returnRQ.getRequestOut();
+                                            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                                            ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
+                                            outputStream.writeObject(message);
+                                            byte[] dataSent = byteArrayOutputStream.toByteArray();
+                                            DatagramPacket dp = new DatagramPacket(dataSent, dataSent.length, packet.getAddress(), packet.getPort());
+                                            socket.send(dp);
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
                                     }
                                 }
                             } catch (IOException e) {
